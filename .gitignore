@@ -1,0 +1,33 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+# Raw downloads are large — keep samples only
+data/raw/*
+!data/raw/.gitkeep
+
+# Local DBs are generated, not committed
+*.db
+*.db-journal
+
+# Private local files — never commit or push
+CLOUDPROJ.md
+cloudproj.md
+INF2006_Team_Project_Brief_2026.pdf
+*Team_Project_Brief*.pdf
+
+# Trained artefacts (commit a small evaluated model later if needed)
+analytics/models/*
+!analytics/models/.gitkeep
+analytics/*.pkl
+*.joblib
+
+node_modules/
+dist/
+.pytest_cache/
