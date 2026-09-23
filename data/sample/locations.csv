@@ -1,0 +1,7 @@
+location_id,building_id,floor,name,type,capacity,map_x,map_y
+LIB-L1,LIB,1,Library Level 1,library,180,0.42,0.55
+LIB-L2,LIB,2,Library Level 2,library,120,0.42,0.48
+DR-A-3-01,BLK-A,3,Discussion Room A-3-01,discussion_room,6,0.28,0.40
+DR-A-3-02,BLK-A,3,Discussion Room A-3-02,discussion_room,6,0.32,0.40
+LT-A-2-01,BLK-A,2,Lecture Theatre A-2-01,lecture_theatre,150,0.30,0.62
+FC-L1,HEART,1,Food Court,food_court,220,0.58,0.70

@@ -1,0 +1,4 @@
+event_id,location_id,title,description,start_time,end_time
+E-001,FC-L1,CCA booth day,Student club booths at Campus Heart,2026-09-23T11:00:00,2026-09-23T16:00:00
+E-002,LT-A-2-01,Guest lecture,Industry talk in LT A-2-01,2026-09-23T14:00:00,2026-09-23T16:00:00
+E-003,LIB-L1,Exam silent hours,Library L1 marked quiet study,2026-09-23T09:00:00,2026-09-23T18:00:00

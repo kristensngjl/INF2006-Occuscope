@@ -1,0 +1,71 @@
+# Fill group_id and student_id before submission. Paths are relative to the ZIP root.
+project:
+  group_id: "Gxxx"
+  title: "Occuscope"
+  problem_statement: >
+    SIT students cannot tell whether campus spaces are quiet or crowded, whether
+    discussion rooms on a floor are free, or what events are on, without walking
+    the building. Occuscope is a hierarchical campus map (campus → building →
+    floor → location) showing Quiet/Moderate/Crowded bands and today's events.
+  cloud_provider: "AWS"
+  repository_commit: ""
+
+team:
+  members:
+    - name: "Zi Qian"
+      student_id: ""
+      role: "Frontend / Map"
+    - name: "Zul"
+      student_id: ""
+      role: "Backend / Database"
+    - name: "Lideon"
+      student_id: ""
+      role: "Data / Machine Learning"
+    - name: "Kristen"
+      student_id: ""
+      role: "Cloud / Scalability"
+    - name: "Ryan"
+      student_id: ""
+      role: "Security / Monitoring / Testing"
+
+architecture:
+  diagram: "evidence/architecture.png"
+  service_model: "IaaS (EC2) + managed database (RDS) — to be confirmed"
+  deployment_model: "Public cloud, load-balanced web app — to be confirmed"
+  components:
+    - "frontend-map"
+    - "backend-api"
+    - "relational-db"
+    - "occupancy-model"
+    - "load-balancer"
+    - "cloudwatch"
+
+evidence:
+  functional_test: "evidence/test-functional.md"
+  security_test: "evidence/test-security.md"
+  data_ai_test: "evidence/test-data-ai.md"
+  scale_resilience_test: "evidence/test-resilience.md"
+  monitoring: "evidence/monitoring.md"
+
+data_ai:
+  dataset: "data/README.md"
+  method: "Supervised occupancy forecast trained on ROBOD + NUS Wi-Fi, transferred onto SIT location types to generate synthetic current occupancy"
+  evaluation: "Held-out NUS timestamps (MAE/RMSE); SIT values are generated, not labelled"
+  reproducible_command: "python analytics/01_eda.py"
+
+security:
+  threat_control_map: "evidence/threat-control-map.md"
+  secrets_handling: ".env locally; .env.example in repo; no secrets in git or screenshots"
+
+run:
+  prerequisites:
+    - "Python 3.11+"
+    - "ROBOD CSVs and NUS Wi-Fi xlsx in data/raw/ (gitignored) for analytics"
+    - "TODO: frontend runtime once ZQ scaffolds src/frontend"
+  commands:
+    - "python analytics/01_eda.py"
+    - "python src/db/init_app_db.py"
+
+declarations:
+  ai_use: "AI_USE_DECLARATION.md"
+  contributions: "TEAM_CONTRIBUTIONS.md"
