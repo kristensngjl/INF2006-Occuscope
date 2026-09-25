@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS building (
     building_id  TEXT PRIMARY KEY,
     name         TEXT NOT NULL UNIQUE,
     campus       TEXT NOT NULL DEFAULT 'SIT Punggol',
-    -- Normalised 0–1 position on the campus map image (nullable until ZQ pins it).
+    -- Normalised 0–1 position on the campus map image (nullable until pinned).
     map_x        REAL CHECK (map_x IS NULL OR (map_x >= 0 AND map_x <= 1)),
     map_y        REAL CHECK (map_y IS NULL OR (map_y >= 0 AND map_y <= 1))
 );

@@ -1,15 +1,17 @@
-"""Rebuild the local Occuscope SQLite database from schema.sql + data/sample CSVs.
+"""Rebuild the local Occuscope SQLite database from schema.sql and data/sample.
 
-Does not import NUS ROBOD or Wi-Fi files. Run from the repo root:
+NUS ROBOD and Wi-Fi files are not imported. Run from the repository root:
 
     python src/db/init_app_db.py
 
-Deletes data/occuscope.db if it already exists so schema changes apply cleanly.
+Deletes data/occuscope.db if it exists so schema changes apply cleanly.
+Generated occupancy is seeded only up to sit_calendar.json map_as_of.
 """
 
 from __future__ import annotations
 
 import csv
+import json
 import sqlite3
 from pathlib import Path
 
@@ -34,7 +36,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 
 def seed(conn: sqlite3.Connection) -> None:
-    """Insert buildings, locations, events, and occupancy preview (if present)."""
+    """Insert buildings, locations, events, generated occupancy, predictions."""
     conn.executemany(
         """
         INSERT INTO building (building_id, name, campus, map_x, map_y)
@@ -61,15 +63,34 @@ def seed(conn: sqlite3.Connection) -> None:
         read_csv(SAMPLE / "events.csv"),
     )
 
-    preview = SAMPLE / "occupancy_preview.csv"
-    if preview.exists():
+    occ = SAMPLE / "occupancy_generated.csv"
+    if not occ.exists():
+        occ = SAMPLE / "occupancy_preview.csv"
+    if occ.exists():
+        occ_rows = read_csv(occ)
+        calendar = SAMPLE / "sit_calendar.json"
+        if calendar.exists() and occ.name == "occupancy_generated.csv":
+            as_of = json.loads(calendar.read_text(encoding="utf-8")).get("map_as_of")
+            if as_of:
+                occ_rows = [r for r in occ_rows if r["timestamp"] <= as_of]
         conn.executemany(
             """
             INSERT INTO occupancy
                 (location_id, timestamp, occupancy_count, source)
             VALUES (:location_id, :timestamp, :occupancy_count, :source)
             """,
-            read_csv(preview),
+            occ_rows,
+        )
+
+    pred = SAMPLE / "occupancy_prediction.csv"
+    if pred.exists():
+        conn.executemany(
+            """
+            INSERT INTO occupancy_prediction
+                (location_id, predicted_for, occupancy_count, model_version)
+            VALUES (:location_id, :predicted_for, :occupancy_count, :model_version)
+            """,
+            read_csv(pred),
         )
 
 

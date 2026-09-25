@@ -1,0 +1,4 @@
+model,mae,rmse,r2
+baseline_hour_roomtype_mean,1.7416,2.9177,-0.0358
+ridge,1.8345,2.8585,0.0057
+random_forest,1.8374,3.0632,-0.1418

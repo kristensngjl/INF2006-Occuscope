@@ -4,7 +4,8 @@ Update this table whenever a tool is used on a submission artefact. Team members
 
 | Tool | Where used | What it produced | Team verification | Licence / source |
 |---|---|---|---|---|
-| Cursor (Grok) | Repo kickoff, 2026-09-23 | Manifest skeleton, folder layout, sample SIT CSVs, SQLite schema/init, EDA stub, README / data dictionary / API contract | Lideon reviewed against the INF2006 brief and inspected ROBOD / Zenodo columns locally | N/A (AI-assisted authoring) |
+| Cursor (Grok) | Repo kickoff, 23 September 2026 | Manifest skeleton, folder layout, sample SIT CSVs, SQLite schema/init, EDA stub, README / data dictionary / API contract | Lideon reviewed against the INF2006 brief and inspected ROBOD / Zenodo columns locally | N/A (AI-assisted authoring) |
+| Cursor (Grok) | Occupancy v0 and SIT generate, 26 September 2026 | Training script, hold-out metrics, generation overlay from the public SIT calendar, README / dictionary / data-AI evidence updates | Lideon compared models on NUS hold-out, checked generated ratios against the academic calendar, and retained the hour×type mean as v0 | N/A (AI-assisted authoring) |
 
 ## Datasets and baselines (must cite)
 

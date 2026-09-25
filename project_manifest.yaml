@@ -49,9 +49,9 @@ evidence:
 
 data_ai:
   dataset: "data/README.md"
-  method: "Supervised occupancy forecast trained on ROBOD + NUS Wi-Fi, transferred onto SIT location types to generate synthetic current occupancy"
+  method: "Hour×room-type mean on ROBOD (date hold-out). SIT occupancy = (prediction / type p95) × capacity × AY2026/27 Trimester 1 calendar; E=IT IWSP mix, W3/W5=other courses, W1 library shared."
   evaluation: "Held-out NUS timestamps (MAE/RMSE); SIT values are generated, not labelled"
-  reproducible_command: "python analytics/01_eda.py"
+  reproducible_command: "python analytics/04_train.py && python analytics/05_generate_sit.py && python src/db/init_app_db.py"
 
 security:
   threat_control_map: "evidence/threat-control-map.md"
@@ -61,9 +61,10 @@ run:
   prerequisites:
     - "Python 3.11+"
     - "ROBOD CSVs and NUS Wi-Fi xlsx in data/raw/ (gitignored) for analytics"
-    - "TODO: frontend runtime once ZQ scaffolds src/frontend"
+    - "Frontend runtime once src/frontend is added"
   commands:
-    - "python analytics/01_eda.py"
+    - "python analytics/04_train.py"
+    - "python analytics/05_generate_sit.py"
     - "python src/db/init_app_db.py"
 
 declarations:

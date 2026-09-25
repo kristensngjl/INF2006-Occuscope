@@ -1,11 +1,10 @@
-"""EDA on cleaned ROBOD. Figures for the report / data-AI test. No app DB writes.
+"""Exploratory figures on cleaned ROBOD for the report and data/AI test.
 
-Run from repo root (after 02_clean_robod.py):
+Does not write to the application database.
+
+Run from the repository root (after 02_clean_robod.py):
 
     python analytics/03_eda_robod.py
-
-Reads data/processed/robod_clean.csv
-Writes analytics/figures/*.png
 """
 
 from __future__ import annotations

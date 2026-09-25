@@ -1,9 +1,9 @@
 """Inspect NUS files under data/raw/ and write a dummy SIT occupancy preview.
 
-This is not the trained model. `source` is always `dummy` so the app DB and
-API can be wired before transfer learning exists.
+This is not the trained model. Every row uses source = dummy so the application
+database can be wired before generated occupancy exists.
 
-Run from the repo root:
+Run from the repository root:
 
     python analytics/01_eda.py
     python src/db/init_app_db.py
