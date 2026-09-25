@@ -1,7 +1,33 @@
 location_id,building_id,floor,name,type,capacity,map_x,map_y
-LIB-L1,LIB,1,Library Level 1,library,180,0.42,0.55
-LIB-L2,LIB,2,Library Level 2,library,120,0.42,0.48
-DR-A-3-01,BLK-A,3,Discussion Room A-3-01,discussion_room,6,0.28,0.40
-DR-A-3-02,BLK-A,3,Discussion Room A-3-02,discussion_room,6,0.32,0.40
-LT-A-2-01,BLK-A,2,Lecture Theatre A-2-01,lecture_theatre,150,0.30,0.62
-FC-L1,HEART,1,Food Court,food_court,220,0.58,0.70
+E2-03-07-DR209,E2,3,DR209,discussion_room,8,0.68,0.36
+E2-03-08-DR210,E2,3,DR210,discussion_room,8,0.70,0.36
+E2-03-19-DR215,E2,3,DR215,discussion_room,8,0.72,0.38
+E2-03-20-DR216,E2,3,DR216,discussion_room,8,0.74,0.38
+E2-04-20-DR223,E2,4,DR223,discussion_room,8,0.70,0.40
+E2-04-21-DR224,E2,4,DR224,discussion_room,8,0.72,0.40
+E6-04-05-DR303,E6,4,DR303,discussion_room,8,0.74,0.50
+E6-04-06-DR304,E6,4,DR304,discussion_room,8,0.76,0.50
+E6-04-07-DR305,E6,4,DR305,discussion_room,8,0.78,0.50
+E6-04-08-DR306,E6,4,DR306,discussion_room,8,0.76,0.52
+E6-04-09-DR307,E6,4,DR307,discussion_room,8,0.78,0.52
+W1-04-OPEN,W1,4,Library L4 open study,library,80,0.40,0.48
+W1-04-01-MR03,W1,4,MR03,discussion_room,4,0.38,0.50
+W1-04-02-MR04,W1,4,MR04,discussion_room,8,0.40,0.50
+W1-04-03-MR05,W1,4,MR05,discussion_room,8,0.42,0.50
+W1-04-04-MR06,W1,4,MR06,discussion_room,8,0.38,0.52
+W1-04-05-MR07,W1,4,MR07,discussion_room,8,0.40,0.52
+W1-04-06-MR08,W1,4,MR08,discussion_room,8,0.42,0.52
+W1-04-07-MR09,W1,4,MR09,discussion_room,4,0.38,0.54
+W1-04-08-MR10,W1,4,MR10,discussion_room,4,0.40,0.54
+W1-04-10-MR15,W1,4,MR15,discussion_room,8,0.42,0.54
+W1-04-11-MR16,W1,4,MR16,discussion_room,8,0.44,0.54
+W1-05-042,W1,5,Project Hub discussion room,discussion_room,4,0.40,0.56
+W1-09-02-MEDIA,W1,9,Media Studio,other,12,0.42,0.62
+W3-03-07-DR02,W3,3,DR02,discussion_room,8,0.24,0.42
+W3-03-10-DR03,W3,3,DR03,discussion_room,8,0.26,0.42
+W3-03-13-DR04,W3,3,DR04,discussion_room,8,0.28,0.42
+W3-04-04-DR05,W3,4,DR05,discussion_room,8,0.26,0.46
+W5-03-07-DR06,W5,3,DR06,discussion_room,8,0.20,0.56
+W5-03-10-DR07,W5,3,DR07,discussion_room,8,0.22,0.56
+W5-03-13-DR08,W5,3,DR08,discussion_room,8,0.24,0.56
+W5-04-04-DR09,W5,4,DR09,discussion_room,8,0.22,0.60

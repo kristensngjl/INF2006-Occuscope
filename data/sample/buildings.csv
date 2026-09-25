@@ -1,4 +1,6 @@
 building_id,name,campus,map_x,map_y
-LIB,Library,SIT Punggol,0.42,0.50
-BLK-A,Academic Block A,SIT Punggol,0.30,0.50
-HEART,Campus Heart,SIT Punggol,0.58,0.68
+E2,Block E2,SIT Punggol,0.72,0.38
+E6,Block E6,SIT Punggol,0.78,0.52
+W1,Library (Block W1),SIT Punggol,0.42,0.50
+W3,Block W3,SIT Punggol,0.26,0.44
+W5,Block W5,SIT Punggol,0.22,0.58

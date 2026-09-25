@@ -1,6 +1,6 @@
 # Source (`src/`)
 
-Runnable application will live here. Right now this folder holds the **database schema** and the **HTTP contract** so frontend, backend, and ML can proceed in parallel.
+Application code will reside here. This folder currently holds the **database schema** and **HTTP contract** so frontend, backend, and data/ML work can proceed in parallel.
 
 | Path | Owner | What it is |
 |---|---|---|
@@ -14,7 +14,15 @@ Runnable application will live here. Right now this folder holds the **database 
 python src/db/init_app_db.py
 ```
 
-Creates `data/occuscope.db`. Deletes and recreates the file each run while the schema is still settling.
+Creates `data/occuscope.db`. Deletes and recreates the file each run so schema changes apply cleanly.
+
+Backend local start (generated occupancy if `data/sample/occupancy_generated.csv` exists):
+
+```
+python src/db/init_app_db.py
+```
+
+`location_id` values follow Room Booking System catalogue form (`E2-03-07-DR209`). Occupancy `source` is `generated` after `analytics/05_generate_sit.py`; `dummy` is only the fallback from `01_eda.py`.
 
 - Foreign keys on. Crowd bands are views, not columns.
 - NUS ROBOD / Wi-Fi files are **never** imported by this script.

@@ -1,4 +1,7 @@
 event_id,location_id,title,description,start_time,end_time
-E-001,FC-L1,CCA booth day,Student club booths at Campus Heart,2026-09-23T11:00:00,2026-09-23T16:00:00
-E-002,LT-A-2-01,Guest lecture,Industry talk in LT A-2-01,2026-09-23T14:00:00,2026-09-23T16:00:00
-E-003,LIB-L1,Exam silent hours,Library L1 marked quiet study,2026-09-23T09:00:00,2026-09-23T18:00:00
+E-001,E2-03-07-DR209,Project meeting,Student group using E2 DR209,2026-09-26T10:00:00,2026-09-26T12:00:00
+E-002,E6-04-05-DR303,CCA briefing,Club briefing in E6 DR303,2026-09-26T14:00:00,2026-09-26T16:00:00
+E-003,W3-03-07-DR02,Study cluster,Open study block in W3 DR02,2026-09-26T09:00:00,2026-09-26T18:00:00
+E-004,W1-04-01-MR03,Library booking,Group work in Library MR03,2026-09-26T11:00:00,2026-09-26T13:00:00
+E-005,W1-04-OPEN,Exam silent hours,Library L4 open study quiet hours,2026-09-26T09:00:00,2026-09-26T18:00:00
+E-006,W5-03-07-DR06,West-side studio,Group work in W5 DR06 (W3 layout, DR06 onwards),2026-09-26T13:00:00,2026-09-26T15:00:00

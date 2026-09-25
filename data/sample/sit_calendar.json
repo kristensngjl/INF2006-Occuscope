@@ -1,0 +1,105 @@
+{
+  "note": "Occupancy overlay after v0. Teaching/recess/exam/break dates from the SIT academic calendar (AY2026/27 Tri 1). Team: E blocks = IT courses, W3/W5 = other courses, W1 library (open study + meeting rooms) is shared by everyone so it does not follow the IT vs other-course IWSP split. OIP 3-week window disabled (dates not public). Not live RBS.",
+  "sources": [
+    "https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes",
+    "https://www.singaporetech.edu.sg/academic-bulletin/undergraduate-sit-and-joint-degree-programmes/integrated-work-study-programme-iwsp-clinical-practice-cpe",
+    "https://www.singaporetech.edu.sg/sites/default/files/2024-04/IWSP%20Schedule_FINAL_20240401.pdf",
+    "https://www.singaporetech.edu.sg/undergraduate-programmes/computing-science"
+  ],
+  "academic_year": "AY2026/27",
+  "trimester": 1,
+  "generate_start": "2026-08-31",
+  "generate_end": "2026-12-13",
+  "map_as_of": "2026-09-25T15:00:00",
+  "hours": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "weekend_multiplier": 0.28,
+  "holiday_multiplier": 0.18,
+  "holiday_dates": ["2026-11-09"],
+  "phases": [
+    {
+      "name": "teaching",
+      "week": "1-6",
+      "start": "2026-08-31",
+      "end": "2026-10-11",
+      "multiplier": 1.0
+    },
+    {
+      "name": "recess",
+      "week": "7",
+      "start": "2026-10-12",
+      "end": "2026-10-18",
+      "multiplier": 0.35,
+      "type_multipliers": {
+        "discussion_room": 0.30,
+        "library": 0.55,
+        "other": 0.40
+      }
+    },
+    {
+      "name": "teaching",
+      "week": "8-13",
+      "start": "2026-10-19",
+      "end": "2026-11-29",
+      "multiplier": 1.0
+    },
+    {
+      "name": "exams",
+      "week": "14",
+      "start": "2026-11-30",
+      "end": "2026-12-06",
+      "multiplier": 0.75,
+      "type_multipliers": {
+        "discussion_room": 0.45,
+        "library": 1.15,
+        "other": 0.40
+      }
+    },
+    {
+      "name": "trimester_break",
+      "week": "15",
+      "start": "2026-12-07",
+      "end": "2026-12-13",
+      "multiplier": 0.22,
+      "type_multipliers": {
+        "discussion_room": 0.25,
+        "library": 0.45,
+        "other": 0.30
+      }
+    }
+  ],
+  "away_windows": [
+    {
+      "id": "ict-iwsp-e-blocks",
+      "enabled": true,
+      "label": "IT courses IWSP (E blocks)",
+      "building_ids": ["E2", "E6"],
+      "types": ["discussion_room"],
+      "start": "2026-08-31",
+      "end": "2026-12-06",
+      "multiplier": 0.48,
+      "source": "Team: E blocks = IT courses. Employer IWSP schedule (2025): Computing Science and Applied AI Sep–Apr; Computer Engineering May–Dec; ICT SE/InfoSec and DigiPen CS May–Apr. Same rhythm for AY2026/27 Tri 1 through week 14. Not an official per-room roster."
+    },
+    {
+      "id": "other-iwsp-w-blocks",
+      "enabled": true,
+      "label": "Other courses IWSP (W3/W5 teaching blocks)",
+      "building_ids": ["W3", "W5"],
+      "types": ["discussion_room"],
+      "start": "2026-08-31",
+      "end": "2026-12-06",
+      "multiplier": 0.78,
+      "source": "Team: W3/W5 = other (non-IT) courses. W1 is the library, shared by everyone — not in this window."
+    },
+    {
+      "id": "uofg-oip-3weeks",
+      "enabled": false,
+      "label": "OIP (3 weeks). Enable when the programme publishes 2026 dates.",
+      "building_ids": ["E2", "E6"],
+      "types": ["discussion_room"],
+      "start": "2026-09-14",
+      "end": "2026-10-04",
+      "multiplier": 0.70,
+      "source": "Team: E = IT. Computing Science page: compulsory 3-week OIP at University of Glasgow in Year 2. Exact 2026 dates are not on the public calendar."
+    }
+  ]
+}

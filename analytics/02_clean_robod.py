@@ -1,11 +1,13 @@
-"""Clean ROBOD room CSVs into one training table. Does not touch the app database.
+"""Clean ROBOD room CSVs into one training table.
 
-Run from repo root:
+HVAC and weather columns are dropped. Room identity and type are taken from
+the source filename (they are not columns in ROBOD). Timestamps are converted
+to Asia/Singapore. Occupant counts are coerced to non-negative integers.
+This script does not write to the application database.
+
+Run from the repository root:
 
     python analytics/02_clean_robod.py
-
-Reads data/raw/combined_Room{1-5}.csv
-Writes data/processed/robod_clean.csv
 """
 
 from __future__ import annotations
