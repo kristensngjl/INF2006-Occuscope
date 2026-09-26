@@ -8,4 +8,4 @@ One row per member. Fill student IDs, commit hashes, and reflections before the 
 | Zul | Backend / Database | REST APIs against `src/api-contract.md` (not started); RDS later | Functional test (API), schema evidence | |
 | Lideon | Data / ML | `analytics/` (clean, EDA, train, generate); `data/` dictionary and SIT seeds; `src/db/schema.sql`; local SQLite init; `evidence/test-data-ai.md` | Data / AI test | |
 | Kristen | Cloud / Scalability | `evidence/architecture.png`, deploy/scale | `evidence/test-resilience.md` | |
-| Ryan | Security / Monitoring / Testing | IAM, secrets, CloudWatch | `evidence/test-security.md`, `monitoring.md`; coordinates all four tests | |
+| Ryan | Security / Monitoring / Testing | Intended controls in `evidence/threat-control-map.md`; named-threat security test in `evidence/test-security.md`; CloudWatch wishlist in `evidence/monitoring.md`; `tests/test_gitignore_secrets.py`; files Lideon’s `evidence/test-data-ai.md` in the test pack. IAM / CloudWatch actuals after deploy. | `evidence/test-security.md`, `evidence/monitoring.md`; coordinates all four tests (`test-data-ai.md` already written) | |
