@@ -29,11 +29,11 @@ Fill `student_id` and `group_id` in `project_manifest.yaml` before packaging. Su
 1. **Train on NUS labels only.** ROBOD provides ground-truth `occupant_count` at five-minute resolution. Features used in v0 are transferable to SIT without campus sensors: hour of day, day of week, and room type. Evaluation is a **date hold-out** (last 14 days), not a shuffled split, so adjacent 5-minute ticks cannot leak from test into train.
 2. **Select the model on NUS hold-out MAE.** An hour × room-type mean lookup outperformed Ridge and Random Forest (MAE 1.74 versus approximately 1.83). That lookup is saved as `occupancy_v0`. Negative R² on the hold-out is reported: the test window is a different occupancy regime (late term).
 3. **Generate SIT occupancy.** Predicted NUS count is converted to a utilisation ratio (count / type 95th percentile), scaled by SIT `location.capacity`, then adjusted by an explicit academic calendar overlay (`data/sample/sit_calendar.json`).
-4. **Calendar overlay (generate time only).** Teaching, recess (week 7: 12–18 October 2026), final assessment, and trimester break follow the published [SIT AY2026/27 Trimester 1 calendar](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). Integrated Work Study Programme (IWSP) effects are a **programme mix**, not live booking data: East blocks (E2, E6) represent IT courses; West teaching blocks (W3, W5) represent other courses; **W1 library is shared** and is not placed on that split. Overseas Immersion Programme (OIP) dates for 2026 are not published; that window is disabled.
+4. **Calendar overlay (generate time only).** Teaching, recess (week 7: 12–18 October 2026), final assessment, and trimester break follow the published [SIT AY2026/27 Trimester 1 calendar](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). Singapore public holidays (and in-lieu Mondays) follow the [MOM 2026 list](https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026) and lower generated occupancy. Integrated Work Study Programme (IWSP) effects are a **programme mix**, not live booking data: East blocks (E2, E6) represent IT courses; West teaching blocks (W3, W5) represent other courses; **W1 library is shared** and is not placed on that split. Overseas Immersion Programme (OIP) dates for 2026 are not published; that window is disabled.
 
 Crowd bands are **not stored as columns**. View `v_occupancy_current` computes `occupancy_ratio` and `crowd_level` from `occupancy_count / capacity`.
 
-Full column notes and licences: `data/DATA_DICTIONARY.md`. Replayable test: `evidence/test-data-ai.md`.
+Evidence for the data/AI test: `evidence/test-data-ai.md`.
 
 ## Quick start
 
@@ -62,7 +62,7 @@ Place ROBOD CSVs and the NUS Wi-Fi workbook in `data/raw/` first (`data/README.m
 | `init_app_db.py` | Rebuild `data/occuscope.db` from `src/db/schema.sql` and `data/sample/` |
 | `01_eda.py` | Dummy occupancy fallback only (`source = dummy`) |
 
-The web application is not runnable yet. Integration surface until then: `src/api-contract.md` and the local database. `init_app_db.py` loads generated occupancy up to `map_as_of` in `sit_calendar.json` so `v_occupancy_current` reflects a teaching weekday, not trimester break.
+The web application is not runnable yet. Integration surface: `src/api-contract.md` and the local database. Sample occupancy is **AY2026/27 Trimester 1** (31 August–27 December 2026, 08:00–20:00 SGT, `+08:00`). Timeline: `GET /occupancy/{id}?from=&to=`. Heatmap: `GET /occupancy/current?at=` (do not use the last seed timestamp — that is trimester break).
 
 ## Architecture
 

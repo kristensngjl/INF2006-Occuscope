@@ -29,8 +29,8 @@ SIT room catalogue uses Room Booking System **display names only** (screenshots;
 | `sample/locations.csv` | Block discussion rooms, library meeting rooms, L4 open study, media studio |
 | `sample/events.csv` | `event` rows (`location_id` must exist) |
 | `sample/occupancy_preview.csv` | Dummy fallback (`source = dummy`) |
-| `sample/occupancy_generated.csv` | Generated occupancy (`source = generated`) |
+| `sample/occupancy_generated.csv` | AY2026/27 Trimester 1 hourly occupancy, 31 Aug–27 Dec 2026, `+08:00` (`source = generated`) |
 | `sample/occupancy_prediction.csv` | Next two hours per location, `model_version = v0` |
 | `sample/sit_calendar.json` | AY2026/27 Trimester 1 overlay; E = IT courses; W3/W5 = other courses; W1 library shared |
 
-`init_app_db.py` prefers generated occupancy over the dummy preview, and seeds readings only up to `map_as_of` so the current-occupancy view is a teaching weekday. Rebuild with `python src/db/init_app_db.py`, then read `building`, `location`, `v_occupancy_current`, and `occupancy_prediction`.
+`init_app_db.py` prefers generated occupancy over the dummy preview and loads the **full Trimester 1 series** (for timeline / date filters). Rebuild with `python src/db/init_app_db.py`. Open CSVs in a text editor or the API — Excel often shows `00:00` and drops the hour. Heatmap should request a teaching instant (`?at=`), not the last row in the file.

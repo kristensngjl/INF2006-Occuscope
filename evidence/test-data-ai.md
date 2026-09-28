@@ -18,7 +18,7 @@ python src/db/init_app_db.py
 
 # Expected result
 
-Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occupancy (`source = generated`), and two-hour predictions. Recess week 7 (12–18 October 2026) should reduce discussion-room utilisation. East-block (IT course) discussion rooms should be quieter than W3/W5 (other courses). W1 library should remain a shared pattern. The selected model is written to `analytics/models/occupancy_v0.joblib`.
+Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occupancy for AY2026/27 Trimester 1, and two-hour predictions. Recess week 7 and MOM public holidays should reduce utilisation. East-block (IT) discussion rooms quieter than W3/W5. ArtFest sample events raise overlapping library hours.
 
 # Actual result
 
@@ -44,23 +44,21 @@ Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occup
 
 **Selected model (lowest MAE): hour × room-type mean.** Ridge and Random Forest did not improve MAE. Negative R² indicates that the hold-out period is a different occupancy regime from training (late term / examinations). Version v0 is therefore that lookup table. It remains usable to generate SIT utilisation ratios.
 
-SIT map occupancy is generated (`source = generated`) as of 26 September 2026.
+SIT map occupancy is generated (`source = generated`). Series: 31 August–27 December 2026 (Trimester 1).
 
-## Generation / academic overlay (26 September 2026, Lideon)
+## Generation / academic overlay (29 September 2026, Lideon)
 
 - Type map: discussion_room → office; library → library (`occupancy_model.py`).
-- Ratio = v0 count / ROBOD type 95th percentile × calendar factors × SIT capacity.
-- Calendar: [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). East blocks = IT courses; W3/W5 = other courses; W1 library shared. OIP window disabled (2026 dates not published).
+- Ratio = v0 count / ROBOD type 95th percentile × calendar × event overlap × SIT capacity.
+- Calendar: [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). East = IT courses; W3/W5 = other courses; W1 library shared. ArtFest sample events. OIP disabled. Timestamps include `+08:00`.
 
-**Example (Wednesday 23 September 2026, 15:00, study week 4):**
+**Example (Wednesday 30 September 2026, 15:00 SGT):**
 
 | Location | Count | Capacity | Ratio | Band |
 |---|---|---|---|---|
-| `W1-04-OPEN` (library, shared) | 56 | 80 | 0.70 | moderate |
+| `W1-04-OPEN` (library + ArtFest sample) | 70 | 80 | 0.875 | crowded |
 | `E2-03-07-DR209` (IT courses, East) | 3 | 8 | 0.375 | moderate |
 | `W3-03-07-DR02` (other courses, W3) | 5 | 8 | 0.625 | moderate |
-
-**Recess week 7** (Wednesday 14 October 2026, 15:00): library 11/80 (quiet); discussion rooms round to 0. After recess (Wednesday 21 October 2026, 15:00) the week-4 pattern returns. **Final assessment** (Wednesday 2 December 2026, 15:00): library 48/80 moderate; discussion rooms 1/8 quiet.
 
 # Artefact path
 

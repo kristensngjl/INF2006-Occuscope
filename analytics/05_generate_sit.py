@@ -33,7 +33,13 @@ CALENDAR = SAMPLE / "sit_calendar.json"
 OCC_OUT = SAMPLE / "occupancy_generated.csv"
 PRED_OUT = SAMPLE / "occupancy_prediction.csv"
 
-AS_OF = datetime(2026, 9, 26, 15, 0, 0)
+AS_OF = datetime(2026, 9, 29, 15, 0, 0)
+SGT = "+08:00"
+
+
+def iso_sgt(ts: datetime) -> str:
+    """ISO-8601 with explicit Singapore offset so clients do not treat the time as UTC midnight."""
+    return ts.strftime("%Y-%m-%dT%H:%M:%S") + SGT
 
 
 def load_calendar() -> dict:
@@ -42,6 +48,24 @@ def load_calendar() -> dict:
 
 def parse_d(s: str) -> date:
     return date.fromisoformat(s)
+
+
+def parse_instant(s: str) -> datetime:
+    return datetime.fromisoformat(s.replace("Z", "+00:00")[:19])
+
+
+def event_factor(location_id: str, ts: datetime, events: pd.DataFrame) -> float:
+    """Raise occupancy when a seeded event overlaps this location and hour (sample ArtFest, etc.)."""
+    if events.empty:
+        return 1.0
+    end = ts + timedelta(hours=1)
+    hits = events[events["location_id"] == location_id]
+    for _, ev in hits.iterrows():
+        a = parse_instant(str(ev["start_time"]))
+        b = parse_instant(str(ev["end_time"]))
+        if a < end and b > ts:
+            return 1.25
+    return 1.0
 
 
 def phase_for(d: date, cal: dict) -> dict | None:
@@ -67,8 +91,15 @@ def away_multiplier(sit_type: str, building_id: str, d: date, cal: dict) -> floa
     return m
 
 
+def holiday_dates(cal: dict) -> set[str]:
+    dates = set(cal.get("holiday_dates") or [])
+    for h in cal.get("holidays") or []:
+        dates.add(str(h["date"]))
+    return dates
+
+
 def calendar_multiplier(sit_type: str, building_id: str, ts: datetime, cal: dict) -> float:
-    """Scale utilisation by academic phase, weekend, public holiday, and IWSP mix."""
+    """Scale utilisation by academic phase, weekend, Singapore public holiday, and IWSP mix."""
     d = ts.date()
     phase = phase_for(d, cal)
     if phase is None:
@@ -78,7 +109,7 @@ def calendar_multiplier(sit_type: str, building_id: str, ts: datetime, cal: dict
     m *= float(type_m.get(sit_type, 1.0))
     if ts.weekday() >= 5:
         m *= float(cal.get("weekend_multiplier", 0.28))
-    if d.isoformat() in set(cal.get("holiday_dates") or []):
+    if d.isoformat() in holiday_dates(cal):
         m *= float(cal.get("holiday_multiplier", 0.18))
     m *= away_multiplier(sit_type, building_id, d, cal)
     return m
@@ -95,7 +126,9 @@ def main() -> None:
     cal = load_calendar()
     hours = [int(h) for h in cal.get("hours", list(range(8, 21)))]
     history_start = parse_d(cal.get("generate_start", "2026-08-31"))
-    history_end = parse_d(cal.get("generate_end", "2026-12-13"))
+    history_end = parse_d(cal.get("generate_end", "2026-12-27"))
+    as_of = parse_instant(str(cal.get("predict_as_of") or cal.get("map_as_of") or "2026-09-29T15:00:00"))
+    events = pd.read_csv(SAMPLE / "events.csv") if (SAMPLE / "events.csv").exists() else pd.DataFrame()
 
     locations = pd.read_csv(SAMPLE / "locations.csv")
     stamps = []
@@ -122,13 +155,14 @@ def main() -> None:
         for ts, nus_count in zip(stamps, pred_count):
             ratio = max(0.0, float(nus_count) / cap_hat)
             ratio *= calendar_multiplier(str(loc["type"]), str(loc["building_id"]), ts, cal)
+            ratio *= event_factor(str(loc["location_id"]), ts, events)
             ratio = min(ratio, 1.05)
             count = int(round(ratio * sit_cap))
             count = max(0, min(count, int(sit_cap * 1.05)))
             rows.append(
                 {
                     "location_id": loc["location_id"],
-                    "timestamp": ts.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "timestamp": iso_sgt(ts),
                     "occupancy_count": count,
                     "source": "generated",
                 }
@@ -138,7 +172,7 @@ def main() -> None:
     occ.to_csv(OCC_OUT, index=False)
     print(f"Wrote {len(occ):,} occupancy rows -> {OCC_OUT.relative_to(ROOT)}")
 
-    pred_hours = [AS_OF + timedelta(hours=1), AS_OF + timedelta(hours=2)]
+    pred_hours = [as_of + timedelta(hours=1), as_of + timedelta(hours=2)]
     pred_rows = []
     for _, loc in locations.iterrows():
         robod_type = type_map.get(str(loc["type"]), "office")
@@ -155,12 +189,13 @@ def main() -> None:
         for ts, nus_count in zip(pred_hours, pred_count):
             ratio = max(0.0, float(nus_count) / cap_hat)
             ratio *= calendar_multiplier(str(loc["type"]), str(loc["building_id"]), ts, cal)
+            ratio *= event_factor(str(loc["location_id"]), ts, events)
             ratio = min(ratio, 1.05)
             count = max(0, min(int(round(ratio * sit_cap)), int(sit_cap * 1.05)))
             pred_rows.append(
                 {
                     "location_id": loc["location_id"],
-                    "predicted_for": ts.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "predicted_for": iso_sgt(ts),
                     "occupancy_count": count,
                     "model_version": version,
                 }
@@ -170,7 +205,7 @@ def main() -> None:
     print(f"Wrote {len(pred):,} prediction rows -> {PRED_OUT.relative_to(ROOT)}")
     print(
         f"{cal.get('academic_year')} Trimester {cal.get('trimester')}: "
-        "recess 12–18 October 2026; final assessment 30 November–6 December; "
+        "AY2026/27 Trimester 1 series 31 Aug–27 Dec 2026 (teaching, recess, Deepavali, Christmas); "
         "IT-course IWSP mix on East discussion rooms; other courses on W3/W5; "
         "W1 library shared; OIP window disabled."
     )

@@ -5,13 +5,12 @@ NUS ROBOD and Wi-Fi files are not imported. Run from the repository root:
     python src/db/init_app_db.py
 
 Deletes data/occuscope.db if it exists so schema changes apply cleanly.
-Generated occupancy is seeded only up to sit_calendar.json map_as_of.
+Generated occupancy is the SIT seed CSV (Singapore time, offset +08:00).
 """
 
 from __future__ import annotations
 
 import csv
-import json
 import sqlite3
 from pathlib import Path
 
@@ -67,19 +66,13 @@ def seed(conn: sqlite3.Connection) -> None:
     if not occ.exists():
         occ = SAMPLE / "occupancy_preview.csv"
     if occ.exists():
-        occ_rows = read_csv(occ)
-        calendar = SAMPLE / "sit_calendar.json"
-        if calendar.exists() and occ.name == "occupancy_generated.csv":
-            as_of = json.loads(calendar.read_text(encoding="utf-8")).get("map_as_of")
-            if as_of:
-                occ_rows = [r for r in occ_rows if r["timestamp"] <= as_of]
         conn.executemany(
             """
             INSERT INTO occupancy
                 (location_id, timestamp, occupancy_count, source)
             VALUES (:location_id, :timestamp, :occupancy_count, :source)
             """,
-            occ_rows,
+            read_csv(occ),
         )
 
     pred = SAMPLE / "occupancy_prediction.csv"

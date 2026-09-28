@@ -50,7 +50,7 @@ def dummy_sit_occupancy(locations: pd.DataFrame) -> pd.DataFrame:
             rows.append(
                 {
                     "location_id": loc["location_id"],
-                    "timestamp": f"2026-09-23T{hour:02d}:00:00",
+                    "timestamp": f"2026-09-29T{hour:02d}:00:00+08:00",
                     "occupancy_count": count,
                     "source": "dummy",
                 }

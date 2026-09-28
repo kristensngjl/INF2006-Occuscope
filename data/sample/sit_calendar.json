@@ -1,20 +1,37 @@
 {
-  "note": "Occupancy overlay after v0. Teaching/recess/exam/break dates from the SIT academic calendar (AY2026/27 Tri 1). Team: E blocks = IT courses, W3/W5 = other courses, W1 library (open study + meeting rooms) is shared by everyone so it does not follow the IT vs other-course IWSP split. OIP 3-week window disabled (dates not public). Not live RBS.",
+  "note": "Occupancy overlay after v0. Generated series is AY2026/27 Trimester 1 (31 Aug–27 Dec 2026, 08:00–20:00 SGT): teaching, recess week 7, final assessment, trimester break, MOM public holidays (Deepavali 8–9 Nov; Christmas 25 Dec). E = IT IWSP mix, W3/W5 = other courses, W1 library shared. Sample ArtFest events in late September. OIP window disabled (2026 dates not published). Not live RBS.",
   "sources": [
     "https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes",
     "https://www.singaporetech.edu.sg/academic-bulletin/undergraduate-sit-and-joint-degree-programmes/integrated-work-study-programme-iwsp-clinical-practice-cpe",
     "https://www.singaporetech.edu.sg/sites/default/files/2024-04/IWSP%20Schedule_FINAL_20240401.pdf",
-    "https://www.singaporetech.edu.sg/undergraduate-programmes/computing-science"
+    "https://www.singaporetech.edu.sg/undergraduate-programmes/computing-science",
+    "https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026"
   ],
   "academic_year": "AY2026/27",
   "trimester": 1,
   "generate_start": "2026-08-31",
-  "generate_end": "2026-12-13",
-  "map_as_of": "2026-09-25T15:00:00",
+  "generate_end": "2026-12-27",
+  "map_as_of": "2026-09-29T15:00:00+08:00",
+  "predict_as_of": "2026-09-29T15:00:00+08:00",
   "hours": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "weekend_multiplier": 0.28,
   "holiday_multiplier": 0.18,
-  "holiday_dates": ["2026-11-09"],
+  "holidays": [
+    {"date": "2026-01-01", "name": "New Year's Day"},
+    {"date": "2026-02-17", "name": "Chinese New Year"},
+    {"date": "2026-02-18", "name": "Chinese New Year"},
+    {"date": "2026-03-21", "name": "Hari Raya Puasa", "note": "Gazetted; MOM notes Islamic dates may be confirmed closer to the day"},
+    {"date": "2026-04-03", "name": "Good Friday"},
+    {"date": "2026-05-01", "name": "Labour Day"},
+    {"date": "2026-05-27", "name": "Hari Raya Haji", "note": "Gazetted; MOM notes Islamic dates may be confirmed closer to the day"},
+    {"date": "2026-05-31", "name": "Vesak Day"},
+    {"date": "2026-06-01", "name": "Vesak Day (Monday in lieu)"},
+    {"date": "2026-08-09", "name": "National Day"},
+    {"date": "2026-08-10", "name": "National Day (Monday in lieu)"},
+    {"date": "2026-11-08", "name": "Deepavali"},
+    {"date": "2026-11-09", "name": "Deepavali (Monday in lieu)"},
+    {"date": "2026-12-25", "name": "Christmas Day"}
+  ],
   "phases": [
     {
       "name": "teaching",

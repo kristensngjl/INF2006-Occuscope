@@ -49,9 +49,9 @@ evidence:
 
 data_ai:
   dataset: "data/README.md"
-  method: "Hour×room-type mean on ROBOD (date hold-out). SIT occupancy = (prediction / type p95) × capacity × AY2026/27 Trimester 1 calendar; E=IT IWSP mix, W3/W5=other courses, W1 library shared."
-  evaluation: "Held-out NUS timestamps (MAE/RMSE); SIT values are generated, not labelled"
-  reproducible_command: "python analytics/04_train.py && python analytics/05_generate_sit.py && python src/db/init_app_db.py"
+  method: "Hour×room-type mean on ROBOD (14-day date hold-out). SIT occupancy = (prediction/type p95)×capacity × AY2026/27 Tri 1 calendar, MOM 2026 holidays, E=IT IWSP mix, W3/W5=other courses, W1 library shared, sample event bump. OIP disabled."
+  evaluation: "Held-out NUS dates MAE/RMSE/R² (mean MAE 1.74); SIT values generated, not labelled"
+  reproducible_command: "python analytics/02_clean_robod.py && python analytics/04_train.py && python analytics/05_generate_sit.py && python src/db/init_app_db.py"
 
 security:
   threat_control_map: "evidence/threat-control-map.md"
@@ -63,6 +63,7 @@ run:
     - "ROBOD CSVs and NUS Wi-Fi xlsx in data/raw/ (gitignored) for analytics"
     - "Frontend runtime once src/frontend is added"
   commands:
+    - "python analytics/02_clean_robod.py"
     - "python analytics/04_train.py"
     - "python analytics/05_generate_sit.py"
     - "python src/db/init_app_db.py"
