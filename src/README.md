@@ -1,6 +1,6 @@
 # Source (`src/`)
 
-Application code will reside here. This folder currently holds the **database schema** and **HTTP contract** so frontend, backend, and data/ML work can proceed in parallel.
+The FastAPI backend is in `api.py`. See [API_SETUP.md](API_SETUP.md) for installation, startup and room-to-map integration. The database schema remains unchanged.
 
 | Path | Owner | What it is |
 |---|---|---|
@@ -30,9 +30,9 @@ python src/db/init_app_db.py
 
 ## API (v0)
 
-See `api-contract.md`. Backend should prefer:
+See `api-contract.md`. The backend implements:
 
-- `GET /occupancy/current` → `v_occupancy_current`
+- `GET /occupancy/current?at=` → latest reading at or before the selected time per room
 - `GET /floors/{building_id}/{floor}/summary` → `v_floor_type_summary`
 
-Frontend folder and server entrypoint: to be added by Zi Qian / Zul.
+Server entrypoint: `python -m uvicorn src.api:app --reload`. Frontend: to be added by Zi Qian.

@@ -37,9 +37,15 @@ The sample seed is **AY2026/27 Trimester 1** (31 August–27 December 2026, hour
 
 **Required for the map:** `GET /occupancy/current?at={ISO-8601}` (Singapore offset). Return, per location, the occupancy row at that instant, or the latest row at or before `at`. Example: `?at=2026-09-30T15:00:00+08:00` (teaching Wednesday). Optional alias: `GET /heatmap?at=`.
 
+Implemented in `src/api.py`. `at` is required; encode the plus sign as `%2B` or use `URLSearchParams`. Timestamps must include hours, minutes, seconds and `+08:00`. Responses are arrays with the fields of `v_occupancy_current`, including `location_id`, hierarchy, capacity, coordinates, source and the actual reading timestamp. Rooms without an earlier reading have null occupancy fields, not zero. Null coordinates remain null. Display the reading timestamp because an as-of result can be old. The optional `/heatmap` alias is not implemented.
+
 ### `GET /occupancy/{location_id}`
 
 Timeline history: hourly `timestamp`, `occupancy_count`, `source`. **Filter** with `?from=` and `?to=` (ISO-8601). Do not plot the whole trimester in one chart; a week is enough on screen.
+
+Both bounds are required. The range is `[from, to)` (inclusive start, exclusive end), with `to > from`, and cannot exceed seven days. Results are sorted by time. Invalid/missing parameters return HTTP 422; unknown locations return 404; known locations without readings return `[]`. Database unavailability returns 503.
+
+The floor summary endpoint uses the latest-reading view independently of heatmap time. For a summary at the selected time, group `/occupancy/current?at=` results on the client.
 
 ### `GET /occupancy/{location_id}/prediction`
 
