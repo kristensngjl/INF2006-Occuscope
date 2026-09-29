@@ -1,0 +1,103 @@
+import {renderModel,adjustModel} from './model.js';
+import {sampleData,api,currentRows,band,dayEvents} from './data.js';
+const $=id=>document.getElementById(id);
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const state={building:'all',floor:'all',selected:null,rows:[],buildings:[],locations:[],events:[],sample:null,mode:'api',version:0,detailVersion:0};
+
+const time=t=>new Intl.DateTimeFormat('en-SG',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Singapore'}).format(new Date(t));
+const at=()=>`${$('date').value}T${$('hour').value}:00:00+08:00`;
+const badge=r=>`<span class="badge ${esc(r.crowd_level||'unknown')}"><i class="${esc(r.crowd_level||'unknown')}"></i>${esc(r.crowd_level||'No data')}</span>`;
+$('hour').innerHTML=Array.from({length:13},(_,i)=>`<option value="${String(i+8).padStart(2,'0')}" ${i+8===15?'selected':''}>${String(i+8).padStart(2,'0')}:00</option>`).join('');
+function validate(){const d=$('date');if(!d.value||d.value<d.min||d.value>d.max){$('notice').textContent='Choose a date between 31 August and 27 December 2026, the sample dataset period.';return false;}return true;}
+async function refresh(){
+ if(!validate())return;
+ const version=++state.version; ++state.detailVersion;
+ state.rows=[]; render(); $('detail').innerHTML='<p class="detail-note">Loading selected time…</p>';
+ $('notice').textContent='Loading campus data…';
+ try{
+   const mode=$('source').value; let rows,buildings,locations,events;
+   if(mode==='sample'){
+    state.sample ||= await sampleData();
+    ({buildings,locations,events}=state.sample);
+    rows=currentRows(locations,state.sample.occupancy_generated,at());
+   }else{
+    [buildings,locations,rows,events]=await Promise.all([api('buildings'),api('locations'),api('occupancy/current',{at:at()}),api('events/today')]);
+   }
+   if(version!==state.version)return;
+   Object.assign(state,{rows,buildings,locations,events,mode});
+   $('notice').textContent='';render();await renderDetail();
+ }catch(e){if(version!==state.version)return;state.rows=[];render();$('detail').innerHTML='<p class="detail-note">Occupancy could not be loaded.</p>';$('notice').innerHTML=`${esc(e.message)} <button id="retry">Try again</button>`;$('retry').onclick=refresh;}
+}
+function chooseFloor(floor){state.floor=String(floor);state.selected=null;render();renderDetail();}
+function chooseBuilding(id){adjustModel('reset');state.building=id;state.floor='all';state.selected=null;render();renderDetail();}
+function render(){
+ $('all').classList.toggle('active',state.building==='all');
+ $('buildings').innerHTML=state.buildings.map(b=>{const rooms=state.rows.filter(r=>r.building_id===b.building_id);return `<button class="building-row ${state.building===b.building_id?'active':''}" data-building="${esc(b.building_id)}" aria-pressed="${state.building===b.building_id}"><span class="building-icon">${esc(b.building_id)}</span><span><strong>${b.building_id==='W1'?'Library · W1':esc(b.name)}</strong><small>${rooms.length} mapped spaces</small></span><i class="${buildingBand(rooms)}"></i></button>`;}).join('');
+ document.querySelectorAll('[data-building]').forEach(b=>b.onclick=()=>chooseBuilding(b.dataset.building));
+ const chosen=state.buildings.find(b=>b.building_id===state.building);
+ $('map-title').textContent=chosen?`${chosen.name}${state.floor==='all'?'':' · Level '+state.floor}`:'Explore SIT Punggol';
+ $('map-kicker').textContent='OCCUSCOPE CAMPUS MODEL';
+ $('selected-time').textContent=`${$('date').value} · ${$('hour').value}:00 SGT`;
+ $('coordinate-title').textContent=`${chosen?chosen.name:'Campus'}${state.floor==='all'?'':' · Level '+state.floor}`;
+ $('spaces-title').textContent=chosen?`${chosen.name} spaces`:'All campus spaces';
+ const floors=[...new Set(state.locations.filter(l=>state.building==='all'||l.building_id===state.building).map(l=>Number(l.floor)))].sort((a,b)=>a-b);
+ $('floors').innerHTML=['all',...floors].map(f=>`<button data-floor="${f}" class="${String(state.floor)===String(f)?'active':''}" aria-pressed="${String(state.floor)===String(f)}">${f==='all'?'All floors':'Level '+f}</button>`).join('');
+ document.querySelectorAll('[data-floor]').forEach(b=>b.onclick=()=>chooseFloor(b.dataset.floor));
+ const q=$('search').value.trim().toLowerCase();
+ const rooms=state.rows.filter(r=>(state.building==='all'||r.building_id===state.building)&&(state.floor==='all'||String(r.floor)===String(state.floor))&&($('crowd').value==='all'||r.crowd_level===$('crowd').value)&&($('type').value==='all'||r.type===$('type').value)&&`${r.name} ${r.location_id} ${r.building_id} ${r.building_name||''} ${r.building_id==='W1'?'library':''}`.toLowerCase().includes(q));
+ $('result-count').textContent=`${rooms.length} spaces`;
+ $('map-count').textContent=`${state.rows.length} spaces · generated occupancy`;
+ renderCoordinates(rooms);
+ renderModel(state,rooms,chooseBuilding,chooseFloor,selectRoom);
+ $('rooms').innerHTML=rooms.length?rooms.map(r=>`<button class="room-card ${state.selected===r.location_id?'selected':''}" data-room="${esc(r.location_id)}" aria-pressed="${state.selected===r.location_id}"><div class="room-card-top"><span>${esc(r.building_id)} / LEVEL ${esc(r.floor)}</span>${badge(r)}</div><h3>${esc(r.name)}</h3><p>${esc(r.type.replaceAll('_',' '))}</p><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,Math.max(0,(r.occupancy_ratio||0)*100))}%"></span></div><div class="room-card-bottom"><span>${r.occupancy_count==null?'No reading':`${esc(r.occupancy_count)} / ${esc(r.capacity)} people`}</span><span>View space ↗</span></div></button>`).join(''):'<p class="no-results">No spaces match this view. Try another floor or clear your filters.</p>';
+ document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>selectRoom(b.dataset.room));
+ const eventDate=state.mode==='api'?new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Singapore',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()):$('date').value;
+ const events=dayEvents(state.events,eventDate).filter(e=>state.building==='all'||state.locations.some(l=>l.location_id===e.location_id&&l.building_id===state.building));
+ $('event-date').textContent=`${eventDate} · ${state.mode==='api'?'Today in Singapore (API)':'Selected day · sample events'}`;
+ $('events').innerHTML=events.length?events.map(e=>`<article class="event"><h3>${esc(e.title)}</h3><p>${time(e.start_time)}–${time(e.end_time)} SGT</p><button data-event-room="${esc(e.location_id)}">${esc(e.location_id)} ↗</button></article>`).join(''):'<p class="event fine-print">No listed events for this view.</p>';
+ document.querySelectorAll('[data-event-room]').forEach(b=>b.onclick=()=>{const r=state.rows.find(r=>r.location_id===b.dataset.eventRoom);if(r){state.building=r.building_id;state.floor=String(r.floor);selectRoom(r.location_id);}});
+}
+function buildingBand(rooms){const known=rooms.filter(r=>r.occupancy_count!=null);if(!known.length)return 'unknown';return band(known.reduce((s,r)=>s+Number(r.occupancy_count),0)/known.reduce((s,r)=>s+Number(r.capacity),0));}
+function selectRoom(id){const room=state.rows.find(r=>r.location_id===id);if(room){if(state.building!==room.building_id)adjustModel('reset');state.building=room.building_id;state.floor=String(room.floor);}state.selected=id;render();renderDetail();if(innerWidth<1100)$('detail').scrollIntoView({behavior:'smooth',block:'nearest'});}
+async function renderDetail(){
+ const version=++state.detailVersion;
+ const r=state.rows.find(r=>r.location_id===state.selected);
+ if(!r){$('detail').innerHTML='<div class="empty-detail"><span>⌖</span><h2>A spot with your name on it.</h2><p>Select a room below to explore its occupancy and daily rhythm.</p></div>';return;}
+ $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div>${badge(r)}<h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy · ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p>${r.building_id==='W5'?'<p class="detail-note">W5 room identifiers await confirmation.</p>':''}<h3 class="chart-heading">The day's rhythm <span class="detail-note">· generated</span></h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
+ $('close-detail').onclick=()=>{state.selected=null;render();renderDetail();};
+ try{
+   let history,predictions;
+   const date=$('date').value;
+   if(state.mode==='sample'){history=state.sample.occupancy_generated.filter(h=>h.location_id===r.location_id&&h.timestamp.slice(0,10)===date);predictions=state.sample.occupancy_prediction.filter(p=>p.location_id===r.location_id);}
+   else{
+    const next=new Date(`${date}T00:00:00Z`);next.setUTCDate(next.getUTCDate()+1);
+    [history,predictions]=await Promise.all([api(`occupancy/${encodeURIComponent(r.location_id)}`,{from:`${date}T00:00:00+08:00`,to:`${next.toISOString().slice(0,10)}T00:00:00+08:00`}),api(`occupancy/${encodeURIComponent(r.location_id)}/prediction`)]);
+   }
+   if(version!==state.detailVersion)return;
+   $('history').innerHTML=history.length?`<div class="chart" role="img" aria-label="Hourly estimated occupancy: ${esc(history.map(h=>`${time(h.timestamp)}: ${h.occupancy_count} people`).join('; '))}">${history.map(h=>`<span class="${h.timestamp.slice(11,13)===$('hour').value?'chosen':''}" style="height:${Math.max(3,Math.min(100,Number(h.occupancy_count)/Number(r.capacity)*100))}%" title="${time(h.timestamp)}: ${esc(h.occupancy_count)} people"></span>`).join('')}</div><div class="chart-labels"><span>${time(history[0].timestamp)}</span><span>Singapore time</span><span>${time(history.at(-1).timestamp)}</span></div>`:'<p class="detail-note">No history for this day.</p>';
+   const future=predictions.filter(p=>Date.parse(p.predicted_for)>Date.parse(at())&&Date.parse(p.predicted_for)<=Date.parse(at())+7200000);
+   $('forecast').innerHTML='<strong>Next two hours</strong>'+(future.length?future.map(p=>`${time(p.predicted_for)} · ${esc(p.occupancy_count)} people <span class="detail-note">(${esc(p.model_version)})</span>`).join('<br>'):'<span class="detail-note">No saved forecast for this time. Sample forecasts cover 29 Sep, 16:00–17:00 SGT.</span>');
+ }catch(e){if(version!==state.detailVersion)return;$('history').textContent=e.message;$('forecast').textContent='Forecast unavailable.';}
+}
+$('all').onclick=()=>chooseBuilding('all');
+['search','crowd','type'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+['date','hour','source'].forEach(id=>$(id).addEventListener('change',refresh));
+$('reset').onclick=()=>{state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';$('date').value='2026-09-30';$('hour').value='15';refresh();};
+refresh();
+
+function renderCoordinates(rooms){
+ const valid=rooms.filter(r=>r.map_x!=null && r.map_y!=null && r.map_x!=='' && r.map_y!=='' && Number.isFinite(Number(r.map_x)) && Number.isFinite(Number(r.map_y)) && Number(r.map_x)>=0 && Number(r.map_x)<=1 && Number(r.map_y)>=0 && Number(r.map_y)<=1);
+ const xs=valid.map(r=>Number(r.map_x)),ys=valid.map(r=>Number(r.map_y));
+ const minX=state.building==='all'?0:Math.min(...xs)-.025,maxX=state.building==='all'?1:Math.max(...xs)+.025;
+ const minY=state.building==='all'?0:Math.min(...ys)-.025,maxY=state.building==='all'?1:Math.max(...ys)+.025;
+ $('crowd-plot').innerHTML=valid.length?valid.map(r=>`<button class="crowd-point ${esc(r.crowd_level||'unknown')} ${state.selected===r.location_id?'selected':''}" style="left:${8+84*(Number(r.map_x)-minX)/(maxX-minX)}%;top:${8+84*(Number(r.map_y)-minY)/(maxY-minY)}%" data-point="${esc(r.location_id)}" title="${esc(r.name)} · Level ${esc(r.floor)} · ${esc(r.crowd_level||'No data')}" aria-label="${esc(r.name)}, ${esc(r.building_id)}, Level ${esc(r.floor)}, ${r.occupancy_ratio==null?'no reading':Math.round(r.occupancy_ratio*100)+' percent occupancy'}, ${esc(r.crowd_level||'unknown')}"><span>${state.building==='all'?'':esc(r.name)}</span></button>`).join(''):'<p class="no-results">No mapped coordinates in this view. Spaces without coordinates remain in the list.</p>';
+ document.querySelectorAll('[data-point]').forEach(b=>b.onclick=()=>selectRoom(b.dataset.point));
+}
+function mapView(model){
+ $('model-panel').hidden=!model;$('crowd-panel').hidden=model;
+ for(const [id,selected] of [['model-view',model],['crowd-view',!model]]){$(id).classList.toggle('active',selected);$(id).setAttribute('aria-pressed',String(selected));}
+}
+$('model-view').onclick=()=>mapView(true);
+$('crowd-view').onclick=()=>mapView(false);
+$('model-home').onclick=()=>chooseBuilding('all');
+document.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>{adjustModel(b.dataset.camera);render();});
