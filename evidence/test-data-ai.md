@@ -4,7 +4,7 @@ Demonstrate that identified NUS occupancy data can be cleaned, that a leakage-sa
 
 # Setup
 
-Python 3.11+, `pip install -r analytics/requirements.txt`, ROBOD CSVs under `data/raw/`. Training recorded on Python 3.11.9.
+Python 3.11+, `pip install -r analytics/requirements.txt`, ROBOD CSVs under `data/raw/`. Training recorded on Python 3.11.9. `04_train.py` also writes the Wi-Fi ablation table when `raw_data.xlsx` sheet `5min` is present.
 
 # Command / steps
 
@@ -28,7 +28,7 @@ Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occup
 - Rooms: R1–R2 lecture, R3–R4 office, R5 library. HVAC and weather columns dropped.
 - No weekend rows (Monday–Friday only).
 - Means are low because overnight hours are empty. Peak around 15:00 SGT.
-- Correlation of Wi-Fi connected devices with `occupant_count` ≈ 0.69 (not used in v0; SIT has no corresponding feed).
+- Correlation of Wi-Fi connected devices with `occupant_count` ≈ 0.69. Ablation (30 Sep 2026): room Wi-Fi lowers NUS MAE (~1.31 vs 1.74) but is unused in v0; SIT has no corresponding feed.
 
 ## Training / hold-out (26 September 2026, Lideon)
 
@@ -42,7 +42,20 @@ Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occup
 | Ridge | 1.83 | 2.86 | 0.01 |
 | Random Forest | 1.84 | 3.06 | −0.14 |
 
-**Selected model (lowest MAE): hour × room-type mean.** Ridge and Random Forest did not improve MAE. Negative R² indicates that the hold-out period is a different occupancy regime from training (late term / examinations). Version v0 is therefore that lookup table. It remains usable to generate SIT utilisation ratios.
+**Selected model (lowest MAE on transferable features): hour × room-type mean.** Ridge and Random Forest did not improve MAE without Wi-Fi. Negative R² indicates that the hold-out period is a different occupancy regime from training (late term / examinations). Version v0 is therefore that lookup table. It remains usable to generate SIT utilisation ratios.
+
+## Wi-Fi ablation (30 September 2026, Lideon)
+
+Same date hold-out. Extra features are **not** in v0 and **not** loaded into `occuscope.db` (SIT has no matching feed).
+
+| Features | Best MAE |
+|---|---|
+| hour + weekday + type (v0) | 1.74 (mean lookup) |
+| + ROBOD `wifi_connected_devices` | 1.31 (Ridge) |
+| + Zenodo `5min` L2–L6 mean by hour×weekday (2018, different building) | 1.77 (RF) — does **not** beat v0 |
+| + room Wi-Fi and floor profile | 1.28 (RF) |
+
+Room-level Wi-Fi **does** help on NUS. The 2018 floor series by itself does not. v0 stays the hour×type mean so SIT generate does not invent a Wi-Fi sensor.
 
 SIT map occupancy is generated (`source = generated`). Series: 31 August–27 December 2026 (Trimester 1).
 
@@ -66,6 +79,7 @@ SIT map occupancy is generated (`source = generated`). Series: 31 August–27 De
 - `analytics/figures/robod_*.png`
 - `analytics/04_train.py`, `analytics/05_generate_sit.py`, `analytics/occupancy_model.py`
 - `analytics/metrics_holdout.csv`
+- `analytics/metrics_wifi_ablation.csv`
 - `analytics/models/occupancy_v0.joblib` (local; gitignored)
 - `data/sample/sit_calendar.json`
 - `data/sample/occupancy_generated.csv`

@@ -67,6 +67,7 @@ run:
     - "python analytics/04_train.py"
     - "python analytics/05_generate_sit.py"
     - "python src/db/init_app_db.py"
+    - "python tests/test_crowd_and_seed.py"
 
 declarations:
   ai_use: "AI_USE_DECLARATION.md"

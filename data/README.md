@@ -21,7 +21,7 @@ Do not `git add` `data/raw/`.
 
 ## Sample files (committed)
 
-SIT room catalogue uses Room Booking System **display names only** (screenshots; not a live scrape). Discussion-room identifiers follow `{block}-{floor}-{unit}-DR{n}` (for example `E2-03-07-DR209`). Library meeting rooms use `{block}-{floor}-{unit}-MR{n}` in W1. Capacity is inferred from furniture in the photographs (four-seat round tables = 4; long tables = 8) unless confirmed. **W5 discussion rooms copy the W3 floor/unit layout; identifiers continue DR06–DR09** (`W5-03-07-DR06` … `W5-04-04-DR09`) and were not taken from an RBS screenshot.
+SIT room catalogue uses Room Booking System **display names only** (screenshots; not a live scrape). Discussion-room identifiers follow `{block}-{floor}-{unit}-DR{n}` (for example `E2-03-07-DR209`). Library meeting rooms use `{block}-{floor}-{unit}-MR{n}` in W1. Capacity is inferred from furniture in the photographs (four-seat round tables = 4; long tables = 8) unless confirmed. Catalogue captured: E2 L3/L4 (DR209–210, 215–216, 223–224); E6 L4 (DR303–307); W3 L3/L4/L6–L8 (DR02–DR17); W5 L3/L5/L7/L8 (DR18–DR20, DR23–DR26). RBS had no DR21/DR22 cards in that screenshot — those ids are not invented.
 
 | File | Role |
 |---|---|

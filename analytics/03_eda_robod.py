@@ -82,7 +82,7 @@ def plot_lecture_vs_library(df: pd.DataFrame) -> None:
 
 def plot_wifi_vs_occupancy(df: pd.DataFrame) -> None:
     sample = df.dropna(subset=["wifi_connected_devices"]).sample(
-        n=min(8000, len(df)), random_state=0
+        n=min(8000, len(df)), random_state=42
     )
     fig, ax = plt.subplots(figsize=(6, 4.5))
     for room_type, part in sample.groupby("room_type", observed=True):

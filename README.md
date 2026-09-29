@@ -109,5 +109,5 @@ Schema: `src/db/schema.sql`. API: `src/api-contract.md`.
 - ROBOD and the Wi-Fi series describe NUS buildings. They supply time-of-day and type shape, not SIT Punggol ground truth. SIT occupancy is not labelled; campus accuracy is not reported.
 - This ROBOD extract contains **weekdays only**. Weekend map values use a Friday occupancy shape scaled by an explicit weekend factor.
 - Map “current” occupancy is generated (v0 + calendar overlay). Recess and examination dates follow the public SIT calendar (subject to change). IWSP reductions are a documented programme mix, not official per-room bookings. OIP 2026 dates are not published.
-- Sample locations are discussion-room identifiers from Room Booking System catalogue screenshots (not a live scrape), plus W1 library spaces. W5 identifiers follow the W3 layout with codes DR06–DR09 pending confirmation. Capacities are inferred from furniture in those photos.
-- Wi-Fi connected-device counts are not the same as people (correlation with ROBOD `occupant_count` ≈ 0.69). They are unused in v0.
+- Sample locations are discussion-room identifiers from Room Booking System catalogue screenshots (not a live scrape), plus W1 library spaces. Catalogue: E2, E6, W3 DR02–DR17, W5 DR18–DR20 and DR23–DR26 (no DR21/DR22 on the cards). Capacities are inferred from furniture in those photos.
+- Wi-Fi connected-device counts are not the same as people (correlation with ROBOD `occupant_count` ≈ 0.69). Room Wi-Fi improves NUS hold-out MAE but is unused in v0 because SIT has no matching feed.
