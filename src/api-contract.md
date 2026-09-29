@@ -37,7 +37,7 @@ The sample seed is **AY2026/27 Trimester 1** (31 August–27 December 2026, hour
 
 **Required for the map:** `GET /occupancy/current?at={ISO-8601}` (Singapore offset). Return, per location, the occupancy row at that instant, or the latest row at or before `at`. Example: `?at=2026-09-30T15:00:00+08:00` (teaching Wednesday). Optional alias: `GET /heatmap?at=`.
 
-Implemented in `src/api.py`. `at` is required; encode the plus sign as `%2B` or use `URLSearchParams`. Timestamps must include hours, minutes, seconds and `+08:00`. Responses are arrays with the fields of `v_occupancy_current`, including `location_id`, hierarchy, capacity, coordinates, source and the actual reading timestamp. Rooms without an earlier reading have null occupancy fields, not zero. Null coordinates remain null. Display the reading timestamp because an as-of result can be old. The optional `/heatmap` alias is not implemented.
+Implemented in `src/backend/api.py`. `at` is required; encode the plus sign as `%2B` or use `URLSearchParams`. Timestamps must include hours, minutes, seconds and `+08:00`. Responses are arrays with the fields of `v_occupancy_current`, including `location_id`, hierarchy, capacity, coordinates, source and the actual reading timestamp. Rooms without an earlier reading have null occupancy fields, not zero. Null coordinates remain null. Display the reading timestamp because an as-of result can be old. The optional `/heatmap` alias is not implemented.
 
 ### `GET /occupancy/{location_id}`
 

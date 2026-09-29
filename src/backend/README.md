@@ -4,9 +4,9 @@ Python 3.11+, from the repository root:
 
 ```powershell
 python -m venv .venv
-.venv\Scripts\python -m pip install -r src/requirements.txt
+.venv\Scripts\python -m pip install -r src/backend/requirements.txt
 .venv\Scripts\python src/db/init_app_db.py
-.venv\Scripts\python -m uvicorn src.api:app --reload
+.venv\Scripts\python -m uvicorn src.backend.api:app --reload
 ```
 
 The initialiser **deletes and rebuilds** `data/occuscope.db`; skip it if you have a populated database you want to keep. The API opens SQLite read-only and preserves the existing schema. Export `DATABASE_URL=sqlite:///path/to/file.db` to override the default. Relative paths resolve from the repository root; `.env` is not automatically loaded. RDS integration is future work.
@@ -43,5 +43,5 @@ const history = await response.json();
 
 The API enforces a seven-day maximum, inclusive start and exclusive end. Missing observations are not zero. Label occupancy as generated, not live sensors. A map is not required to test the endpoints.
 
-Inspect occupancy CSVs using a text editor, API or database, **not Excel**, to preserve times. See [api-contract.md](api-contract.md) for the contract.
+Inspect occupancy CSVs using a text editor, API or database, **not Excel**, to preserve times. See [api-contract.md](../api-contract.md) for the contract.
 

@@ -62,7 +62,7 @@ Place ROBOD CSVs and the NUS Wi-Fi workbook in `data/raw/` first (`data/README.m
 | `init_app_db.py` | Rebuild `data/occuscope.db` from `src/db/schema.sql` and `data/sample/` |
 | `01_eda.py` | Dummy occupancy fallback only (`source = dummy`) |
 
-The local REST API is runnable; see [API setup and map integration](src/API_SETUP.md). The frontend is still to be built. Sample occupancy is **AY2026/27 Trimester 1** (31 August–27 December 2026, 08:00–20:00 SGT, `+08:00`). Timeline: `GET /occupancy/{id}?from=&to=` (maximum seven days). Heatmap: `GET /occupancy/current?at=` (do not use the last seed timestamp — that is trimester break).
+The local REST API is runnable; see [API setup and map integration](src/backend/README.md). The frontend is still to be built. Sample occupancy is **AY2026/27 Trimester 1** (31 August–27 December 2026, 08:00–20:00 SGT, `+08:00`). Timeline: `GET /occupancy/{id}?from=&to=` (maximum seven days). Heatmap: `GET /occupancy/current?at=` (do not use the last seed timestamp — that is trimester break).
 
 ## Architecture
 
