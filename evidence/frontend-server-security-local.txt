@@ -1,0 +1,26 @@
+Date: 30 September 2026 (run by Ryan)
+Python: Python 3.12.10   Node: v24.13.1
+Commit: d8362c2
+Command: tests/test_frontend_server_security.py -v
+
+header Content-Security-Policy: absent
+header X-Frame-Options: absent
+header Referrer-Policy: absent
+header Permissions-Policy: absent
+test_api_proxy_fails_closed (__main__.FrontendServerSecurityTest.test_api_proxy_fails_closed) ... ok
+test_index_and_assets_served (__main__.FrontendServerSecurityTest.test_index_and_assets_served) ... ok
+test_non_allowlisted_paths_are_404 (__main__.FrontendServerSecurityTest.test_non_allowlisted_paths_are_404) ... ok
+test_only_get_is_allowed (__main__.FrontendServerSecurityTest.test_only_get_is_allowed) ... ok
+test_response_headers_report (__main__.FrontendServerSecurityTest.test_response_headers_report) ... ok
+test_server_binds_loopback_only (__main__.FrontendServerSecurityTest.test_server_binds_loopback_only) ... ok
+C:\Users\ryang\Codingiiggigigiig\y2t1\INF2006-Occuscope\tests\test_frontend_server_security.py:69: ResourceWarning: unclosed file <_io.TextIOWrapper name=3 encoding='cp1252'>
+  cls.proc = None
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+C:\Users\ryang\Codingiiggigigiig\y2t1\INF2006-Occuscope\tests\test_frontend_server_security.py:69: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='cp1252'>
+  cls.proc = None
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.797s
+
+OK

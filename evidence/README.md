@@ -17,5 +17,7 @@ Named artefacts cited by `project_manifest.yaml`. Fill these before submission; 
 | `security-offline-tests.txt` | Raw offline security / hygiene test output | Ryan |
 | `secret-scan-local.txt` | Raw secret-pattern scan output | Ryan |
 | `preflight-local.txt` | Raw submission preflight output | Ryan |
+| `security-review.md` | Static security review (frontend, API, Lambda) | Ryan |
+| `frontend-server-security-local.txt` | Raw frontend dev-server security test output | Ryan |
 
 Each test file must include: objective, setup, command/steps, expected result, actual result (dated), artefact path.

@@ -19,5 +19,13 @@ Intended controls for Occuscope. Rows marked **done** can be shown from the repo
 | Secrets in CloudWatch screenshots | Redact account IDs, IPs, keys before pasting | `evidence/monitoring.md` | pending (deploy) | monitoring export |
 | Wrong Lambda runtime vs v0 joblib | `src/infra/build_lambda_package.sh` installs CPython **3.11** manylinux wheels (`--python-version 3.11`, fastapi + mangum), so the Lambda runtime must be 3.11 or the compiled wheels will not import. The package copies only `api.py`, `lambda_handler.py` and the DB; **no joblib model is packaged** (predictions are precomputed rows in `occupancy_prediction`). Kristen to confirm the deployed runtime and that no model file is loaded at request time. The v0 joblib (Python 3.11.9, sklearn 1.9.1, joblib 1.6.0) matters only if inference moves into Lambda later. | Kristen deploy | pending (Kristen confirms) | `src/infra/build_lambda_package.sh`, `src/backend/lambda_handler.py`, Lambda configuration export (pending Kristen) |
 | Deployed resource names exposed in the repo | Example bucket name in the `lambda_handler.py` docstring; replace with a placeholder like `<data-bucket>` and never commit the deployed URL | `src/backend/lambda_handler.py` | pending (Kristen) | `tests/test_no_secrets_in_tracked_files.py` (deployed URL pattern) |
+| OpenAPI docs exposed on API app | Disable `/docs`, `/redoc`, `/openapi.json` in production | `src/backend/api.py` | finding (open, SR-1) | `evidence/security-review.md` |
+| Verbose DB-unavailable error | Generic 503 message without repo paths | `src/backend/api.py` | finding (open, SR-2) | `evidence/security-review.md` |
+| Missing browser security headers on static host | CSP, frameguard, referrer, permissions on production | production hosting | finding (open, SR-3) | `evidence/security-review.md` |
+| Floor label HTML interpolation | Escape or use DOM APIs for floor chips | `src/frontend/app.js`, `model.js` | finding (open, SR-4, SR-5) | `evidence/security-review.md` |
+| Example bucket name in Lambda docstring | Placeholder bucket name in docs | `src/backend/lambda_handler.py` | finding (open, SR-6) | `evidence/security-review.md` |
+| Unpinned Lambda dependency install | Pin versions in `build_lambda_package.sh` | `src/infra/build_lambda_package.sh` | finding (open, SR-7) | `evidence/security-review.md` |
+| Third-party font request leaks visitor data | Self-host fonts or use a system font stack; keeps a future CSP tight | `src/frontend/styles.css` | finding (open, SR-9) | `evidence/security-review.md` |
+| Compromised S3 DB object | IAM deny writes; integrity of `occuscope.db` object | S3 + Lambda | finding (open, SR-8) | `evidence/security-review.md` |
 
 Ryan owns filling **pending** rows as controls are implemented.

@@ -74,6 +74,7 @@ run:
     - "python tests/test_api_security.py"
     - "python tests/test_no_secrets_in_tracked_files.py"
     - "python tests/test_submission_preflight.py"
+    - "python tests/test_frontend_server_security.py"
 
 declarations:
   ai_use: "AI_USE_DECLARATION.md"

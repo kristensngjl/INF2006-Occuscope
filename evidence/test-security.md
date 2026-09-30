@@ -41,6 +41,7 @@ Supporting:
 6. `python tests/test_gitignore_secrets.py` from the repository root.
 7. Confirm responses and docs do not claim live Punggol sensors (`source` is `generated` after seed).
 8. `python tests/test_no_secrets_in_tracked_files.py` from the repository root.
+9. `python tests/test_frontend_server_security.py` from the repository root (Node required).
 
 # Expected result
 
@@ -60,6 +61,7 @@ Supporting:
 - Offline supporting checks: `test_gitignore_secrets.py` (2), `test_data_store_hygiene.py` (4), `test_crowd_and_seed.py` (4) — **10 passed**, 30 September 2026 (`evidence/security-offline-tests.txt`).
 - Secrets supporting check (earlier run): `python tests/test_gitignore_secrets.py` — all tests passed, 26 September 2026, Ryan.
 - Secret-pattern scan (tracked + uncommitted files): `python tests/test_no_secrets_in_tracked_files.py` — **8 tests run, 8 passed**, 30 September 2026, Ryan (`evidence/secret-scan-local.txt`).
+- Frontend dev server checks: `python tests/test_frontend_server_security.py` — **6 tests run, 6 passed**, 30 September 2026, Ryan (`evidence/frontend-server-security-local.txt`). Static review: **9** findings (**8** Low, **1** Medium) in `evidence/security-review.md`.
 
 **Not yet covered:** deployed API Gateway URL, IAM, network security groups, CloudWatch (Kristen).
 
@@ -74,6 +76,9 @@ Supporting:
 - `evidence/security-offline-tests.txt`
 - `tests/test_no_secrets_in_tracked_files.py`
 - `evidence/secret-scan-local.txt`
+- `tests/test_frontend_server_security.py`
+- `evidence/security-review.md`
+- `evidence/frontend-server-security-local.txt`
 - `.gitignore`, `.env.example`
 - `evidence/threat-control-map.md`
 - `evidence/test-data-ai.md`

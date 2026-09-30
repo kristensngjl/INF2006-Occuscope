@@ -13,6 +13,7 @@ Update this table whenever a tool is used on a submission artefact. Team members
 | Cursor | Security evidence, 30 September 2026 | `tests/test_api_security.py`, evidence updates | Ryan ran the tests and reviewed outputs against `src/api-contract.md` | N/A |
 | Cursor | Functional evidence, 30 September 2026 | `evidence/test-functional.md`, `evidence/functional-run-local.txt`, manifest run section | Ryan ran the commands and checked outputs against `src/api-contract.md` and `src/frontend/README.md` | N/A |
 | Cursor | Preflight and secret scan, 30 September 2026 | `tests/test_no_secrets_in_tracked_files.py`, `tests/test_submission_preflight.py`, monitoring export commands, report draft (local) | Ryan ran the tests and reviewed the outputs; report draft to be checked against evidence | N/A |
+| Cursor | Static security review, 30 September 2026 | `evidence/security-review.md`, `tests/test_frontend_server_security.py`, report-draft check | Ryan verified each finding against the cited lines and ran the test | N/A |
 
 ## Datasets and baselines (must cite)
 
