@@ -1,0 +1,30 @@
+﻿Date: 30 September 2026 (run by Ryan)
+Python: Python 3.12.10
+Commit: 951563a
+Commands: tests/test_gitignore_secrets.py, tests/test_data_store_hygiene.py, tests/test_crowd_and_seed.py
+
+test_env_example_secret_key_is_placeholder (__main__.GitignoreSecretsTest.test_env_example_secret_key_is_placeholder) ... ok
+test_sensitive_paths_are_ignored (__main__.GitignoreSecretsTest.test_sensitive_paths_are_ignored) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.425s
+
+OK
+test_forbidden_paths_not_tracked (__main__.DataStoreHygieneTest.test_forbidden_paths_not_tracked) ... ok
+test_init_does_not_read_raw (__main__.DataStoreHygieneTest.test_init_does_not_read_raw) ... ok
+test_local_db_has_only_app_sources (__main__.DataStoreHygieneTest.test_local_db_has_only_app_sources) ... ok
+test_schema_is_sit_app_only (__main__.DataStoreHygieneTest.test_schema_is_sit_app_only) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.078s
+
+OK
+test_boundaries (__main__.CrowdBandTest.test_boundaries) ... ok
+test_schema_and_contract_match (__main__.CrowdBandTest.test_schema_and_contract_match) ... ok
+test_occupancy_generated_columns_and_values (__main__.GeneratedSeedTest.test_occupancy_generated_columns_and_values) ... ok
+test_prediction_columns (__main__.GeneratedSeedTest.test_prediction_columns) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.237s
+
+OK

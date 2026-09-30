@@ -1,0 +1,26 @@
+﻿Date: 30 September 2026 (run by Ryan)
+Python: Python 3.12.10
+Commit: 951563a
+Command: tests/test_api_security.py -v
+
+test_client_cannot_supply_crowd_level (__main__.ApiSecurityTest.test_client_cannot_supply_crowd_level) ... ok
+test_current_rejects_time_without_offset (__main__.ApiSecurityTest.test_current_rejects_time_without_offset) ... ok
+test_current_requires_at (__main__.ApiSecurityTest.test_current_requires_at) ... ok
+test_current_rows_match_thresholds (__main__.ApiSecurityTest.test_current_rows_match_thresholds) ... ok
+test_db_is_read_only (__main__.ApiSecurityTest.test_db_is_read_only) ... ok
+test_injection_style_id_is_404_not_500 (__main__.ApiSecurityTest.test_injection_style_id_is_404_not_500) ... ok
+test_no_write_routes (__main__.ApiSecurityTest.test_no_write_routes) ... ok
+test_prediction_shape (__main__.ApiSecurityTest.test_prediction_shape) ... ok
+test_timeline_range_rules (__main__.ApiSecurityTest.test_timeline_range_rules) ... ok
+test_unknown_location_is_404 (__main__.ApiSecurityTest.test_unknown_location_is_404) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.355s
+
+OK
+
+# live check
+GET /occupancy/current (no at): 422
+GET /occupancy/current?at=...: 200 (JSON array, 47 locations)
+POST /occupancy/current: 405
+

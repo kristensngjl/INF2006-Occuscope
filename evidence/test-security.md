@@ -10,7 +10,7 @@ Demonstrate that `crowd_level` cannot be written by the client and that GET occu
 
 # Setup
 
-**Primary threat (blocked on backend):** expected results locked against `src/api-contract.md` and `src/db/schema.sql`. There is no HTTP server yet.
+**Primary threat:** expected results locked against `src/api-contract.md` and `src/db/schema.sql`. Local API exists (`src/backend/api.py`). Build steps: `python -m venv .venv`, install `src/backend/requirements.txt` and `tests/requirements-test.txt`, then `python src/db/init_app_db.py`.
 
 **Secrets supporting check (runnable now):** from the repository root, Python 3.11+:
 
@@ -18,27 +18,28 @@ Demonstrate that `crowd_level` cannot be written by the client and that GET occu
 python tests/test_gitignore_secrets.py
 ```
 
-**When Zul’s API exists:** copy `.env.example` to `.env` (never commit `.env`), rebuild SQLite, then start the API:
-
-```
-python src/db/init_app_db.py
-```
-
-Use `data/occuscope.db` (gitignored). Do not import `data/raw/` into the database.
+Copy `.env.example` to `.env` (never commit `.env`). Use `data/occuscope.db` (gitignored). Do not import `data/raw/` into the database.
 
 # Command / steps
 
-Named threat (when the API is up; replace base URL if Kristen deploys):
+Named threat (local API; replace base URL when Kristen shares API Gateway):
 
-1. `GET /occupancy/current` — each row has `occupancy_ratio` and `crowd_level`; band matches quiet ≤ 0.30 / moderate ≤ 0.70 / else crowded from count / capacity.
-2. If any write route exists, send extra JSON including `crowd_level` — the stored/served band must still come from the view. If the API is read-only, record that mutating routes are absent (control = no writes).
+1. `GET /occupancy/current?at=2026-09-30T15:00:00%2B08:00` — each row has `occupancy_ratio` and `crowd_level`; band matches quiet ≤ 0.30 / moderate ≤ 0.70 / else crowded from count / capacity.
+2. `GET /occupancy/current` without `at` returns 422.
+3. The API defines only GET routes. POST/PUT/PATCH/DELETE return 404 or 405.
+
+Automated (local SQLite + FastAPI TestClient):
+
+```
+python tests/test_api_security.py -v
+```
 
 Supporting:
 
-3. `GET /occupancy/{location_id}/prediction` for a seeded id (for example `E2-03-07-DR209`).
-4. Unknown `location_id` on occupancy and prediction paths — 4xx, not 500.
-5. `python tests/test_gitignore_secrets.py` from the repository root.
-6. Confirm responses and docs do not claim live Punggol sensors (`source` is `generated` after seed).
+4. `GET /occupancy/{location_id}/prediction` for a seeded id (for example `E2-03-07-DR209`).
+5. Unknown `location_id` on occupancy and prediction paths — 4xx, not 500.
+6. `python tests/test_gitignore_secrets.py` from the repository root.
+7. Confirm responses and docs do not claim live Punggol sensors (`source` is `generated` after seed).
 
 # Expected result
 
@@ -50,19 +51,26 @@ Supporting:
 # Date
 
 - Secrets supporting check: 26 September 2026 (Ryan).
-- Named threat (API): TODO.
+- Named threat (API): 30 September 2026 (Ryan, local API).
 
 # Actual result
 
-- Named threat: TODO (blocked on Zul’s API).
-- Secrets supporting check: `python tests/test_gitignore_secrets.py` — all tests passed, 26 September 2026, Ryan. Does not prove crowd-level forgery control.
+- Named threat (local only, not deployed AWS): `python tests/test_api_security.py -v` — **10 tests run, 10 passed**, 30 September 2026, Ryan (`evidence/security-api-local.txt`). `crowd_level` / `colour` query params do not change the JSON versus the baseline `at` request. Injection-style location ids returned **404** (not 500); `GET /buildings` still **200** after probes. OpenAPI exposes only **GET** operations; POST/PUT/PATCH/DELETE on `/occupancy/current` and `/locations` returned **404** or **405**. Live `curl` against uvicorn on port 8000: **422** without `at`, **200** with demo `at`, **405** on POST.
+- Offline supporting checks: `test_gitignore_secrets.py` (2), `test_data_store_hygiene.py` (4), `test_crowd_and_seed.py` (4) — **10 passed**, 30 September 2026 (`evidence/security-offline-tests.txt`).
+- Secrets supporting check (earlier run): `python tests/test_gitignore_secrets.py` — all tests passed, 26 September 2026, Ryan.
+
+**Not yet covered:** deployed API Gateway URL, IAM, network security groups, CloudWatch (Kristen).
 
 # Artefact path
 
 - `src/api-contract.md`
 - `src/db/schema.sql` (`v_occupancy_current`, `app_user`)
 - `tests/test_gitignore_secrets.py`
+- `tests/test_api_security.py`
+- `src/backend/api.py`
+- `evidence/security-api-local.txt`
+- `evidence/security-offline-tests.txt`
 - `.gitignore`, `.env.example`
 - `evidence/threat-control-map.md`
 - `evidence/test-data-ai.md`
-- Redacted request/response once the API exists (no keys, account IDs, or IPs)
+- Redacted request/response once the deployed API exists (no keys, account IDs, or IPs)

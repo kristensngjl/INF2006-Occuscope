@@ -10,6 +10,7 @@ Update this table whenever a tool is used on a submission artefact. Team members
 | Cursor (Grok) | Tri 1 seed + store hygiene, 29 September 2026 | Full-trimester generate, MOM holidays, API `?at=` notes, `tests/test_data_store_hygiene.py` | Lideon checked timestamps (`+08:00`), generated sources in SQLite, and that NUS raw stays out of git and the app DB | N/A (AI-assisted authoring) |
 | Cursor (Grok) | RBS rooms + Wi-Fi ablation, 30 September 2026 | Catalogue locations; `metrics_wifi_ablation.csv`; crowd/seed tests; pinned `analytics/requirements.txt` | Lideon matched room ids to RBS screenshots and kept v0 without Wi-Fi after NUS MAE improved with room Wi-Fi | N/A (AI-assisted authoring) |
 | Codex | Frontend and original model, 29–30 September 2026 | `src/frontend/`: UI, data adapter, development proxy, tests and documentation | Agent ran five data/API tests and checked room/floor selection in-browser; human team review pending. Original procedural campus model; catalogue-driven floors and markers. | AI-assisted UI and original illustrative geometry; SIT wayfinder used as reference |
+| Cursor | Security evidence, 30 September 2026 | `tests/test_api_security.py`, evidence updates | Ryan ran the tests and reviewed outputs against `src/api-contract.md` | N/A |
 
 ## Datasets and baselines (must cite)
 
