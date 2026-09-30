@@ -17,6 +17,7 @@ data/raw/*
 *.db-journal
 
 # Private local files — never commit or push
+report_draft/
 CLOUDPROJ.md
 cloudproj.md
 INF2006_Team_Project_Brief_2026.pdf

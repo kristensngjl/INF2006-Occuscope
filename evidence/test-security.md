@@ -40,6 +40,7 @@ Supporting:
 5. Unknown `location_id` on occupancy and prediction paths — 4xx, not 500.
 6. `python tests/test_gitignore_secrets.py` from the repository root.
 7. Confirm responses and docs do not claim live Punggol sensors (`source` is `generated` after seed).
+8. `python tests/test_no_secrets_in_tracked_files.py` from the repository root.
 
 # Expected result
 
@@ -58,6 +59,7 @@ Supporting:
 - Named threat (local only, not deployed AWS): `python tests/test_api_security.py -v` — **10 tests run, 10 passed**, 30 September 2026, Ryan (`evidence/security-api-local.txt`). `crowd_level` / `colour` query params do not change the JSON versus the baseline `at` request. Injection-style location ids returned **404** (not 500); `GET /buildings` still **200** after probes. OpenAPI exposes only **GET** operations; POST/PUT/PATCH/DELETE on `/occupancy/current` and `/locations` returned **404** or **405**. Live `curl` against uvicorn on port 8000: **422** without `at`, **200** with demo `at`, **405** on POST.
 - Offline supporting checks: `test_gitignore_secrets.py` (2), `test_data_store_hygiene.py` (4), `test_crowd_and_seed.py` (4) — **10 passed**, 30 September 2026 (`evidence/security-offline-tests.txt`).
 - Secrets supporting check (earlier run): `python tests/test_gitignore_secrets.py` — all tests passed, 26 September 2026, Ryan.
+- Secret-pattern scan (tracked + uncommitted files): `python tests/test_no_secrets_in_tracked_files.py` — **8 tests run, 8 passed**, 30 September 2026, Ryan (`evidence/secret-scan-local.txt`).
 
 **Not yet covered:** deployed API Gateway URL, IAM, network security groups, CloudWatch (Kristen).
 
@@ -70,6 +72,8 @@ Supporting:
 - `src/backend/api.py`
 - `evidence/security-api-local.txt`
 - `evidence/security-offline-tests.txt`
+- `tests/test_no_secrets_in_tracked_files.py`
+- `evidence/secret-scan-local.txt`
 - `.gitignore`, `.env.example`
 - `evidence/threat-control-map.md`
 - `evidence/test-data-ai.md`

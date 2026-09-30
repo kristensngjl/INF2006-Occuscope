@@ -1,0 +1,47 @@
+﻿Date: 30 September 2026 (run by Ryan)
+Python: Python 3.12.10   Node: v24.13.1
+Commit: b72dac1
+Servers: API http://127.0.0.1:8000, frontend http://127.0.0.1:5173 (local only, not deployed)
+
+# 2a API via frontend proxy
+## GET /api/buildings
+[{"building_id":"E2","name":"Block E2","campus":"SIT Punggol","map_x":0.72,"map_y":0.38},{"building_id":"E6","name":"Block E6","campus":"SIT Punggol","map_x":0.78,"map_y":0.52},{"building_id":"W1","name":"Library (Block W1)","campus":"SIT Punggol","map_x":0.42,"map_y":0.5},{"building_id":"W3","name":"Block W3","campus":"SIT Punggol","map_x":0.26,"map_y":0.44},{"building_id":"W5","name":"Block W5","campus":"SIT Punggol","map_x":0.22,"map_y":0.58}]
+
+## GET /api/locations?building_id=E2&floor=4
+[{"location_id":"E2-04-20-DR223","building_id":"E2","floor":4,"name":"DR223","type":"discussion_room","capacity":8,"map_x":0.7,"map_y":0.4,"building_name":"Block E2","campus":"SIT Punggol"},{"location_id":"E2-04-21-DR224","building_id":"E2","floor":4,"name":"DR224","type":"discussion_room","capacity":8,"map_x":0.72,"map_y":0.4,"building_name":"Block E2","campus":"SIT Punggol"}]
+
+## GET /api/occupancy/current (no at) status
+422
+
+## cur.json saved to TEMP (47-row check in 2b)
+
+# 2b DR223 and floor lists
+row_count 47
+dr223 [{'location_id': 'E2-04-20-DR223', 'building_id': 'E2', 'building_name': 'Block E2', 'campus': 'SIT Punggol', 'floor': 4, 'name': 'DR223', 'type': 'discussion_room', 'capacity': 8, 'map_x': 0.7, 'map_y': 0.4, 'timestamp': '2026-09-30T15:00:00+08:00', 'occupancy_count': 3, 'source': 'generated', 'occupancy_ratio': 0.375, 'crowd_level': 'moderate'}]
+W3 distinct_floors [3, 4, 6, 7, 8]
+W5 distinct_floors [3, 5, 7, 8]
+
+# 2c timeline and prediction for E2-04-20-DR223
+## Note: first curl attempt used an unquoted URL in PowerShell; API returned 422 (missing from/to). Retried with single-quoted URL.
+timeline_len 13
+sources ['generated']
+sample timestamps 08:00-20:00 on 2026-09-30 (hourly rows)
+
+## prediction
+[{"predicted_for":"2026-09-29T16:00:00+08:00","occupancy_count":3,"model_version":"v0"},{"predicted_for":"2026-09-29T17:00:00+08:00","occupancy_count":3,"model_version":"v0"}]
+
+# 2d events/today
+[{"event_id":"E-ART-01","location_id":"W1-04-OPEN","title":"ArtFest exhibition (sample)","description":"Campus ArtFest showcase in Library L4 open study ÔÇö sample pin not an official programme listing","start_time":"2026-09-28T10:00:00+08:00","end_time":"2026-10-04T18:00:00+08:00"},{"event_id":"E-ART-03","location_id":"W1-04-01-MR03","title":"ArtFest workshop (sample)","description":"Small-group workshop in Library MR03","start_time":"2026-09-30T11:00:00+08:00","end_time":"2026-09-30T13:00:00+08:00"},{"event_id":"E-008","location_id":"E6-04-05-DR303","title":"CCA briefing","description":"Club briefing in E6 DR303","start_time":"2026-09-30T14:00:00+08:00","end_time":"2026-09-30T16:00:00+08:00"}]
+http_code 200
+
+# 2e frontend automated tests (OCCUSCOPE_INTEGRATION=1)
+tests 4, pass 4, fail 0, skipped 0 (node --test tests/*.test.mjs)
+
+# 2f static UI strings
+## index.html matches (live sensor|generated)
+<section class="intro"><div><p class="eyebrow">YOUR CAMPUS, AT A GLANCE</p><h1>Find your kind of <em>quiet.</em></h1><p>Explore campus spaces, check the crowd, and settle in.</p></div><div class="data-note"><span>Ôùê &nbsp; MODEL-GENERATED DATA</span><p>Estimated occupancy. Not live sensors<br>or room-booking availability.</p></div></section>
+## app.js matches generated
+$('map-count').textContent=`${state.rows.length} spaces ┬À generated occupancy`;
+$('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">Ô£ò</button></div>${badge(r)}<h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} ┬À Level ${esc(r.floor)} ┬À ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'ÔÇö':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy ┬À ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm <span class="detail-note">┬À generated</span></h3><div id="history">Loading daily historyÔÇª</div><div class="forecast" id="forecast">Loading forecastÔÇª</div>`;
+
+# 2g Browser click-through not run in this session; see evidence/test-frontend-map.md (Zi Qian, 30 Sep) for the keyboard-driven browser run.

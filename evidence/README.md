@@ -11,5 +11,11 @@ Named artefacts cited by `project_manifest.yaml`. Fill these before submission; 
 | `test-resilience.md` | Scale / failover / recovery | Kristen |
 | `monitoring.md` | CloudWatch (or equivalent) export | Ryan |
 | `threat-control-map.md` | Threat → control → evidence path | Ryan |
+| `test-frontend-map.md` | Supporting map / browser evidence | Zi Qian |
+| `functional-run-local.txt` | Raw local functional workflow run output | Ryan |
+| `security-api-local.txt` | Raw local API security test output | Ryan |
+| `security-offline-tests.txt` | Raw offline security / hygiene test output | Ryan |
+| `secret-scan-local.txt` | Raw secret-pattern scan output | Ryan |
+| `preflight-local.txt` | Raw submission preflight output | Ryan |
 
 Each test file must include: objective, setup, command/steps, expected result, actual result (dated), artefact path.
