@@ -8,8 +8,8 @@ test('selected-time frontend proxy returns populated teaching-day occupancy', {s
  const response=await fetch(`${origin}/api/occupancy/current?${new URLSearchParams({at})}`);
  assert.equal(response.status,200);
  const rows=await response.json();
- assert.equal(rows.length,32);
- assert.equal(new Set(rows.map(r=>r.location_id)).size,32);
+ const catalogue=await (await fetch(`${origin}/api/locations`)).json();
+ assert.deepEqual(rows.map(r=>r.location_id).sort(),catalogue.map(r=>r.location_id).sort(), 'Occupancy must include all API locations');
  assert.ok(rows.some(r=>r.occupancy_count>0));
  for(const r of rows){
    assert.equal(r.timestamp,at);
@@ -20,4 +20,5 @@ test('selected-time frontend proxy returns populated teaching-day occupancy', {s
  }
  const missingAt=await fetch(`${origin}/api/occupancy/current`);
  assert.equal(missingAt.status,422);
+ assert.equal((await fetch(`${origin}/sample/locations.csv`)).status,404);
 });

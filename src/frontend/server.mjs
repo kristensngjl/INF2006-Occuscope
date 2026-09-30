@@ -3,9 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 const root = path.dirname(fileURLToPath(import.meta.url));
-const samples = new Set(['buildings.csv','locations.csv','events.csv','occupancy_generated.csv','occupancy_prediction.csv']);
 const assets = new Set(['index.html','styles.css','app.js','data.js','model.js']);
-const types = {'.html':'text/html','.css':'text/css','.js':'text/javascript','.csv':'text/csv'};
+const types = {'.html':'text/html','.css':'text/css','.js':'text/javascript'};
 http.createServer(async (req,res) => {
   const url = new URL(req.url,'http://localhost');
   if(req.method !== 'GET') {res.writeHead(405); return res.end();}
@@ -20,10 +19,9 @@ http.createServer(async (req,res) => {
     const name = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
     let file;
     if(assets.has(name)) file = path.join(root,name);
-    else if(url.pathname.startsWith('/sample/') && samples.has(url.pathname.slice(8))) file = path.join(root,'../../data/sample',url.pathname.slice(8));
     else {res.writeHead(404); return res.end('Not found');}
     const content = await readFile(file);
     res.writeHead(200,{'Content-Type':`${types[path.extname(file)]}; charset=utf-8`,'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});
     res.end(content);
-  } catch(error) {res.writeHead(503,{'Content-Type':'application/json'}); res.end(JSON.stringify({detail:'Data unavailable. Check the sample files or start the API on port 8000.'}));}
+  } catch(error) {res.writeHead(503,{'Content-Type':'application/json'}); res.end(JSON.stringify({detail:'Data unavailable. Start the API on port 8000.'}));}
 }).listen(Number(process.env.PORT || 5173),'127.0.0.1',()=>console.log('Occuscope: http://127.0.0.1:'+(process.env.PORT || 5173)));

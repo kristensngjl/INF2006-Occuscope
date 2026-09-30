@@ -15,44 +15,41 @@ cd src/frontend
 node --test tests/*.test.mjs
 ```
 
-## Data modes
+## API-only data
 
-The optional **Sample dataset** mode reads the existing five CSV files under `data/sample/` through an allowlisted local server. It does not create or rebuild the database. Buildings and room identities come from the CSVs; selected-time occupancy uses the latest reading at or before that time. Missing data is never treated as zero. Sample-mode crowd bands mirror the API contract; API mode uses the server's room crowd bands directly.
+Start the backend before opening the frontend. The frontend proxies /api requests to http://127.0.0.1:8000 (override with API_ORIGIN). All buildings, rooms, occupancy, history, predictions and events come from the API. No source selector, CSV loader, sample routes or offline fallback remains. Failed requests show an error and retry. Events use today's Singapore date.
 
-**Local backend API is the default.** Start FastAPI using `src/backend/README.md` before opening the frontend. The local frontend server proxies `/api/*` to `http://127.0.0.1:8000`, avoiding cross-origin configuration. Set `API_ORIGIN` before starting to change this address. Backend errors are shown explicitly; the interface does not silently substitute sample data. `/events/today` returns today's Singapore events regardless of the selected occupancy date, and the UI labels this distinction.
-
-The default view is 30 September 2026 at 15:00 SGT. Data covers 31 August–27 December 2026, 08:00–20:00. Saved predictions cover only 29 September at 16:00 and 17:00; other times show forecast unavailability. Occupancy is generated, not live sensors or booking availability. W5 room codes require confirmation.
+The default view is 30 September 2026 at 15:00 SGT. Data covers 31 August–27 December 2026, 08:00–20:00. Saved predictions cover only 29 September at 16:00 and 17:00; other times show forecast unavailability. Occupancy is generated, not live sensors or booking availability.
 
 ## Interface and map
 
-The main map embeds the actual visitor map used by SIT's official Campus Wayfinder: https://pcmap-sit-visitor.netlify.app/. The provider retains its search, pan/zoom and floor-selection controls; map assets/code are not copied or rehosted. The standalone map was inspected in-browser. The embedded map stayed blank in the Codex in-app preview during verification, so embedded operation is **not verified**. A visible direct-map link and reload control are included; the official map requires internet access.
+The **3D campus** view is our original procedural model, projected from 3D coordinates into SVG. Select a building to expand its floors, select a floor, then a crowd marker to open that room. Rotate, zoom and reset controls adjust the model. The SIT wayfinder is a reference link only; no provider map is embedded or copied. Shapes and room positions are illustrative, not surveyed architectural plans. The authored scenery includes facade fins, glazing, planted balconies, individual solar panels, entrance canopies, steps, forecourts, benches, planted beds and tree-lined paths. Roads and paths are decorative approximations, not routing data.
 
-The map is a cross-origin third-party application. Its clicks do not filter Occuscope, and Occuscope does not inject occupancy colours into it. A supported provider SDK/message API and a verified room-to-map coordinate mapping would be needed for synchronized selection and a crowd overlay. Do not claim these are implemented.
-
-Occuscope provides separate building/floor/type/crowd filters, room search, location details and daily occupancy charts for 32 spaces across E2, E6, W1, W3 and W5. The **Crowd positions** view uses API `map_x` / `map_y` (normalized dataset coordinates), with building selection fitting the selected points. It is explicitly labelled as uncalibrated to the official map. Unknown/null coordinates are omitted from this plot, while those rooms remain in the list. Occupancy ratio sizes the room-card meters; server `crowd_level` controls their CSS presentation. No colour or crowd band is sent as an API input. Sidebar building indicators aggregate mapped-room counts and capacities only.
+The model, floor controls and room list use the current location catalogue: 47 spaces across E2, E6, W1, W3 and W5. W3 includes Levels 3, 4, 6, 7 and 8; W5 includes Levels 3, 5, 7 and 8. The **Crowd positions** view retains the dataset map_x/map_y plot. Server crowd_level controls room marker presentation, while occupancy_ratio controls meters. Missing readings remain unknown.
 
 Default request: `GET /occupancy/current?at=2026-09-30T15:00:00+08:00`. `URLSearchParams` encodes the plus as `%2B`. The client does not read the unfiltered latest-row database view. Room selection joins by `location_id`. Missing readings remain unknown, not zero.
 
-Responsive layouts, keyboard-operated buttons, visible focus indicators, labelled controls, text crowd labels and accessible chart descriptions are included. Fonts optionally load from Google Fonts, with system fallbacks offline. All local sample data remains usable without internet access.
+Responsive layouts, keyboard-operated buttons, visible focus indicators, labelled controls, text crowd labels and accessible chart descriptions are included. Fonts optionally load from Google Fonts, with system fallbacks offline. The backend must be running.
 
 ## Files and deployment
 
-- `index.html`: application shell, official map embed and coordinate-view container.
+- `index.html`: application shell, original model and coordinate-view containers.
 - `styles.css`: responsive visual design.
 - `app.js`: views, controls, asynchronous loading and API integration.
-- `data.js`: CSV parsing, sample readings and data adapters.
+- `model.js`: original geometry, projection, camera controls and floor/room selection.
+- `data.js`: API requests and display helpers.
 - `server.mjs`: loopback-only development server with an explicit static-file allowlist and API proxy. Does not expose the repository or `.env` files.
 
-For cloud deployment, serve the four frontend assets through the team's chosen hosting service and route `/api/` through a same-origin reverse proxy. Sample mode additionally requires the five `/sample/` CSV routes. The local server is a development tool, not a production hosting/security implementation.
+For cloud deployment, serve the frontend assets through the team's chosen hosting service and route `/api/` through a same-origin reverse proxy.  The local server is a development tool, not a production hosting/security implementation.
 
 ## Manual functional check
 
-1. Start the API and frontend, then open the default API view: 32 spaces at 30 September 2026, 15:00 SGT.
+1. Start the API and frontend, then open the default API view: 47 spaces at 30 September 2026, 15:00 SGT.
 2. Select E2, then Level 4: DR223 and DR224 appear.
 3. Choose Crowd positions, select DR223, and verify 3/8 people, 38% displayed, moderate, generated, and the 30 September 15:00 timestamp.
 4. The daily chart is populated. The forecast states that no saved forecast exists for this time; September 29 forecasts are not relabelled.
-5. Choose Campus map. If the embedded provider map is blank, open the visible direct-map link. Search a room and use the provider's floor/zoom controls. These do not synchronize with Occuscope's filters.
-6. Choose Sample dataset explicitly for offline occupancy. API mode never silently falls back.
+5. Choose 3D campus, select W3 and Level 8: DR15, DR16 and DR17 appear. W5 Level 8 contains DR25 and DR26. Test model rotation, zoom and room selection.
+6. Verify there is no source selector; /sample/locations.csv returns 404.
 7. Stop the API and refresh: an error and retry action appear, with no stale occupancy cards.
 
 ## Integration test
@@ -64,4 +61,12 @@ $env:OCCUSCOPE_INTEGRATION='1'
 node --test tests/*.test.mjs
 ```
 
-Checks 32 distinct rooms at the requested teaching-day timestamp, required fields, nonzero counts, generated source, ratio/band consistency, and rejection of requests with no `at` argument. Without the environment flag, only this integration test is skipped.
+Checks all current catalogue rooms at the requested teaching-day timestamp, required fields, nonzero counts, generated source, ratio/band consistency, and rejection of requests with no `at` argument. Without the environment flag, only this integration test is skipped.
+
+## Database freshness
+
+Updating the CSVs does not update an existing SQLite database. The API integration test compares occupancy location IDs against the API locations endpoint. The standard init script deletes the existing database; preserve any teammate data before using it. For an isolated preview, seed a separate SQLite file using the existing schema and seed function, and point the backend DATABASE_URL at that file. The frontend never reads CSVs directly.
+
+## Level 5 bridges and reference landmarks
+
+The model includes an illustrative E6–E1 Level 5 connection, supported by SIT's Facilities page (https://www.singaporetech.edu.sg/life-at-sit/facilities). Western bridge spans illustrate the Campus Heart Level 5 Collaboration Loop described by BCA (https://www1.bca.gov.sg/growth-and-transformation/bca-awards/universal-design-excellence-award/award-winners-2025/). Exact western endpoints and all alignments are schematic, not verified navigation routes. E1, E3, E4 and E5 are context landmarks only, identified from the official visitor wayfinder. Their heights and footprints are approximate and they have no invented crowd data. The model now displays at least five levels for bridge context, rather than inferring total building height solely from available rooms. Level 5 selection can legitimately have zero dataset rooms.
