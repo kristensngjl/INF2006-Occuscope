@@ -16,11 +16,11 @@ The visual map is modelled on SIT’s [Campus Wayfinder](https://www.singaporete
 
 | Name | Student ID | Role |
 |---|---|---|
-| Zi Qian | | Frontend / Map (heatmap UI and wayfinder UI) |
-| Zul | | Backend / Database |
-| Lideon | | Data / Machine Learning |
-| Kristen | | Cloud / Scalability |
-| Ryan | | Security / Monitoring / Testing |
+| Zi Qian | 2501958 | Frontend / Map (heatmap UI and wayfinder UI) |
+| Zul | 2500993 | Backend / Database |
+| Lideon | 2501098 | Data / Machine Learning |
+| Kristen | 2501481 | Cloud / Scalability |
+| Ryan | 2501205 | Security / Monitoring / Testing |
 
 Fill `student_id` and `group_id` in `project_manifest.yaml` before packaging. Submission deadline: **Sunday 11 October 2026, 11:59 PM**.
 
