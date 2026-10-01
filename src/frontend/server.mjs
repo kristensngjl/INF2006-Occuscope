@@ -7,12 +7,18 @@ const assets = new Set(['index.html','styles.css','app.js','data.js','model.js']
 const types = {'.html':'text/html','.css':'text/css','.js':'text/javascript'};
 http.createServer(async (req,res) => {
   const url = new URL(req.url,'http://localhost');
-  if(req.method !== 'GET') {res.writeHead(405); return res.end();}
+  if(req.method !== 'GET' && !(req.method === 'POST' && url.pathname === '/api/chat')) {res.writeHead(405); return res.end();}
   try {
     if(url.pathname.startsWith('/api/')) {
       const upstream = new URL(process.env.API_ORIGIN || 'http://127.0.0.1:8000');
       upstream.pathname = url.pathname.slice(4); upstream.search = url.search;
-      const response = await fetch(upstream,{signal:AbortSignal.timeout(12000)});
+      let body;
+      if(req.method==='POST'){
+        const chunks=[];let size=0;
+        for await(const chunk of req){size+=chunk.length;if(size>8192){res.writeHead(413);return res.end('Request too large');}chunks.push(chunk);}
+        body=Buffer.concat(chunks);
+      }
+      const response = await fetch(upstream,{method:req.method,body,headers:body?{'Content-Type':'application/json'}:undefined,signal:AbortSignal.timeout(25000)});
       res.writeHead(response.status,{'Content-Type':'application/json'});
       return res.end(await response.text());
     }

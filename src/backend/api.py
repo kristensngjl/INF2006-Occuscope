@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
+from .chat import ChatInput, answer
 
 ROOT = Path(__file__).resolve().parents[2]
 SGT = timezone(timedelta(hours=8))
@@ -123,6 +124,13 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         return rows("""SELECT * FROM event WHERE julianday(start_time) < julianday(?)
                        AND julianday(end_time) > julianday(?) ORDER BY julianday(start_time), event_id""",
                     (end.isoformat(), start.isoformat()))
+
+    @app.post("/chat")
+    def chat(body: ChatInput):
+        if not body.message.strip():
+            raise HTTPException(422, "Enter a question")
+        instant = parse_time(body.at, "at").isoformat()
+        return answer(body.message.strip(), instant, current(instant))
 
     return app
 

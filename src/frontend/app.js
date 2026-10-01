@@ -93,3 +93,24 @@ $('model-home').onclick=()=>chooseBuilding('all');
 document.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>{adjustModel(b.dataset.camera);render();});
 
 bindModelGestures($('campus-model'),render);
+
+// Replies are rendered as text, never executable model HTML.
+const chatPanel=$('campus-chat');
+function showChat(open){chatPanel.hidden=!open;$('chat-toggle').setAttribute('aria-expanded',String(open));if(open)$('chat-input').focus();else $('chat-toggle').focus();}
+$('chat-toggle').onclick=()=>showChat(chatPanel.hidden);
+$('chat-close').onclick=()=>showChat(false);
+chatPanel.addEventListener('keydown',e=>{if(e.key==='Escape')showChat(false);});
+function chatLine(text,kind){const line=document.createElement('p');line.className='chat-line '+kind;line.textContent=text;$('chat-messages').append(line);line.scrollIntoView({block:'nearest'});return line;}
+chatLine('Hi! Ask me about crowd levels or rooms. Each question uses the date and time selected above.','assistant');
+$('chat-form').onsubmit=async e=>{
+ e.preventDefault();const message=$('chat-input').value.trim();if(!message)return;
+ const instant=at();chatLine(message,'user');$('chat-input').value='';$('chat-send').disabled=true;
+ const pending=chatLine('Checking campus data…','assistant');
+ try{
+  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,at:instant}),signal:AbortSignal.timeout(30000)});
+  const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Unable to answer this question.');
+  pending.textContent=data.answer+'\nViewing: '+instant;
+  for(const id of data.location_ids||[]){const room=state.rows.find(r=>r.location_id===id);if(!room)continue;const button=document.createElement('button');button.className='chat-room';button.textContent=room.name+' · '+room.building_id+' ↗';button.onclick=()=>{if(at()!==instant){chatLine('The selected time has changed. Ask again for updated suggestions.','assistant');return;}selectRoom(id);mapView(true);showChat(false);};pending.append(document.createElement('br'),button);}
+ }catch(error){pending.textContent=error.name==='TimeoutError'?'The assistant took too long. Try again.':error.message;}
+ finally{$('chat-send').disabled=false;}
+};

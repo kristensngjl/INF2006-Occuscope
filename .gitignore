@@ -34,3 +34,6 @@ analytics/*.pkl
 node_modules/
 dist/
 .pytest_cache/
+
+# Private local chatbot credentials
+/.chat.local.json
