@@ -1,0 +1,5 @@
+horizon_hours,model,mae,rmse,r2,n
+1,persist_last_count,0.8295,2.7444,0.0919,17364
+1,v0_hour_type_mean,1.7601,2.9346,-0.0383,17364
+2,persist_last_count,0.8897,2.2945,0.3711,17160
+2,v0_hour_type_mean,1.78,2.952,-0.041,17160

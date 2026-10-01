@@ -125,7 +125,10 @@ class ApiSecurityTest(unittest.TestCase):
         bad = "NOPE-00-00-XX"
         self.assertEqual(self.client.get(f"/locations/{bad}").status_code, 404)
         self.assertEqual(
-            self.client.get(f"/occupancy/{bad}/prediction").status_code, 404
+            self.client.get(
+                f"/occupancy/{bad}/prediction", params={"at": DEMO_AT}
+            ).status_code,
+            404,
         )
         r = self.client.get(
             f"/occupancy/{bad}",
@@ -176,14 +179,16 @@ class ApiSecurityTest(unittest.TestCase):
         )
 
     def test_prediction_shape(self) -> None:
-        r = self.client.get(f"/occupancy/{KNOWN_ID}/prediction")
+        r = self.client.get(
+            f"/occupancy/{KNOWN_ID}/prediction", params={"at": DEMO_AT}
+        )
         self.assertEqual(r.status_code, 200)
         items = r.json()
         self.assertIsInstance(items, list)
-        for item in items:
-            self.assertIn("predicted_for", item)
-            self.assertIn("occupancy_count", item)
-            self.assertIn("model_version", item)
+        self.assertGreaterEqual(len(items), 1)
+        self.assertLessEqual(len(items), 2)
+        missing = self.client.get(f"/occupancy/{KNOWN_ID}/prediction")
+        self.assertEqual(missing.status_code, 422)
 
     def test_no_write_routes(self) -> None:
         paths = self.client.app.openapi()["paths"]

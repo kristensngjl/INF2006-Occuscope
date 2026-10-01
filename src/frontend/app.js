@@ -4,10 +4,38 @@ const $=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={building:'all',floor:'all',selected:null,rows:[],buildings:[],locations:[],events:[],version:0,detailVersion:0};
 
+const SEED_START='2026-08-31';
+const SEED_END='2026-12-27';
+let liveTimer=null;
 const time=t=>new Intl.DateTimeFormat('en-SG',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Singapore'}).format(new Date(t));
 const at=()=>`${$('date').value}T${$('hour').value}:00:00+08:00`;
+function singaporeParts(){
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Singapore',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+  const get=t=>parts.find(p=>p.type===t).value;
+  return {date:`${get('year')}-${get('month')}-${get('day')}`,hour:Number(get('hour'))};
+}
+function snapLiveClock(){
+  let {date,hour}=singaporeParts();
+  if(date<SEED_START)date=SEED_START;
+  if(date>SEED_END)date=SEED_END;
+  hour=Math.min(20,Math.max(8,hour));
+  $('date').value=date;
+  $('hour').value=String(hour).padStart(2,'0');
+}
+function setLive(on){
+  $('live').checked=on;
+  $('date').disabled=on;
+  $('hour').disabled=on;
+  $('clock-fields').classList.toggle('following',on);
+  clearInterval(liveTimer);
+  liveTimer=null;
+  if(on){
+    snapLiveClock();
+    liveTimer=setInterval(()=>{if(!$('live').checked)return;snapLiveClock();refresh();},60000);
+  }
+}
 const badge=r=>`<span class="badge ${esc(r.crowd_level||'unknown')}"><i class="${esc(r.crowd_level||'unknown')}"></i>${esc(r.crowd_level||'No data')}</span>`;
-$('hour').innerHTML=Array.from({length:13},(_,i)=>`<option value="${String(i+8).padStart(2,'0')}" ${i+8===15?'selected':''}>${String(i+8).padStart(2,'0')}:00</option>`).join('');
+$('hour').innerHTML=Array.from({length:13},(_,i)=>{const h=String(i+8).padStart(2,'0');return `<option value="${h}">${h}:00</option>`;}).join('');
 function validate(){const d=$('date');if(!d.value||d.value<d.min||d.value>d.max){$('notice').textContent='Choose a date between 31 August and 27 December 2026, the available data period.';return false;}return true;}
 async function refresh(){
  if(!validate())return;
@@ -30,7 +58,7 @@ function render(){
  const chosen=state.buildings.find(b=>b.building_id===state.building);
  $('map-title').textContent=chosen?`${chosen.name}${state.floor==='all'?'':' · Level '+state.floor}`:'Explore SIT Punggol';
  $('map-kicker').textContent='OCCUSCOPE CAMPUS MODEL';
- $('selected-time').textContent=`${$('date').value} · ${$('hour').value}:00 SGT`;
+ $('selected-time').textContent=`${$('live').checked?'Following clock · ':''}${$('date').value} · ${$('hour').value}:00 SGT · generated`;
  $('coordinate-title').textContent=`${chosen?chosen.name:'Campus'}${state.floor==='all'?'':' · Level '+state.floor}`;
  $('spaces-title').textContent=chosen?`${chosen.name} spaces`:'All campus spaces';
  const floors=[...new Set(state.locations.filter(l=>state.building==='all'||l.building_id===state.building).map(l=>Number(l.floor)))].sort((a,b)=>a-b);
@@ -62,7 +90,7 @@ async function renderDetail(){
    let history,predictions;
    const date=$('date').value;
    const next=new Date(`${date}T00:00:00Z`);next.setUTCDate(next.getUTCDate()+1);
-   [history,predictions]=await Promise.all([api(`occupancy/${encodeURIComponent(r.location_id)}`,{from:`${date}T00:00:00+08:00`,to:`${next.toISOString().slice(0,10)}T00:00:00+08:00`}),api(`occupancy/${encodeURIComponent(r.location_id)}/prediction`)]);
+   [history,predictions]=await Promise.all([api(`occupancy/${encodeURIComponent(r.location_id)}`,{from:`${date}T00:00:00+08:00`,to:`${next.toISOString().slice(0,10)}T00:00:00+08:00`}),api(`occupancy/${encodeURIComponent(r.location_id)}/prediction`,{at:at()})]);
    if(version!==state.detailVersion)return;
    $('history').innerHTML=history.length?`<div class="chart" role="img" aria-label="Hourly estimated occupancy: ${esc(history.map(h=>`${time(h.timestamp)}: ${h.occupancy_count} people`).join('; '))}">${history.map(h=>`<span class="${h.timestamp.slice(11,13)===$('hour').value?'chosen':''}" style="height:${Math.max(3,Math.min(100,Number(h.occupancy_count)/Number(r.capacity)*100))}%" title="${time(h.timestamp)}: ${esc(h.occupancy_count)} people"></span>`).join('')}</div><div class="chart-labels"><span>${time(history[0].timestamp)}</span><span>Singapore time</span><span>${time(history.at(-1).timestamp)}</span></div>`:'<p class="detail-note">No history for this day.</p>';
    const future=predictions.filter(p=>Date.parse(p.predicted_for)>Date.parse(at())&&Date.parse(p.predicted_for)<=Date.parse(at())+7200000);
@@ -71,8 +99,10 @@ async function renderDetail(){
 }
 $('all').onclick=()=>chooseBuilding('all');
 ['search','crowd','type'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
-['date','hour'].forEach(id=>$(id).addEventListener('change',refresh));
-$('reset').onclick=()=>{adjustModel('reset');state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';$('date').value='2026-09-30';$('hour').value='15';refresh();};
+['date','hour'].forEach(id=>$(id).addEventListener('change',()=>{setLive(false);refresh();}));
+$('live').onchange=()=>{if($('live').checked){setLive(true);refresh();}else setLive(false);};
+$('reset').onclick=()=>{adjustModel('reset');state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';setLive(true);refresh();};
+setLive(true);
 refresh();
 
 function renderCoordinates(rooms){

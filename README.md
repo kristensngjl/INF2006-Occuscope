@@ -2,15 +2,13 @@
 
 **INF2006 Team Project 1 — Cloud Computing and Big Data**
 
-Occuscope is a hierarchical campus map for SIT Punggol (**campus → building → floor → location**). It shows crowd level at mapped spaces and the events scheduled for the day.
+Occuscope is a hierarchical campus map for SIT Punggol (**campus → building → floor → location**). Students can see Quiet / Moderate / Crowded at mapped rooms and what is on the calendar that day, without walking the building first.
 
-## Problem statement
+There is **no live Punggol sensor feed**. Occupancy on the map is **model-generated** from NUS training data plus an academic-calendar overlay, not cameras or Room Booking System availability.
 
-Students cannot tell whether the library is crowded, whether discussion rooms on a given floor are free, or what is on around campus without walking the building. Occuscope answers those three questions on one map.
+The visual layout follows SIT’s [Campus Wayfinder](https://www.singaporetech.edu.sg/campus-wayfinder) as a **map reference only** (not turn-by-turn routing). The frontend has two features: a **crowd heatmap** (colour from occupancy ratio) and a **wayfinder-style 3D campus view**.
 
-Crowd bands are **Quiet** (occupancy ratio ≤ 0.30), **Moderate** (≤ 0.70), and **Crowded** (otherwise). They are derived from an occupancy model trained on identified NUS datasets and transferred onto SIT location types and capacities. There is no live Punggol sensor feed; occupancy shown in the application is **generated**, not measured on site.
-
-The visual map is modelled on SIT’s [Campus Wayfinder](https://www.singaporetech.edu.sg/campus-wayfinder) as a **map layout reference only** (not routing). The frontend comprises two separate features: a **crowd heatmap** (colour from occupancy ratio) and a **wayfinder-style stacked / 3D campus view** (browse buildings and floors). Neither is turn-by-turn navigation.
+Architecture diagram: [`evidence/architecture.png`](evidence/architecture.png) (Kristen). Data/AI evidence: [`evidence/test-data-ai.md`](evidence/test-data-ai.md). Manifest: [`project_manifest.yaml`](project_manifest.yaml). Deadline: **Sunday 11 October 2026, 11:59 PM**. `group_id` in the manifest is still `Gxxx` until the group number is confirmed.
 
 ## Team
 
@@ -22,92 +20,105 @@ The visual map is modelled on SIT’s [Campus Wayfinder](https://www.singaporete
 | Kristen | 2501481 | Cloud / Scalability |
 | Ryan | 2501205 | Security / Monitoring / Testing |
 
-Fill `student_id` and `group_id` in `project_manifest.yaml` before packaging. Submission deadline: **Sunday 11 October 2026, 11:59 PM**.
+## Quick start — run the site
 
-## Method (data and occupancy)
+Python 3.11+ and Node.js 18+. From the repository root, **two terminals**:
 
-1. **Train on NUS labels only.** ROBOD provides ground-truth `occupant_count` at five-minute resolution. Features used in v0 are transferable to SIT without campus sensors: hour of day, day of week, and room type. Evaluation is a **date hold-out** (last 14 days), not a shuffled split, so adjacent 5-minute ticks cannot leak from test into train.
-2. **Select the model on NUS hold-out MAE.** An hour × room-type mean lookup outperformed Ridge and Random Forest (MAE 1.74 versus approximately 1.83). That lookup is saved as `occupancy_v0`. Negative R² on the hold-out is reported: the test window is a different occupancy regime (late term).
-3. **Generate SIT occupancy.** Predicted NUS count is converted to a utilisation ratio (count / type 95th percentile), scaled by SIT `location.capacity`, then adjusted by an explicit academic calendar overlay (`data/sample/sit_calendar.json`).
-4. **Calendar overlay (generate time only).** Teaching, recess (week 7: 12–18 October 2026), final assessment, and trimester break follow the published [SIT AY2026/27 Trimester 1 calendar](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). Singapore public holidays (and in-lieu Mondays) follow the [MOM 2026 list](https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026) and lower generated occupancy. Integrated Work Study Programme (IWSP) effects are a **programme mix**, not live booking data: East blocks (E2, E6) represent IT courses; West teaching blocks (W3, W5) represent other courses; **W1 library is shared** and is not placed on that split. Overseas Immersion Programme (OIP) dates for 2026 are not published; that window is disabled.
+```powershell
+python src/db/init_app_db.py
+python -m pip install -r src/backend/requirements.txt
+python -m uvicorn src.backend.api:app --host 127.0.0.1 --port 8000
+```
 
-Crowd bands are **not stored as columns**. View `v_occupancy_current` computes `occupancy_ratio` and `crowd_level` from `occupancy_count / capacity`.
+```powershell
+node src/frontend/server.mjs
+```
 
-Evidence for the data/AI test: `evidence/test-data-ai.md`.
+Open **http://127.0.0.1:5173**. The frontend proxies `/api` to port 8000. `init_app_db.py` **deletes and rebuilds** `data/occuscope.db` from `data/sample/` (62 locations, Trimester 1 generated occupancy). Skip it if you already have a seed you want to keep.
 
-## Quick start
+**Follow Singapore time** (default on) snaps the map to now SGT, clamped to 31 August–27 December 2026, 08:00–20:00. Uncheck it to pick a date/hour for a demo. Occupancy stays generated either way.
 
-Python 3.11+. Training in this repository was run on **Python 3.11.9** (scikit-learn 1.9.1, joblib 1.6.0). From the repository root (Windows):
+Copy `.env.example` to `.env` only if you run the optional campus chat (Groq). Never commit `.env`. Chat is not the occupancy model.
+
+## Quick start — reproduce occupancy (data / ML)
+
+Training in this repo used **Python 3.11.9**. `data/raw/` (ROBOD CSVs, Wi-Fi xlsx) is **gitignored and not in the ZIP**. Markers can re-run hold-out metrics from committed `data/processed/robod_clean.csv`. Rebuild that file, or the C5 Wi-Fi ablation, only if you have downloaded Figshare/Zenodo locally (`data/README.md`). `occupancy_v0.joblib` is gitignored; run `04_train.py` before `05_generate_sit.py` if you need a new generate.
 
 ```
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r analytics/requirements.txt
-copy .env.example .env
 python analytics/02_clean_robod.py
 python analytics/03_eda_robod.py
 python analytics/04_train.py
+python analytics/06_holdout_diagnostics.py
 python analytics/05_generate_sit.py
 python src/db/init_app_db.py
 ```
-
-Place ROBOD CSVs and the NUS Wi-Fi workbook in `data/raw/` first (`data/README.md`). Never commit `.env` or `data/raw/`.
 
 | Command | Purpose |
 |---|---|
 | `02_clean_robod.py` | Clean ROBOD → `data/processed/robod_clean.csv` |
 | `03_eda_robod.py` | Figures under `analytics/figures/` |
-| `04_train.py` | Time hold-out; `analytics/metrics_holdout.csv` and `analytics/models/occupancy_v0.joblib` |
-| `05_generate_sit.py` | SIT occupancy and two-hour forecasts (`source = generated`) |
-| `init_app_db.py` | Rebuild `data/occuscope.db` from `src/db/schema.sql` and `data/sample/` |
-| `01_eda.py` | Dummy occupancy fallback only (`source = dummy`) |
+| `04_train.py` | Date hold-out; `metrics_holdout.csv`; `occupancy_v0.joblib` |
+| `06_holdout_diagnostics.py` | MAE by type/hour; 7 vs 14-day window; persist vs v0; NUS crowd-band counts |
+| `05_generate_sit.py` | SIT occupancy (`source = generated`) |
+| `init_app_db.py` | Rebuild SQLite from schema + `data/sample/` |
+| `01_eda.py` | Dummy occupancy fallback (`source = dummy`) |
 
-The local REST API is runnable; see [API setup and map integration](src/backend/README.md). The frontend is still to be built. Sample occupancy is **AY2026/27 Trimester 1** (31 August–27 December 2026, 08:00–20:00 SGT, `+08:00`). Timeline: `GET /occupancy/{id}?from=&to=` (maximum seven days). Heatmap: `GET /occupancy/current?at=` (do not use the last seed timestamp — that is trimester break).
+Map API: `GET /occupancy/current?at=` (ISO-8601 with `+08:00`; do not use `MAX(timestamp)` — that is trimester break). Timeline: `GET /occupancy/{id}?from=&to=` (max seven days). Next two hours: `GET /occupancy/{id}/prediction?at=` (lookahead in the generated series). Contract: [`src/api-contract.md`](src/api-contract.md).
+
+## Method (data and occupancy)
+
+Crowd bands: **Quiet** ≤ 0.30, **Moderate** ≤ 0.70, otherwise **Crowded**. They are computed in SQL views from `occupancy_count / capacity`, not stored columns.
+
+1. **Train on NUS labels only.** ROBOD `occupant_count`, 5-minute ticks. v0 features: hour, weekday, room type (transferable to SIT without campus sensors). **Date hold-out** (last 14 days), not shuffled rows.
+2. **Select on NUS MAE.** Hour × room-type mean beat Ridge and Random Forest (MAE **1.74** vs ~1.83). Negative R² on the hold-out is reported (late-term regime). Lecture MAE is higher than office/library; 15:00 is harder than overnight. A 7-day hold-out MAE is ~1.73 (same order). Copying last hour’s NUS count beats v0 for 1–2 hour MAE; SIT has **no last reading**, so the map does not use persist.
+3. **Generate SIT rows.** Ratio = v0 count / ROBOD type 95th percentile × SIT capacity × calendar × sample events × per-room mix (without mix, every discussion room would match at 15:00). 62 locations, 31 August–27 December 2026, 08:00–20:00 SGT.
+4. **Calendar overlay (generate only).** [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes); [MOM 2026 holidays](https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026). East (E2, E6) = IT IWSP mix; W3/W5 = other courses; **W1 library is shared**. OIP 2026 dates are unpublished (window off).
+
+Same Quiet/Moderate/Crowded cut-offs on NUS hold-out: 08:00 is almost all Quiet; 15:00 is mixed. That is a band sanity check, not SIT accuracy.
 
 ## Architecture
 
-Two stores, one map:
+1. **Offline analytics** — ROBOD / NUS Wi-Fi in `data/raw/` (gitignored). Never loaded into the app database.
+2. **Application database** — SIT buildings, 62 locations, generated occupancy, events (`data/occuscope.db` locally; RDS later). API reads SQLite; the browser reads the API only.
 
-1. **Offline analytics** — ROBOD (and optional NUS Wi-Fi) remain in `data/raw/` and are never copied into the application database.
-2. **Application database** — SIT `building`, `location`, `occupancy`, `event`, `occupancy_prediction` (SQLite locally; RDS later). The API reads the database; the frontend reads the API.
-
-Heatmap payload: `GET /occupancy/current` (`map_x`, `map_y`, `occupancy_ratio`, `crowd_level`). Heatmap and wayfinder UIs: Zi Qian. Occupancy values: Lideon. HTTP: Zul.
-
-Architecture diagram (Kristen): [`evidence/architecture.png`](evidence/architecture.png) — to be supplied.
+| Piece | Owner |
+|---|---|
+| Occupancy values, generate, metrics | Lideon |
+| REST API, schema | Zul |
+| Heatmap + 3D wayfinder UI | Zi Qian |
+| AWS deploy / scale | Kristen |
+| Security tests / evidence pack | Ryan |
 
 ## Technology
 
-- Cloud: AWS (deployment topology to be confirmed with the cloud owner: EC2 + load balancer + RDS, or API Gateway + Lambda + S3)
-- Local database: SQLite (`DATABASE_URL=sqlite:///data/occuscope.db`)
-- Training data:
-  - [ROBOD](https://github.com/ideas-lab-nus/robod) — NUS rooms, ground-truth occupant counts, 5-minute ticks (Tekler et al., *Building Simulation*, 2022)
-  - [NUS Wi-Fi floor counts](https://zenodo.org/records/17578240) — floors L2–L6, 2018, CC BY 4.0 (not used in v0)
-
-Schema: `src/db/schema.sql`. API: `src/api-contract.md`.
+- App: HTML/CSS/JS frontend (`src/frontend/`), FastAPI (`src/backend/`), SQLite (`src/db/schema.sql`)
+- Cloud: AWS (topology with the cloud owner: S3 + API Gateway + Lambda, or EC2 + load balancer + RDS)
+- Training: Python 3.11.9, pandas / scikit-learn; [ROBOD](https://github.com/ideas-lab-nus/robod) (Tekler et al., *Building Simulation*, 2022); [NUS Wi-Fi floors](https://zenodo.org/records/17578240) CC BY 4.0 (ablation only; unused in v0)
 
 ## Repository layout
 
 | Path | Purpose |
 |---|---|
-| `src/` | API contract, database schema, local SQLite initialiser |
-| `data/sample/` | SIT seed CSVs, generated occupancy, academic calendar overlay |
-| `data/processed/` | Cleaned ROBOD table |
+| `src/frontend/` | Map UI and local static server |
+| `src/backend/` | FastAPI + Lambda handler |
+| `src/db/` | Schema and SQLite seed |
+| `src/api-contract.md` | HTTP contract |
+| `data/sample/` | SIT seed CSVs (generated occupancy, calendar) |
+| `data/processed/` | Cleaned ROBOD (committed) |
 | `data/raw/` | NUS downloads (gitignored) |
-| `analytics/` | Clean, exploratory analysis, train, generate |
-| `evidence/` | Marker tests, architecture, monitoring |
+| `analytics/` | Clean, EDA, train, generate, hold-out diagnostics |
+| `evidence/` | Marker tests and logs |
 | `tests/` | Repeatable tests |
-| `project_manifest.yaml` | Required submission summary |
-
-## Status
-
-**Completed (data / ML):** identified datasets; ROBOD cleaned; exploratory figures; v0 occupancy model with baseline comparison; generated SIT occupancy and next-two-hour predictions; academic-calendar overlay as above.
-
-**Outstanding:** confirm W5 Room Booking System codes; frontend and cloud API integration; AWS deployment; report sections and remaining tests; pin runtime with the Lambda owner (trained on Python 3.11.9).
+| `project_manifest.yaml` | Submission summary |
 
 ## Limitations
 
-- ROBOD and the Wi-Fi series describe NUS buildings. They supply time-of-day and type shape, not SIT Punggol ground truth. SIT occupancy is not labelled; campus accuracy is not reported.
-- This ROBOD extract contains **weekdays only**. Weekend map values use a Friday occupancy shape scaled by an explicit weekend factor.
-- Map “current” occupancy is generated (v0 + calendar overlay). Recess and examination dates follow the public SIT calendar (subject to change). IWSP reductions are a documented programme mix, not official per-room bookings. OIP 2026 dates are not published.
-- Sample locations are discussion-room identifiers from Room Booking System catalogue screenshots (not a live scrape), plus W1 library spaces. Catalogue: E2, E6, W3 DR02–DR17, W5 DR18–DR20 and DR23–DR26 (no DR21/DR22 on the cards). Capacities are inferred from furniture in those photos.
-- Wi-Fi connected-device counts are not the same as people (correlation with ROBOD `occupant_count` ≈ 0.69). Room Wi-Fi improves NUS hold-out MAE but is unused in v0 because SIT has no matching feed.
+- ROBOD and Wi-Fi describe **NUS**, not SIT Punggol. SIT occupancy is not labelled; campus accuracy is not reported.
+- This ROBOD extract is **weekdays only**. Weekend map hours use Friday’s hour shape × an explicit weekend factor.
+- Follow Singapore time only chooses which **generated** hour to show.
+- Per-room mix and IWSP factors are not live RBS. Sample ArtFest events are demo pins.
+- Study-space capacities are estimates. Catalogue: RBS discussion rooms (screenshots, not a scrape); E2/E6 Wayfinder study spaces; W1 from [LibHelp](https://libhelp.singaporetech.edu.sg/faq/277332) / [library facilities](https://libguides.singaporetech.edu.sg/library/facilities). W5 has DR18–DR20 and DR23–DR26 (**not** DR21/DR22). ACE seminar rooms are not seeded as open study.
+- Wi-Fi device counts are not people (corr ≈ 0.69 with ROBOD occupants). Room Wi-Fi helps NUS MAE but is unused in v0 (SIT has no matching feed).

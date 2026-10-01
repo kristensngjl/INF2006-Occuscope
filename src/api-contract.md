@@ -49,7 +49,9 @@ The floor summary endpoint uses the latest-reading view independently of heatmap
 
 ### `GET /occupancy/{location_id}/prediction`
 
-Rows from `occupancy_prediction` for that id (`predicted_for`, `occupancy_count`, `model_version`). v0 seed is the next two hours after `predict_as_of` in `sit_calendar.json`. Do not treat this as a live sensor.
+**Required:** `?at={ISO-8601+08:00}` (same instant as the heatmap). Returns up to two later **generated** occupancy hours for that location (`predicted_for`, `occupancy_count`, `model_version` = `v0`). This is lookahead in the seeded series, not a live sensor or a model loaded in Lambda.
+
+The CSV `occupancy_prediction.csv` is still a sample artefact (two hours after `predict_as_of` in `sit_calendar.json`). The API does not depend on that table for the map.
 
 ## Events
 

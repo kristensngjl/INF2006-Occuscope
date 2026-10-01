@@ -6,7 +6,8 @@ Teaching / recess / examination dates follow the published SIT AY2026/27
 Trimester 1 calendar. IWSP is a programme mix (East = IT courses; W3/W5 =
 other courses; W1 library shared). OIP dates for 2026 are not published.
 
-Run from the repository root (after 04_train.py):
+v0 is an hour×type mean, so every SIT room of the same type would be identical at 15:00.
+Generate applies a documented vacancy factor and a stable per-room mix (not live RBS).
 
     python analytics/05_generate_sit.py
     python src/db/init_app_db.py
@@ -24,7 +25,12 @@ import pandas as pd
 
 _ANALYTICS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ANALYTICS))
-from occupancy_model import SIT_TYPE_MAP  # noqa: E402
+from occupancy_model import (  # noqa: E402
+    SIT_TYPE_MAP,
+    hour_jitter,
+    location_mix,
+    type_vacancy,
+)
 
 ROOT = _ANALYTICS.parent
 SAMPLE = ROOT / "data" / "sample"
@@ -115,6 +121,43 @@ def calendar_multiplier(sit_type: str, building_id: str, ts: datetime, cal: dict
     return m
 
 
+def sit_occupancy_count(
+    loc: pd.Series,
+    ts: datetime,
+    nus_count: float,
+    p95: dict,
+    type_map: dict,
+    cal: dict,
+    events: pd.DataFrame,
+) -> int:
+    """v0 ratio × calendar × event × room mix. Mix is generate-only (not sensors)."""
+    robod_type = type_map.get(str(loc["type"]), "office")
+    cap_hat = float(p95.get(robod_type, 10.0)) or 10.0
+    sit_cap = int(loc["capacity"])
+    sit_type = str(loc["type"])
+    lid = str(loc["location_id"])
+    ratio = max(0.0, float(nus_count) / cap_hat)
+    ratio *= calendar_multiplier(sit_type, str(loc["building_id"]), ts, cal)
+    ratio *= event_factor(lid, ts, events)
+    ratio *= type_vacancy(sit_type)
+    ratio *= location_mix(lid)
+    ratio *= hour_jitter(lid, ts)
+    ratio = min(max(ratio, 0.0), 1.05)
+    count = int(round(ratio * sit_cap))
+    return max(0, min(count, int(sit_cap * 1.05)))
+
+
+def band(count: int, cap: int) -> str:
+    if cap <= 0:
+        return "unknown"
+    r = count / cap
+    if r <= 0.30:
+        return "quiet"
+    if r <= 0.70:
+        return "moderate"
+    return "crowded"
+
+
 def main() -> None:
     if not MODEL_PATH.exists():
         raise SystemExit("Run python analytics/04_train.py first.")
@@ -141,8 +184,6 @@ def main() -> None:
     rows = []
     for _, loc in locations.iterrows():
         robod_type = type_map.get(str(loc["type"]), "office")
-        cap_hat = float(p95.get(robod_type, 10.0)) or 10.0
-        sit_cap = int(loc["capacity"])
         X = pd.DataFrame(
             {
                 "hour": [t.hour for t in stamps],
@@ -153,12 +194,7 @@ def main() -> None:
         # ROBOD has no Saturday/Sunday rows: use Friday's hour profile, then apply weekend_multiplier.
         pred_count = model.predict(X)
         for ts, nus_count in zip(stamps, pred_count):
-            ratio = max(0.0, float(nus_count) / cap_hat)
-            ratio *= calendar_multiplier(str(loc["type"]), str(loc["building_id"]), ts, cal)
-            ratio *= event_factor(str(loc["location_id"]), ts, events)
-            ratio = min(ratio, 1.05)
-            count = int(round(ratio * sit_cap))
-            count = max(0, min(count, int(sit_cap * 1.05)))
+            count = sit_occupancy_count(loc, ts, nus_count, p95, type_map, cal, events)
             rows.append(
                 {
                     "location_id": loc["location_id"],
@@ -172,12 +208,19 @@ def main() -> None:
     occ.to_csv(OCC_OUT, index=False)
     print(f"Wrote {len(occ):,} occupancy rows -> {OCC_OUT.relative_to(ROOT)}")
 
+    demo = datetime(2026, 9, 30, 15, 0, 0)
+    demo_iso = iso_sgt(demo)
+    loc_cap = dict(zip(locations["location_id"], locations["capacity"]))
+    loc_type = dict(zip(locations["location_id"], locations["type"]))
+    slice_ = occ[occ["timestamp"] == demo_iso]
+    dr = slice_[slice_["location_id"].map(lambda i: loc_type.get(i) == "discussion_room")]
+    counts = dr.apply(lambda r: band(int(r["occupancy_count"]), int(loc_cap[r["location_id"]])), axis=1)
+    print(f"Discussion-room bands at {demo_iso}: {counts.value_counts().to_dict()}")
+
     pred_hours = [as_of + timedelta(hours=1), as_of + timedelta(hours=2)]
     pred_rows = []
     for _, loc in locations.iterrows():
         robod_type = type_map.get(str(loc["type"]), "office")
-        cap_hat = float(p95.get(robod_type, 10.0)) or 10.0
-        sit_cap = int(loc["capacity"])
         X = pd.DataFrame(
             {
                 "hour": [t.hour for t in pred_hours],
@@ -187,11 +230,7 @@ def main() -> None:
         )
         pred_count = model.predict(X)
         for ts, nus_count in zip(pred_hours, pred_count):
-            ratio = max(0.0, float(nus_count) / cap_hat)
-            ratio *= calendar_multiplier(str(loc["type"]), str(loc["building_id"]), ts, cal)
-            ratio *= event_factor(str(loc["location_id"]), ts, events)
-            ratio = min(ratio, 1.05)
-            count = max(0, min(int(round(ratio * sit_cap)), int(sit_cap * 1.05)))
+            count = sit_occupancy_count(loc, ts, nus_count, p95, type_map, cal, events)
             pred_rows.append(
                 {
                     "location_id": loc["location_id"],
@@ -207,7 +246,7 @@ def main() -> None:
         f"{cal.get('academic_year')} Trimester {cal.get('trimester')}: "
         "AY2026/27 Trimester 1 series 31 Aug–27 Dec 2026 (teaching, recess, Deepavali, Christmas); "
         "IT-course IWSP mix on East discussion rooms; other courses on W3/W5; "
-        "W1 library shared; OIP window disabled."
+        "W1 library shared; OIP window disabled; per-room mix so peak hour is not all crowded."
     )
 
 

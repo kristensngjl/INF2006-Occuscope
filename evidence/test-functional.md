@@ -10,7 +10,7 @@ From the repository root: Python 3.11+ (`.venv` with FastAPI and httpx), Node 18
 
 1. **2a — Proxy API:** `GET /api/buildings`, `GET /api/locations?building_id=E2&floor=4`, `GET /api/occupancy/current` (no `at`), `GET /api/occupancy/current?at=2026-09-30T15:00:00%2B08:00` via `http://127.0.0.1:5173`.
 2. **2b — DR223 and floors:** Python check on saved `cur.json`; distinct floors for W3 and W5 from `/api/locations`.
-3. **2c — Chart data:** `GET /api/occupancy/E2-04-20-DR223?from=…&to=…` and `GET /api/occupancy/E2-04-20-DR223/prediction`.
+3. **2c — Chart data:** `GET /api/occupancy/E2-04-20-DR223?from=…&to=…` and `GET /api/occupancy/E2-04-20-DR223/prediction?at=2026-09-30T15:00:00+08:00`.
 4. **2d — Events:** `GET /api/events/today`.
 5. **2e — Frontend tests:** `OCCUSCOPE_INTEGRATION=1` and `node --test tests/*.test.mjs` under `src/frontend`.
 6. **2f — Static copy:** `curl` index and `app.js` for generated / live-sensor wording.

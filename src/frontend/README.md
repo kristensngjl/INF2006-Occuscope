@@ -19,13 +19,13 @@ node --test tests/*.test.mjs
 
 Start the backend before opening the frontend. The frontend proxies /api requests to http://127.0.0.1:8000 (override with API_ORIGIN). All buildings, rooms, occupancy, history, predictions and events come from the API. No source selector, CSV loader, sample routes or offline fallback remains. Failed requests show an error and retry. Events use today's Singapore date.
 
-The default view is 30 September 2026 at 15:00 SGT. Data covers 31 August–27 December 2026, 08:00–20:00. Saved predictions cover only 29 September at 16:00 and 17:00; other times show forecast unavailability. Occupancy is generated, not live sensors or booking availability.
+The default view follows Singapore time when that control is on (clamped to 31 August–27 December 2026, 08:00–20:00). Occupancy is generated, not live sensors or booking availability. `GET /occupancy/{id}/prediction?at=` returns the next two generated hours after the selected instant.
 
 ## Interface and map
 
 The **3D campus** view is our original procedural model, projected from 3D coordinates into SVG. Select a building to expand its floors, select a floor, then a crowd marker to open that room. Rotate, zoom and reset controls adjust the model. The SIT wayfinder is a reference link only; no provider map is embedded or copied. Shapes and room positions are illustrative, not surveyed architectural plans. The authored scenery includes facade fins, glazing, planted balconies, individual solar panels, entrance canopies, steps, forecourts, benches, planted beds and tree-lined paths. Roads and paths are decorative approximations, not routing data.
 
-The model, floor controls and room list use the current location catalogue: 47 spaces across E2, E6, W1, W3 and W5. W3 includes Levels 3, 4, 6, 7 and 8; W5 includes Levels 3, 5, 7 and 8. The **Crowd positions** view retains the dataset map_x/map_y plot. Server crowd_level controls room marker presentation, while occupancy_ratio controls meters. Missing readings remain unknown.
+The model, floor controls and room list use the current location catalogue: 62 spaces across E2, E6, W1, W3 and W5. W3 includes Levels 3, 4, 6, 7 and 8; W5 includes Levels 3, 5, 7 and 8. The **Crowd positions** view retains the dataset map_x/map_y plot. Server crowd_level controls room marker presentation, while occupancy_ratio controls meters. Missing readings remain unknown.
 
 Default request: `GET /occupancy/current?at=2026-09-30T15:00:00+08:00`. `URLSearchParams` encodes the plus as `%2B`. The client does not read the unfiltered latest-row database view. Room selection joins by `location_id`. Missing readings remain unknown, not zero.
 
@@ -44,7 +44,7 @@ For cloud deployment, serve the frontend assets through the team's chosen hostin
 
 ## Manual functional check
 
-1. Start the API and frontend, then open the default API view: 47 spaces at 30 September 2026, 15:00 SGT.
+1. Start the API and frontend, then open the default API view: 62 spaces at the selected Singapore time (Follow Singapore time, or a demo date/hour).
 2. Select E2, then Level 4: DR223 and DR224 appear.
 3. Choose Crowd positions, select DR223, and verify 3/8 people, 38% displayed, moderate, generated, and the 30 September 15:00 timestamp.
 4. The daily chart is populated. The forecast states that no saved forecast exists for this time; September 29 forecasts are not relabelled.

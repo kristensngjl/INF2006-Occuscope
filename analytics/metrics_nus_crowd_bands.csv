@@ -1,0 +1,7 @@
+hour,crowd_level,count,share,n
+8,quiet,725,0.9904,732
+8,moderate,7,0.0096,732
+8,crowded,0,0.0,732
+15,quiet,378,0.5164,732
+15,moderate,148,0.2022,732
+15,crowded,206,0.2814,732

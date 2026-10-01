@@ -100,11 +100,19 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         return rows("SELECT * FROM v_floor_type_summary WHERE building_id = ? AND floor = ? ORDER BY type", (building_id, floor))
 
     @app.get("/occupancy/{location_id}/prediction")
-    def prediction(location_id: str):
+    def prediction(location_id: str, at: str = Query(...)):
+        """Next two generated hours after `at` (same v0 series as the map, not a live model)."""
+        instant = parse_time(at, "at").isoformat()
         require_location(location_id)
-        return rows("""SELECT predicted_for, occupancy_count, model_version
-                       FROM occupancy_prediction WHERE location_id = ?
-                       ORDER BY julianday(predicted_for), model_version""", (location_id,))
+        return rows(
+            """SELECT timestamp AS predicted_for, occupancy_count, 'v0' AS model_version
+               FROM occupancy
+               WHERE location_id = ?
+                 AND julianday(timestamp) > julianday(?)
+               ORDER BY julianday(timestamp)
+               LIMIT 2""",
+            (location_id, instant),
+        )
 
     @app.get("/occupancy/{location_id}")
     def timeline(location_id: str, from_: str = Query(..., alias="from"), to: str = Query(...)):

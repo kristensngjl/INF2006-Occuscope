@@ -36,7 +36,7 @@ python tests/test_api_security.py -v
 
 Supporting:
 
-4. `GET /occupancy/{location_id}/prediction` for a seeded id (for example `E2-03-07-DR209`).
+4. `GET /occupancy/{location_id}/prediction?at=` for a seeded id (for example `E2-03-07-DR209` at `2026-09-30T15:00:00+08:00`).
 5. Unknown `location_id` on occupancy and prediction paths — 4xx, not 500.
 6. `python tests/test_gitignore_secrets.py` from the repository root.
 7. Confirm responses and docs do not claim live Punggol sensors (`source` is `generated` after seed).

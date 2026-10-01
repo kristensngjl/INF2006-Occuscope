@@ -8,6 +8,9 @@ Named artefacts cited by `project_manifest.yaml`. Fill these before submission; 
 | `test-functional.md` | Workflow test (map + API) | Zi Qian / Zul |
 | `test-security.md` | Named threat vs control | Ryan |
 | `test-data-ai.md` | Occupancy model validation | Lideon |
+| `train-holdout-local.txt` | Raw `04_train.py` hold-out / C5 log | Lideon |
+| `generate-sit-local.txt` | Raw `05_generate_sit.py` log | Lideon |
+| `holdout-diagnostics-local.txt` | Raw `06_holdout_diagnostics.py` log | Lideon |
 | `test-resilience.md` | Scale / failover / recovery | Kristen |
 | `monitoring.md` | CloudWatch (or equivalent) export | Ryan |
 | `threat-control-map.md` | Threat → control → evidence path | Ryan |
