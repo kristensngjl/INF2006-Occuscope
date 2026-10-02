@@ -1,4 +1,5 @@
 import {renderModel,adjustModel,bindModelGestures} from './model.js';
+import {mountBookingAction} from './bookings.js';
 import {api,band,dayEvents} from './data.js';
 const $=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -85,6 +86,7 @@ async function renderDetail(){
  const r=state.rows.find(r=>r.location_id===state.selected);
  if(!r){$('detail').innerHTML='<div class="empty-detail"><span>⌖</span><h2>A spot with your name on it.</h2><p>Select a room below to explore its occupancy and daily rhythm.</p></div>';return;}
  $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div>${badge(r)}<h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy · ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm <span class="detail-note">· generated</span></h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
+ mountBookingAction(r);
  $('close-detail').onclick=()=>{state.selected=null;render();renderDetail();};
  try{
    let history,predictions;

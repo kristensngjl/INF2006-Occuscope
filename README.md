@@ -40,6 +40,18 @@ Open **http://127.0.0.1:5173**. The frontend proxies `/api` to port 8000. `init_
 
 Copy `.env.example` to `.env` only if you run the optional campus chat (Groq). Never commit `.env`. Chat is not the occupancy model.
 
+## Student demo login
+
+Login uses pre-created fictional student accounts, with email and password only. Seed accounts without rebuilding or wiping campus data:
+
+```powershell
+python -m src.db.seed_students
+```
+
+This adds exactly 1,998 students: **2500001–2500999** and **2600001–2600999**. Email format: `studentid@sit.singaporetech.edu.sg`. Each profile has a generated name; the shared demo password is **OccuscopeDemo26!**. Passwords are salted and hashed in SQLite. Re-running the command preserves existing accounts and passwords. IDs 2500000 and 2600000 are excluded. These accounts do not authenticate against SIT or send any emails.
+
+Restart the backend and Node server, then use **Student login**. Enter your student email and password, then click **Sign in**. Self-registration is disabled. After a destructive campus database rebuild, run the student seed again. Booking logic is unchanged pending the team's room-status data update. [Booking implementation notes](src/backend/BOOKING_SETUP.md).
+
 ## Quick start — reproduce occupancy (data / ML)
 
 Training in this repo used **Python 3.11.9**. `data/raw/` (ROBOD CSVs, Wi-Fi xlsx) is **gitignored and not in the ZIP**. Markers can re-run hold-out metrics from committed `data/processed/robod_clean.csv`. Rebuild that file, or the C5 Wi-Fi ablation, only if you have downloaded Figshare/Zenodo locally (`data/README.md`). `occupancy_v0.joblib` is gitignored; run `04_train.py` before `05_generate_sit.py` if you need a new generate.

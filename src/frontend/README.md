@@ -27,14 +27,16 @@ The **3D campus** view is our original procedural model, projected from 3D coord
 
 The model, floor controls and room list use the current location catalogue: 62 spaces across E2, E6, W1, W3 and W5. W3 includes Levels 3, 4, 6, 7 and 8; W5 includes Levels 3, 5, 7 and 8. The **Crowd positions** view retains the dataset map_x/map_y plot. Server crowd_level controls room marker presentation, while occupancy_ratio controls meters. Missing readings remain unknown.
 
-Default request: `GET /occupancy/current?at=2026-09-30T15:00:00+08:00`. `URLSearchParams` encodes the plus as `%2B`. The client does not read the unfiltered latest-row database view. Room selection joins by `location_id`. Missing readings remain unknown, not zero.
+Example selected-time request: `GET /occupancy/current?at=2026-09-30T15:00:00+08:00`. `URLSearchParams` encodes the plus as `%2B`. The client does not read the unfiltered latest-row database view. Room selection joins by `location_id`. Missing readings remain unknown, not zero.
 
 Responsive layouts, keyboard-operated buttons, visible focus indicators, labelled controls, text crowd labels and accessible chart descriptions are included. Fonts optionally load from Google Fonts, with system fallbacks offline. The backend must be running.
 
 ## Files and deployment
 
 - `index.html`: application shell, original model and coordinate-view containers.
-- `styles.css`: responsive visual design.
+- `styles.css`: responsive campus design.
+- `login.css`: student login and time-block picker styling.
+- `bookings.js`: email/password login, student profile and weekly room reservations.
 - `app.js`: views, controls, asynchronous loading and API integration.
 - `model.js`: original geometry, projection, camera controls and floor/room selection.
 - `data.js`: API requests and display helpers.

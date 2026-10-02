@@ -9,11 +9,11 @@ python -m venv .venv
 .venv\Scripts\python -m uvicorn src.backend.api:app --reload
 ```
 
-The initialiser **deletes and rebuilds** `data/occuscope.db`; skip it if you have a populated database you want to keep. The API opens SQLite read-only and preserves the existing schema. Export `DATABASE_URL=sqlite:///path/to/file.db` to override the default. Relative paths resolve from the repository root; `.env` is not automatically loaded. RDS integration is future work.
+The initialiser **deletes and rebuilds** `data/occuscope.db`; skip it if you have a populated database you want to keep. Occupancy routes read SQLite without modifying it. Login and booking routes add their tables and require write access; see [booking setup](BOOKING_SETUP.md). Export `DATABASE_URL=sqlite:///path/to/file.db` to override the default. Relative paths resolve from the repository root; `.env` is not automatically loaded. RDS integration is future work.
 
 Open http://127.0.0.1:8000/docs to test the endpoints interactively.
 
-## Connect the future map
+## Map API integration
 
 Assign each map marker or room polygon its catalogue `location_id`. Join by this key, not name or array position. `/buildings` and `/locations?building_id=E2&floor=3` provide the hierarchy, capacities and normalised coordinates. Match coordinates to the eventual artwork; list rooms with null coordinates until pinned.
 

@@ -1,4 +1,4 @@
-"""Read-only local API over the frozen SIT application schema."""
+"""Campus occupancy API with project student accounts and room bookings."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
 from .chat import ChatInput, answer
+from .bookings import create_router
 
 ROOT = Path(__file__).resolve().parents[2]
 SGT = timezone(timedelta(hours=8))
@@ -138,8 +139,17 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         if not body.message.strip():
             raise HTTPException(422, "Enter a question")
         instant = parse_time(body.at, "at").isoformat()
-        return answer(body.message.strip(), instant, current(instant))
+        # Use the same generated v0 series as the room forecast panel. Bound
+        # the window so missing evening data cannot become tomorrow's forecast.
+        end = (parse_time(instant, "at") + timedelta(hours=2)).isoformat()
+        forecasts = rows("""SELECT location_id, timestamp AS predicted_for, occupancy_count
+                            FROM occupancy
+                            WHERE julianday(timestamp) > julianday(?)
+                              AND julianday(timestamp) <= julianday(?)
+                            ORDER BY location_id, julianday(timestamp)""", (instant, end))
+        return answer(body.message.strip(), instant, current(instant), forecasts)
 
+    app.include_router(create_router(path, parse_time))
     return app
 
 
