@@ -1,10 +1,12 @@
 {
-  "note": "Occupancy overlay after v0. Generated series is AY2026/27 Trimester 1 (31 Aug–27 Dec 2026, 08:00–20:00 SGT): teaching, recess week 7, final assessment, trimester break, MOM public holidays (Deepavali 8–9 Nov; Christmas 25 Dec). E = IT IWSP mix, W3/W5 = other courses, W1 library shared. Sample ArtFest events in late September. OIP window disabled (2026 dates not published). Per-room mix + discussion-room vacancy so peak hours are not all Crowded. Not live RBS.",
+  "note": "Occupancy overlay after v0. Generated series is AY2026/27 Trimester 1 (31 Aug–27 Dec 2026, 08:00–20:00 SGT): teaching, recess week 7, weeks 12–13 swot/pre-exams, final assessment, trimester break, MOM public holidays (Deepavali 8–9 Nov; Christmas 25 Dec). E = IT IWSP mix, W3/W5 = other courses, W1 library shared. Demo campus events (not official listings) apply mixed turnout on overlapping hours; titles such as lunch do not imply crowded. Discussion-room bookings rise before and during exams; study-space occupancy rises with them. Available rooms stay a mix of walk-in and empty. OIP window disabled (2026 dates not published). Per-room mix + discussion-room vacancy so peak hours are not all Crowded. Foodgle Hub (E4 Campus Court) follows SIT hours including Saturday, Sunday and public holidays; Wholesome (W3 L2) is open Saturday until 15:00 and closed Sunday/PH. Not live RBS.",
   "sources": [
     "https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes",
     "https://www.singaporetech.edu.sg/academic-bulletin/undergraduate-sit-and-joint-degree-programmes/integrated-work-study-programme-iwsp-clinical-practice-cpe",
     "https://www.singaporetech.edu.sg/sites/default/files/2024-04/IWSP%20Schedule_FINAL_20240401.pdf",
     "https://www.singaporetech.edu.sg/undergraduate-programmes/computing-science",
+    "https://www.singaporetech.edu.sg/campus-life/punggol-campus",
+    "https://www.singaporetech.edu.sg/about/punggol-campus",
     "https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026"
   ],
   "academic_year": "AY2026/27",
@@ -16,6 +18,23 @@
   "hours": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "weekend_multiplier": 0.28,
   "holiday_multiplier": 0.18,
+  "food_courts": {
+    "note": "Published SIT Punggol F&B hours. Occupancy still generated; counts drop only when the court is closed.",
+    "source": "https://www.singaporetech.edu.sg/about/punggol-campus",
+    "venues": {
+      "E4-01-FOODGLE": {
+        "name": "Foodgle Hub",
+        "mon_fri": ["07:30", "19:30"],
+        "sat_sun_ph": ["08:30", "19:30"]
+      },
+      "W3-02-WHOLESOME": {
+        "name": "Wholesome by Food Canopy",
+        "mon_fri": ["07:30", "19:30"],
+        "saturday": ["07:30", "15:00"],
+        "sunday_ph": null
+      }
+    }
+  },
   "holidays": [
     {"date": "2026-01-01", "name": "New Year's Day"},
     {"date": "2026-02-17", "name": "Chinese New Year"},
@@ -54,21 +73,35 @@
     },
     {
       "name": "teaching",
-      "week": "8-13",
+      "week": "8-11",
       "start": "2026-10-19",
-      "end": "2026-11-29",
+      "end": "2026-11-15",
       "multiplier": 1.0
+    },
+    {
+      "name": "pre_exams",
+      "week": "12-13",
+      "start": "2026-11-16",
+      "end": "2026-11-29",
+      "multiplier": 1.05,
+      "type_multipliers": {
+        "discussion_room": 1.18,
+        "library": 1.42,
+        "food_court": 1.08,
+        "other": 0.70
+      }
     },
     {
       "name": "exams",
       "week": "14",
       "start": "2026-11-30",
       "end": "2026-12-06",
-      "multiplier": 0.75,
+      "multiplier": 0.92,
       "type_multipliers": {
-        "discussion_room": 0.45,
-        "library": 1.15,
-        "other": 0.40
+        "discussion_room": 1.22,
+        "library": 1.70,
+        "food_court": 1.12,
+        "other": 0.45
       }
     },
     {

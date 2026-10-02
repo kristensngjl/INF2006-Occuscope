@@ -155,7 +155,7 @@ def create_router(path, parse_time):
         if row is None:
             raise HTTPException(404, "Room not found.")
         if row["type"] != "discussion_room":
-            raise HTTPException(422, "Only discussion rooms can be booked. Study spaces are walk-in only.")
+            raise HTTPException(422, "Only discussion rooms can be booked. Study spaces and food courts are walk-in only.")
         return row
 
     def conflicts(conn, location_id, start, end, user_id=None):

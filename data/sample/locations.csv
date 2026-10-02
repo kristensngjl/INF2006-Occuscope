@@ -10,6 +10,7 @@ E2-05-STUDY1,E2,5,E2 L5 Study Space 1,library,28,0.69,0.41
 E2-05-STUDY2,E2,5,E2 L5 Study Space 2,library,28,0.71,0.41
 E2-07-STUDY,E2,7,E2 L7 Study Space,library,28,0.70,0.43
 E2-09-STUDY,E2,9,E2 L9 Study Space,library,28,0.70,0.45
+E4-01-FOODGLE,E4,1,Foodgle Hub,food_court,220,0.80,0.30
 E6-04-05-DR303,E6,4,DR303,discussion_room,8,0.74,0.50
 E6-04-06-DR304,E6,4,DR304,discussion_room,8,0.76,0.50
 E6-04-07-DR305,E6,4,DR305,discussion_room,8,0.78,0.50
@@ -38,6 +39,7 @@ W1-06-OPEN,W1,6,Library L6 open study,library,55,0.41,0.57
 W1-06-HUB,W1,6,Project Hub L6,library,24,0.42,0.57
 W1-09-HUB,W1,9,Project Hub L9,library,24,0.41,0.62
 W1-09-02-MEDIA,W1,9,Media Studio,other,12,0.42,0.62
+W3-02-WHOLESOME,W3,2,Wholesome by Food Canopy,food_court,140,0.26,0.38
 W3-03-07-DR02,W3,3,DR02,discussion_room,8,0.24,0.42
 W3-03-10-DR03,W3,3,DR03,discussion_room,8,0.26,0.42
 W3-03-13-DR04,W3,3,DR04,discussion_room,8,0.28,0.42

@@ -106,6 +106,7 @@ class ApiSecurityTest(unittest.TestCase):
             ts = row.get("timestamp")
             if ts is not None:
                 self.assertLessEqual(datetime.fromisoformat(ts), requested)
+            self.assertIn(int(row.get("booked") or 0), (0, 1))
         self.assertTrue(any_crowd, "expected at least one populated crowd_level at demo instant")
 
     def test_client_cannot_supply_crowd_level(self) -> None:

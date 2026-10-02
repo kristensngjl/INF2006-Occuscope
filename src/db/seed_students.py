@@ -40,6 +40,7 @@ def seed_students(path, students=None):
         conn.execute("PRAGMA foreign_keys=ON")
         conn.executescript((ROOT / "src/backend/booking_schema.sql").read_text(encoding="utf-8"))
         inserted = 0
+        demo_hash = password_hash(DEMO_PASSWORD)
         with conn:
             for row in (trial_students() if students is None else students):
                 user_id = "trial-" + row["student_id"]
@@ -52,7 +53,7 @@ def seed_students(path, students=None):
                     continue
                 conn.execute("INSERT INTO app_user(user_id,email,role) VALUES (?,?,'student')", (user_id,row["email"]))
                 conn.execute("INSERT INTO student_profile VALUES (?,?,?,1)", (user_id,row["student_id"],row["display_name"]))
-                conn.execute("INSERT INTO student_credential VALUES (?,?)", (user_id,password_hash(DEMO_PASSWORD)))
+                conn.execute("INSERT INTO student_credential VALUES (?,?)", (user_id,demo_hash))
                 inserted += 1
         return inserted
 

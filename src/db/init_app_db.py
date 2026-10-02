@@ -6,6 +6,7 @@ NUS ROBOD and Wi-Fi files are not imported. Run from the repository root:
 
 Deletes data/occuscope.db if it exists so schema changes apply cleanly.
 Generated occupancy is the SIT seed CSV (Singapore time, offset +08:00).
+Also seeds demo student logins and hour-aligned discussion-room bookings.
 """
 
 from __future__ import annotations
@@ -96,6 +97,7 @@ def summarize(conn: sqlite3.Connection) -> None:
         "occupancy",
         "occupancy_prediction",
         "app_user",
+        "room_booking",
     ):
         n = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
         print(f"  {table}: {n} rows")
@@ -112,9 +114,24 @@ def main() -> None:
         DB_PATH.unlink()
     with connect() as conn:
         conn.executescript(SCHEMA.read_text(encoding="utf-8"))
+        booking = ROOT / "src" / "backend" / "booking_schema.sql"
+        if booking.is_file():
+            conn.executescript(booking.read_text(encoding="utf-8"))
         seed(conn)
         conn.commit()
         print(f"App DB ready: {DB_PATH.relative_to(ROOT)}")
+
+    import sys
+
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from src.db.seed_students import seed_students
+    from src.db.demo_bookings import insert_demo_bookings
+
+    students = seed_students(DB_PATH)
+    bookings = insert_demo_bookings(DB_PATH)
+    print(f"Demo accounts: {students} students; discussion-room bookings: {bookings} rows.")
+    with connect() as conn:
         summarize(conn)
         print("NUS ROBOD / Wi-Fi stay in data/raw/ — not in this database.")
 

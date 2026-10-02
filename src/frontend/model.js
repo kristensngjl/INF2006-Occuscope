@@ -2,6 +2,7 @@
 // illustrative massing, not a surveyed architectural/floor-plan model.
 const shapes={
  E2:{x:180,y:-125,w:190,d:66,wings:true},
+ E4:{x:345,y:-20,w:48,d:76,wings:false},
  E6:{x:250,y:95,w:145,d:72,wings:true},
  W1:{x:-135,y:10,w:82,d:85,wings:false},
  W3:{x:-280,y:-100,w:115,d:65,wings:true},
@@ -115,7 +116,6 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
    const towerLabel=project(tx,ty,th+20);
    contextLabels+=`<text x="${towerLabel[0]}" y="${towerLabel[1]}" text-anchor="middle" class="landmark-label">E1 · University Tower</text>`;
    landmark(310,-118,45,66,37,'E3 · Ho Bee Auditorium',['#bca471','#99805c','#777066']);
-   landmark(345,-20,48,76,23,'E4 · Food Court',['#edece2','#c8d2c3','#a7bba9']);
    landmark(310,35,74,64,39,'E5 · Multi-Purpose Hall',['#e0e3e0','#becbc6','#a1b5b1']);
    const road=project(12,120,1);
    contextLabels+=`<text x="${road[0]}" y="${road[1]}" text-anchor="middle" class="landmark-label">Campus Boulevard</text>`;
@@ -161,11 +161,11 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
    if(focus&&!selected)continue;
    const sceneStart=svg.length;
    const locations=state.locations.filter(l=>l.building_id===id),levels=[...new Set(locations.map(r=>Number(r.floor)))].sort((a,b)=>a-b);
-   const max=Math.max(5,...levels),expanded=!!focus;
+   const max=id==='E4'?Math.max(1,...levels):Math.max(5,...levels),expanded=!!focus;
    svg+=`<g class="model-building" ${expanded?'':`tabindex="0" role="button" aria-label="Explore ${safe(building.name)}" data-model-building="${safe(id)}"`}>`;
    svg+=box(s.x,s.y,s.w+14,s.d+14,0,4,['#d2d9bf','#b1bf9f','#9fab90']);
    for(let f=1;f<=max;f++){
-     const top=expanded?f*15:f*8,active=String(state.floor)===String(f),mapped=levels.includes(f)||f===5;
+     const top=expanded?f*15:f*8,active=String(state.floor)===String(f),mapped=levels.includes(f)||(id!=='E4'&&f===5);
      const tones=active?['#e3d5a6','#bca46a','#a38a53']:mapped?['#eef0dc','#c4d0be','#a8bcae']:['#e5eadf','#d1dacd','#becdc0'];
      const opacity=expanded&&state.floor!=='all'&&!active?.22:1;
      svg+=`<g opacity="${opacity}" ${expanded&&mapped?`class="model-level" tabindex="0" role="button" aria-label="View Level ${f}" data-model-floor="${f}"`:''}>`;
@@ -197,7 +197,13 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
    svg+='</g>';
    scene.push({depth:depth(s.x,s.y),markup:svg.slice(sceneStart)});
    svg=svg.slice(0,sceneStart);
-   if(!focus){const [px,py]=project(s.x,s.y,max*8+30);markers+=`<g class="model-tag" tabindex="0" role="button" aria-label="Explore ${safe(building.name)}" data-model-building="${id}" transform="translate(${px},${py})"><rect x="-43" y="-18" width="86" height="36" rx="9"/><text text-anchor="middle" y="-2">${id==='W1'?'W1 · Library':id}</text><text text-anchor="middle" y="11" class="tag-sub">${locations.length} spaces ↗</text></g>`;}
+   if(!focus){
+     const title=id==='W1'?'W1 · Library':id==='E4'?'E4 · Foodgle':id==='W3'?'W3 · Wholesome':id;
+     const wide=title.includes('·');
+     const tw=wide?118:86;
+     const [px,py]=project(s.x,s.y,max*8+30);
+     markers+=`<g class="model-tag" tabindex="0" role="button" aria-label="Explore ${safe(building.name)}" data-model-building="${id}" transform="translate(${px},${py})"><rect x="${-tw/2}" y="-18" width="${tw}" height="36" rx="9"/><text text-anchor="middle" y="-2">${title}</text><text text-anchor="middle" y="11" class="tag-sub">${locations.length} spaces ↗</text></g>`;
+   }
    if(focus){
      const allValid=locations.filter(r=>r.map_x!=null&&r.map_y!=null&&r.map_x!==''&&r.map_y!=='');
      const xs=allValid.map(r=>Number(r.map_x)),ys=allValid.map(r=>Number(r.map_y));
@@ -217,7 +223,7 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
  bind('[data-model-building]',el=>{if(el.dataset.modelBuilding!==state.building)onBuilding(el.dataset.modelBuilding);});
  bind('[data-model-floor]',el=>onFloor(el.dataset.modelFloor));
  bind('[data-model-room]',el=>onRoom(el.dataset.modelRoom));
- const floors=focus?[...new Set([5,...state.locations.filter(l=>l.building_id===state.building).map(l=>Number(l.floor))])].sort((a,b)=>a-b):[];
- document.getElementById('model-floors').innerHTML=focus?['all',...floors].map(f=>`<button data-model-select-floor="${f}" class="${String(state.floor)===String(f)?'active':''}" aria-pressed="${String(state.floor)===String(f)}">${f==='all'?'All levels':'Level '+f}</button>`).join(''):'<span>Choose E2, E6, W1, W3 or W5 to explore its floors.</span>';
+ const floors=focus?[...new Set([...(state.building==='E4'?[]:[5]),...state.locations.filter(l=>l.building_id===state.building).map(l=>Number(l.floor))])].sort((a,b)=>a-b):[];
+ document.getElementById('model-floors').innerHTML=focus?['all',...floors].map(f=>`<button data-model-select-floor="${f}" class="${String(state.floor)===String(f)?'active':''}" aria-pressed="${String(state.floor)===String(f)}">${f==='all'?'All levels':'Level '+f}</button>`).join(''):'<span>Choose E2, E4, E6, W1, W3 or W5 to explore its floors.</span>';
  document.querySelectorAll('[data-model-select-floor]').forEach(el=>el.onclick=()=>onFloor(el.dataset.modelSelectFloor));
 }

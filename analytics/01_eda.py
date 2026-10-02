@@ -46,6 +46,8 @@ def dummy_sit_occupancy(locations: pd.DataFrame) -> pd.DataFrame:
                 base += 0.15
             if loc["type"] == "library":
                 base += 0.1
+            if loc["type"] == "food_court" and 11 <= hour <= 14:
+                base += 0.25
             count = min(cap, max(0, int(round(cap * base))))
             rows.append(
                 {

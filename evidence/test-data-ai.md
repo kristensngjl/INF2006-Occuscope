@@ -20,7 +20,7 @@ python src/db/init_app_db.py
 
 # Expected result
 
-Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occupancy for AY2026/27 Trimester 1, and two-hour predictions. Recess week 7 and MOM public holidays should reduce utilisation. East-block (IT) discussion rooms quieter than W3/W5. ArtFest sample events raise overlapping library hours.
+Cleaned ROBOD table, exploratory figures, hold-out MAE/RMSE, generated SIT occupancy for AY2026/27 Trimester 1, and two-hour predictions. Recess week 7 and MOM public holidays should reduce utilisation. East-block (IT) discussion rooms quieter than W3/W5. Demo campus events apply mixed turnout on overlapping hours.
 
 # Actual result
 
@@ -90,7 +90,7 @@ SIT map occupancy is generated (`source = generated`). Series: 31 August–27 De
 
 - Type map: discussion_room → office; library → library (`occupancy_model.py`).
 - Ratio = v0 count / ROBOD type 95th percentile × calendar × event overlap × SIT capacity × per-room mix (1 Oct 2026: same-type rooms are no longer identical at peak hour).
-- Calendar: [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). East = IT courses; W3/W5 = other courses; W1 library shared. ArtFest sample events. OIP disabled. Timestamps include `+08:00`.
+- Calendar: [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). East = IT courses; W3/W5 = other courses; W1 library shared. Demo campus events (not official listings). OIP disabled. Timestamps include `+08:00`.
 
 **Example (Wednesday 30 September 2026, 15:00 SGT):**
 
@@ -103,12 +103,12 @@ SIT map occupancy is generated (`source = generated`). Series: 31 August–27 De
 
 ## Overlay checks (1 October 2026, Lideon)
 
-Same generated CSV as `05_generate_sit.py` (95,914 rows, 62 locations). Quiet ≤30% / Moderate ≤70% / Crowded otherwise. After `python src/db/init_app_db.py`, `GET /occupancy/current?at=` reads these counts (not `MAX(timestamp)`).
+Same generated CSV as `05_generate_sit.py` (99,008 rows, 64 locations). Quiet ≤30% / Moderate ≤70% / Crowded otherwise. After `python src/db/init_app_db.py`, `GET /occupancy/current?at=` reads these counts (not `MAX(timestamp)`). `booked` is joined from demo `room_booking` and is mixed with occupancy (booked+people, no-shows, walk-ins, empty available).
 
 | Check | Instant | Where | Expected | Actual | Artefact |
 |---|---|---|---|---|---|
 | Peak-hour mix | `2026-09-30T15:00:00+08:00` | 45 discussion rooms | At least 3 distinct counts and 2 crowd bands (v0 alone would clone hour×type) | 6 distinct counts; quiet 9 / moderate 28 / crowded 8 | `data/sample/occupancy_generated.csv`; `tests/test_crowd_and_seed.py`; `evidence/generate-sit-local.txt`; `evidence/crowd-and-seed-local.txt` |
-| ArtFest bump | Wed 23 Sep 15:00 vs Wed 30 Sep 15:00 (exhibition overlaps `W1-04-OPEN` 28 Sep–4 Oct) | `W1-04-OPEN` | Event hour higher (`event_factor` 1.25) | 13 people (quiet) vs 15 people (quiet) | `data/sample/events.csv` `E-ART-01`; `occupancy_generated.csv` |
+| Creative Trail overlap | Wed 2 Sep 15:00 vs Wed 9 Sep 15:00 (trail overlaps `W1-04-OPEN` 4 Sep–16 Oct) | `W1-04-OPEN` | Event turnout is mixed (not a flat 1.25 bump) | Counts still differ by day via mix/jitter/turnout | `data/sample/events.csv` `E-001`; `occupancy_generated.csv` |
 | Public holiday | Mon 9 Nov 15:00 (Deepavali in lieu) vs Mon 16 Nov 15:00 teaching | `W3-03-07-DR02`; `W1-04-OPEN` | Holiday multiplier 0.18 → lower counts | DR02: 0 vs 3; library: 2 vs 14 | `data/sample/sit_calendar.json`; `occupancy_generated.csv` |
 
 API join example after seed: `GET /occupancy/current?at=2026-09-30T15:00:00+08:00` (`src/api-contract.md`).

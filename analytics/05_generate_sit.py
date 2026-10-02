@@ -27,6 +27,8 @@ _ANALYTICS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ANALYTICS))
 from occupancy_model import (  # noqa: E402
     SIT_TYPE_MAP,
+    booking_occupancy_count,
+    event_turnout,
     hour_jitter,
     location_mix,
     type_vacancy,
@@ -60,18 +62,34 @@ def parse_instant(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00")[:19])
 
 
-def event_factor(location_id: str, ts: datetime, events: pd.DataFrame) -> float:
-    """Raise occupancy when a seeded event overlaps this location and hour (sample ArtFest, etc.)."""
+def event_overlaps(location_id: str, ts: datetime, events: pd.DataFrame) -> bool:
     if events.empty:
-        return 1.0
+        return False
     end = ts + timedelta(hours=1)
     hits = events[events["location_id"] == location_id]
     for _, ev in hits.iterrows():
         a = parse_instant(str(ev["start_time"]))
         b = parse_instant(str(ev["end_time"]))
         if a < end and b > ts:
-            return 1.25
-    return 1.0
+            return True
+    return False
+
+
+def event_factor(location_id: str, ts: datetime, events: pd.DataFrame) -> float:
+    """Scale occupancy for overlapping events. Turnout is hashed from event_id, not the title."""
+    if events.empty:
+        return 1.0
+    end = ts + timedelta(hours=1)
+    hits = events[events["location_id"] == location_id]
+    factors = []
+    for _, ev in hits.iterrows():
+        a = parse_instant(str(ev["start_time"]))
+        b = parse_instant(str(ev["end_time"]))
+        if a < end and b > ts:
+            factors.append(event_turnout(str(ev["event_id"]), ts))
+    if not factors:
+        return 1.0
+    return sum(factors) / len(factors)
 
 
 def phase_for(d: date, cal: dict) -> dict | None:
@@ -113,12 +131,50 @@ def calendar_multiplier(sit_type: str, building_id: str, ts: datetime, cal: dict
     m = float(phase.get("multiplier", 1.0))
     type_m = phase.get("type_multipliers") or {}
     m *= float(type_m.get(sit_type, 1.0))
-    if ts.weekday() >= 5:
+    if ts.weekday() >= 5 and sit_type != "food_court":
         m *= float(cal.get("weekend_multiplier", 0.28))
-    if d.isoformat() in holiday_dates(cal):
+    if d.isoformat() in holiday_dates(cal) and sit_type != "food_court":
         m *= float(cal.get("holiday_multiplier", 0.18))
     m *= away_multiplier(sit_type, building_id, d, cal)
     return m
+
+
+def _hm(value: str) -> tuple[int, int]:
+    hour, minute = value.split(":")
+    return int(hour), int(minute)
+
+
+def food_court_open_factor(location_id: str, ts: datetime, cal: dict) -> float:
+    """Published SIT Punggol F&B hours, not sensors.
+
+    Foodgle Hub (E4): Mon–Fri 07:30–19:30; Sat, Sun and public holidays 08:30–19:30.
+    Wholesome (W3 L2): Mon–Fri 07:30–19:30; Sat 07:30–15:00; Sun and public holidays closed.
+    Source: https://www.singaporetech.edu.sg/about/punggol-campus
+    """
+    venues = ((cal.get("food_courts") or {}).get("venues")) or {}
+    spec = venues.get(location_id)
+    if not spec:
+        return 1.0
+    holiday = ts.date().isoformat() in holiday_dates(cal)
+    weekday = ts.weekday()
+    window = spec.get("mon_fri")
+    if holiday or weekday >= 5:
+        if "sunday_ph" in spec and spec["sunday_ph"] is None and (weekday == 6 or holiday):
+            return 0.04
+        window = spec.get("sat_sun_ph") or spec.get("saturday")
+        if weekday == 5 and spec.get("saturday"):
+            window = spec["saturday"]
+    if not window:
+        return 0.04
+    start_h, start_m = _hm(window[0])
+    end_h, end_m = _hm(window[1])
+    start = ts.replace(hour=start_h, minute=start_m, second=0, microsecond=0)
+    end = ts.replace(hour=end_h, minute=end_m, second=0, microsecond=0)
+    if not start <= ts < end:
+        return 0.06
+    if holiday or weekday >= 5:
+        return 0.78
+    return 1.0
 
 
 def sit_occupancy_count(
@@ -142,9 +198,14 @@ def sit_occupancy_count(
     ratio *= type_vacancy(sit_type)
     ratio *= location_mix(lid)
     ratio *= hour_jitter(lid, ts)
+    if sit_type == "food_court":
+        ratio *= food_court_open_factor(lid, ts, cal)
     ratio = min(max(ratio, 0.0), 1.05)
     count = int(round(ratio * sit_cap))
-    return max(0, min(count, int(sit_cap * 1.05)))
+    count = max(0, min(count, int(sit_cap * 1.05)))
+    return booking_occupancy_count(
+        lid, ts, sit_type, sit_cap, count, event_overlaps(lid, ts, events)
+    )
 
 
 def band(count: int, cap: int) -> str:

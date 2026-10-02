@@ -25,11 +25,11 @@ SIT room catalogue uses Room Booking System **display names only** (screenshots;
 
 | File | Role |
 |---|---|
-| `sample/buildings.csv` | E2, E6, W1 (library), W3, W5 |
-| `sample/locations.csv` | 62 spaces: RBS discussion/meeting rooms; E2/E6 wayfinder study spaces; W1 library open study / commons / hubs |
-| `sample/events.csv` | `event` rows (`location_id` must exist) |
+| `sample/buildings.csv` | E2, E4 (Campus Court / Foodgle), E6, W1 (library), W3, W5 |
+| `sample/locations.csv` | 64 spaces: RBS discussion/meeting rooms; E2/E6 wayfinder study spaces; W1 library open study / commons / hubs; Foodgle Hub (E4 L1) and Wholesome by Food Canopy (W3 L2) |
+| `sample/events.csv` | Demo campus `event` rows (`location_id` must exist). Titles are original; not copied official listings. |
 | `sample/occupancy_preview.csv` | Dummy fallback (`source = dummy`) for **all** catalogue ids, 29 Sep 08:00–20:00 |
-| `sample/occupancy_generated.csv` | AY2026/27 Trimester 1 hourly occupancy, 31 Aug–27 Dec 2026, 08:00–20:00 `+08:00` (`source = generated`; 1,547 hours × 62 locations) |
+| `sample/occupancy_generated.csv` | AY2026/27 Trimester 1 hourly occupancy, 31 Aug–27 Dec 2026, 08:00–20:00 `+08:00` (`source = generated`; 1,547 hours × 64 locations) |
 | `sample/occupancy_prediction.csv` | Sample two hours after `predict_as_of` (29 Sep 16:00–17:00), one row per location, `model_version = v0`. Map forecast uses `GET /occupancy/{id}/prediction?at=` on the generated series. |
 | `sample/sit_calendar.json` | AY2026/27 Trimester 1 overlay; E = IT courses; W3/W5 = other courses; W1 library shared |
 

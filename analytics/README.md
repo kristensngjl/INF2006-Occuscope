@@ -40,7 +40,7 @@ Academic overlay (generate time only): AY2026/27 Trimester 1 dates from the SIT 
 | Cleaned ROBOD table and EDA figures | Done |
 | Baseline versus Ridge versus Random Forest on NUS hold-out | Done (`metrics_holdout.csv`; hour × type mean wins MAE) |
 | Wi-Fi ablation (room Wi-Fi vs floor `5min`; not in app DB) | Done (`metrics_wifi_ablation.csv`; room Wi-Fi helps NUS MAE; v0 still no Wi-Fi) |
-| Generated `occupancy` and sample `occupancy_prediction` for all 62 SIT location ids | `occupancy_generated.csv`, `occupancy_prediction.csv` |
+| Generated `occupancy` and sample `occupancy_prediction` for all 64 SIT location ids | `occupancy_generated.csv`, `occupancy_prediction.csv` |
 | MAE slices, 7 vs 14-day window, persist vs v0, NUS band counts | Done (`metrics_mae_by_type_hour.csv`, `metrics_holdout_window.csv`, `metrics_persist_vs_v0.csv`, `metrics_nus_crowd_bands.csv`) |
 
 Model files belong in `analytics/models/` (gitignored until a small evaluated artefact is chosen for the submission ZIP).

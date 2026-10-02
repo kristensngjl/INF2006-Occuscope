@@ -36,6 +36,31 @@ function setLive(on){
   }
 }
 const badge=r=>`<span class="badge ${esc(r.crowd_level||'unknown')}"><i class="${esc(r.crowd_level||'unknown')}"></i>${esc(r.crowd_level||'No data')}</span>`;
+function bookingHoursOpen(){
+  const hour=Number($('hour').value);
+  return hour>=8&&hour<20;
+}
+function bookPill(r){
+  if(r.type!=='discussion_room')return '';
+  if(!bookingHoursOpen())return '<span class="book-pill">Closed</span>';
+  return Number(r.booked)?`<span class="book-pill is-booked">Booked</span>`:`<span class="book-pill is-free">Available</span>`;
+}
+function bookingNote(r){
+  if(r.type!=='discussion_room'){
+    if(r.type==='food_court')return 'Walk-in food court. Occupancy is generated; seating is not booked in Occuscope.';
+    if(r.type==='library')return 'Walk-in study space. Occupancy is generated; this space is not booked in Occuscope.';
+            return 'Walk-in space. Occupancy is generated.';
+  }
+  if(!bookingHoursOpen())return 'Discussion rooms can be booked 08:00–20:00 SGT. Occupancy below is still generated for this hour.';
+  const people=Number(r.occupancy_count||0);
+  if(Number(r.booked)){
+    if(people<=0)return 'Booked this hour, but generated occupancy is empty — students do reserve rooms and then not show up.';
+    if(people<=2)return 'Booked this hour. A small group may be inside, or the booking may be only partly used.';
+    return 'Booked this hour, and occupancy suggests people are using the room.';
+  }
+  if(people>0)return 'No Occuscope booking this hour. Occupancy can still be walk-in students using an unreserved room.';
+  return 'Available this hour. Generated occupancy is empty — this slot is free in the demo.';
+}
 $('hour').innerHTML=Array.from({length:13},(_,i)=>{const h=String(i+8).padStart(2,'0');return `<option value="${h}">${h}:00</option>`;}).join('');
 function validate(){const d=$('date');if(!d.value||d.value<d.min||d.value>d.max){$('notice').textContent='Choose a date between 31 August and 27 December 2026, the available data period.';return false;}return true;}
 async function refresh(){
@@ -54,7 +79,7 @@ function chooseFloor(floor){state.floor=String(floor);state.selected=null;render
 function chooseBuilding(id){adjustModel('reset');state.building=id;state.floor='all';state.selected=null;render();renderDetail();}
 function render(){
  $('all').classList.toggle('active',state.building==='all');
- $('buildings').innerHTML=state.buildings.map(b=>{const rooms=state.rows.filter(r=>r.building_id===b.building_id);return `<button class="building-row ${state.building===b.building_id?'active':''}" data-building="${esc(b.building_id)}" aria-pressed="${state.building===b.building_id}"><span class="building-icon">${esc(b.building_id)}</span><span><strong>${b.building_id==='W1'?'Library · W1':esc(b.name)}</strong><small>${rooms.length} mapped spaces</small></span><i class="${buildingBand(rooms)}"></i></button>`;}).join('');
+ $('buildings').innerHTML=state.buildings.map(b=>{const rooms=state.rows.filter(r=>r.building_id===b.building_id);const label=b.building_id==='W1'?'Library · W1':b.building_id==='E4'?'Foodgle · E4':b.building_id==='W3'?'Wholesome · W3':esc(b.name);return `<button class="building-row ${state.building===b.building_id?'active':''}" data-building="${esc(b.building_id)}" aria-pressed="${state.building===b.building_id}"><span class="building-icon">${esc(b.building_id)}</span><span><strong>${label}</strong><small>${rooms.length} mapped spaces</small></span><i class="${buildingBand(rooms)}"></i></button>`;}).join('');
  document.querySelectorAll('[data-building]').forEach(b=>b.onclick=()=>chooseBuilding(b.dataset.building));
  const chosen=state.buildings.find(b=>b.building_id===state.building);
  $('map-title').textContent=chosen?`${chosen.name}${state.floor==='all'?'':' · Level '+state.floor}`:'Explore SIT Punggol';
@@ -66,12 +91,13 @@ function render(){
  $('floors').innerHTML=['all',...floors].map(f=>`<button data-floor="${f}" class="${String(state.floor)===String(f)?'active':''}" aria-pressed="${String(state.floor)===String(f)}">${f==='all'?'All floors':'Level '+f}</button>`).join('');
  document.querySelectorAll('[data-floor]').forEach(b=>b.onclick=()=>chooseFloor(b.dataset.floor));
  const q=$('search').value.trim().toLowerCase();
- const rooms=state.rows.filter(r=>(state.building==='all'||r.building_id===state.building)&&(state.floor==='all'||String(r.floor)===String(state.floor))&&($('crowd').value==='all'||r.crowd_level===$('crowd').value)&&($('type').value==='all'||r.type===$('type').value)&&`${r.name} ${r.location_id} ${r.building_id} ${r.building_name||''} ${r.building_id==='W1'?'library':''}`.toLowerCase().includes(q));
+ const bookFilter=$('booked').value;
+ const rooms=state.rows.filter(r=>(state.building==='all'||r.building_id===state.building)&&(state.floor==='all'||String(r.floor)===String(state.floor))&&($('crowd').value==='all'||r.crowd_level===$('crowd').value)&&($('type').value==='all'||r.type===$('type').value)&&(bookFilter==='all'||(r.type==='discussion_room'&&bookingHoursOpen()&&((bookFilter==='booked'&&Number(r.booked))||(bookFilter==='available'&&!Number(r.booked)))))&&`${r.name} ${r.location_id} ${r.building_id} ${r.building_name||''} ${r.building_id==='W1'?'library':''} ${r.type==='food_court'?'foodgle wholesome canteen':''}`.toLowerCase().includes(q));
  $('result-count').textContent=`${rooms.length} spaces`;
  $('map-count').textContent=`${state.rows.length} spaces · generated occupancy`;
  renderCoordinates(rooms);
  renderModel(state,rooms,chooseBuilding,chooseFloor,selectRoom);
- $('rooms').innerHTML=rooms.length?rooms.map(r=>`<button class="room-card ${state.selected===r.location_id?'selected':''}" data-room="${esc(r.location_id)}" aria-pressed="${state.selected===r.location_id}"><div class="room-card-top"><span>${esc(r.building_id)} / LEVEL ${esc(r.floor)}</span>${badge(r)}</div><h3>${esc(r.name)}</h3><p>${esc(r.type.replaceAll('_',' '))}</p><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,Math.max(0,(r.occupancy_ratio||0)*100))}%"></span></div><div class="room-card-bottom"><span>${r.occupancy_count==null?'No reading':`${esc(r.occupancy_count)} / ${esc(r.capacity)} people`}</span><span>View space ↗</span></div></button>`).join(''):'<p class="no-results">No spaces match this view. Try another floor or clear your filters.</p>';
+ $('rooms').innerHTML=rooms.length?rooms.map(r=>`<button class="room-card ${state.selected===r.location_id?'selected':''}" data-room="${esc(r.location_id)}" aria-pressed="${state.selected===r.location_id}"><div class="room-card-top"><span>${esc(r.building_id)} / LEVEL ${esc(r.floor)}</span>${badge(r)}</div><h3>${esc(r.name)}</h3><p>${[esc(r.type.replaceAll('_',' ')),bookPill(r)].filter(Boolean).join(' · ')}</p><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,Math.max(0,(r.occupancy_ratio||0)*100))}%"></span></div><div class="room-card-bottom"><span>${r.occupancy_count==null?'No reading':`${esc(r.occupancy_count)} / ${esc(r.capacity)} people`}</span><span>View space ↗</span></div></button>`).join(''):'<p class="no-results">No spaces match this view. Try another floor or clear your filters.</p>';
  document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>selectRoom(b.dataset.room));
  const eventDate=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Singapore',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const events=dayEvents(state.events,eventDate).filter(e=>state.building==='all'||state.locations.some(l=>l.location_id===e.location_id&&l.building_id===state.building));
@@ -85,7 +111,7 @@ async function renderDetail(){
  const version=++state.detailVersion;
  const r=state.rows.find(r=>r.location_id===state.selected);
  if(!r){$('detail').innerHTML='<div class="empty-detail"><span>⌖</span><h2>A spot with your name on it.</h2><p>Select a room below to explore its occupancy and daily rhythm.</p></div>';return;}
- $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div>${badge(r)}<h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy · ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm <span class="detail-note">· generated</span></h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
+ $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div><div class="detail-pills">${badge(r)}${bookPill(r)}</div><h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy · ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note">${esc(bookingNote(r))}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm <span class="detail-note">· generated</span></h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
  mountBookingAction(r);
  $('close-detail').onclick=()=>{state.selected=null;render();renderDetail();};
  try{
@@ -100,10 +126,10 @@ async function renderDetail(){
  }catch(e){if(version!==state.detailVersion)return;$('history').textContent=e.message;$('forecast').textContent='Forecast unavailable.';}
 }
 $('all').onclick=()=>chooseBuilding('all');
-['search','crowd','type'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+['search','crowd','type','booked'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
 ['date','hour'].forEach(id=>$(id).addEventListener('change',()=>{setLive(false);refresh();}));
 $('live').onchange=()=>{if($('live').checked){setLive(true);refresh();}else setLive(false);};
-$('reset').onclick=()=>{adjustModel('reset');state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';setLive(true);refresh();};
+$('reset').onclick=()=>{adjustModel('reset');state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';$('booked').value='all';setLive(true);refresh();};
 setLive(true);
 refresh();
 

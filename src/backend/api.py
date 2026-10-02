@@ -77,8 +77,22 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
 
     @app.get("/occupancy/current")
     def current(at: str = Query(...)):
-        instant = parse_time(at, "at").isoformat()
-        return rows("""
+        requested = parse_time(at, "at")
+        instant = requested.isoformat()
+        tables = {row["name"] for row in rows("SELECT name FROM sqlite_master WHERE type='table'")}
+        booked_sql = ", 0 AS booked"
+        params: tuple = (instant,)
+        # Demo bookings exist only for discussion rooms, 08:00–20:00 SGT (last slot ends 20:00).
+        if "room_booking" in tables and 8 <= requested.hour < 20:
+            booked_sql = """, CASE WHEN l.type = 'discussion_room' AND EXISTS (
+                    SELECT 1 FROM room_booking rb
+                    WHERE rb.location_id = l.location_id AND rb.status = 'confirmed'
+                      AND julianday(rb.start_time) <= julianday(?)
+                      AND julianday(rb.end_time) > julianday(?)
+                 ) THEN 1 ELSE 0 END AS booked"""
+            params = (instant, instant, instant)
+        return rows(
+            f"""
             SELECT l.location_id, l.building_id, b.name AS building_name,
                    b.campus, l.floor, l.name, l.type, l.capacity, l.map_x, l.map_y,
                    o.timestamp, o.occupancy_count, o.source,
@@ -87,6 +101,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
                         WHEN 1.0 * o.occupancy_count / l.capacity <= 0.30 THEN 'quiet'
                         WHEN 1.0 * o.occupancy_count / l.capacity <= 0.70 THEN 'moderate'
                         ELSE 'crowded' END AS crowd_level
+                   {booked_sql}
             FROM location l JOIN building b ON b.building_id = l.building_id
             LEFT JOIN occupancy o ON o.reading_id = (
                 SELECT o2.reading_id FROM occupancy o2
@@ -94,7 +109,9 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
                   AND julianday(o2.timestamp) <= julianday(?)
                 ORDER BY julianday(o2.timestamp) DESC, o2.reading_id DESC LIMIT 1
             ) ORDER BY l.location_id
-        """, (instant,))
+            """,
+            params,
+        )
 
     @app.get("/floors/{building_id}/{floor}/summary")
     def floor_summary(building_id: str, floor: int):

@@ -1,9 +1,208 @@
 event_id,location_id,title,description,start_time,end_time
-E-ART-01,W1-04-OPEN,ArtFest exhibition (sample),Campus ArtFest showcase in Library L4 open study — sample pin not an official programme listing,2026-09-28T10:00:00+08:00,2026-10-04T18:00:00+08:00
-E-ART-02,W1-09-02-MEDIA,ArtFest media programme (sample),Screenings and showreels during ArtFest week,2026-09-29T14:00:00+08:00,2026-09-29T17:00:00+08:00
-E-ART-03,W1-04-01-MR03,ArtFest workshop (sample),Small-group workshop in Library MR03,2026-09-30T11:00:00+08:00,2026-09-30T13:00:00+08:00
-E-ART-04,W1-04-02-MR04,ArtFest critique (sample),Peer critique session,2026-10-01T15:00:00+08:00,2026-10-01T17:00:00+08:00
-E-007,E2-03-07-DR209,Project meeting,Student group in E2 DR209,2026-09-29T10:00:00+08:00,2026-09-29T12:00:00+08:00
-E-008,E6-04-05-DR303,CCA briefing,Club briefing in E6 DR303,2026-09-30T14:00:00+08:00,2026-09-30T16:00:00+08:00
-E-009,W3-03-07-DR02,Study cluster,Open study block in W3 DR02,2026-10-01T09:00:00+08:00,2026-10-01T18:00:00+08:00
-E-010,W5-03-07-DR18,West-side studio,Group work in W5 DR18,2026-10-02T13:00:00+08:00,2026-10-02T15:00:00+08:00
+E-001,W1-04-OPEN,Punggol Creative Trail,"Student-made work in Library L4 open study. Demo calendar, not an official listing.",2026-09-04T10:00:00+08:00,2026-10-16T18:00:00+08:00
+E-002,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-08-31T12:00:00+08:00,2026-08-31T13:00:00+08:00
+E-003,E2-03-07-DR209,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-08-31T15:00:00+08:00,2026-08-31T17:00:00+08:00
+E-004,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-09-01T14:00:00+08:00,2026-09-01T16:00:00+08:00
+E-005,W3-03-10-DR03,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-09-01T10:00:00+08:00,2026-09-01T12:00:00+08:00
+E-006,W1-05-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-09-02T16:00:00+08:00,2026-09-02T18:00:00+08:00
+E-007,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-09-02T12:00:00+08:00,2026-09-02T14:00:00+08:00
+E-008,E2-05-STUDY1,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-09-03T17:00:00+08:00,2026-09-03T19:00:00+08:00
+E-009,W1-04-03-MR05,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-09-03T11:00:00+08:00,2026-09-03T13:00:00+08:00
+E-010,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-09-04T15:00:00+08:00,2026-09-04T17:00:00+08:00
+E-011,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-09-04T12:00:00+08:00,2026-09-04T13:00:00+08:00
+E-012,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-09-05T11:00:00+08:00,2026-09-05T15:00:00+08:00
+E-013,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-09-05T09:00:00+08:00,2026-09-05T14:00:00+08:00
+E-014,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-09-05T10:00:00+08:00,2026-09-05T16:00:00+08:00
+E-015,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-09-06T11:00:00+08:00,2026-09-06T16:00:00+08:00
+E-016,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-09-06T10:00:00+08:00,2026-09-06T17:00:00+08:00
+E-017,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-09-07T12:00:00+08:00,2026-09-07T13:00:00+08:00
+E-018,E2-04-20-DR223,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-09-07T15:00:00+08:00,2026-09-07T17:00:00+08:00
+E-019,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-09-08T14:00:00+08:00,2026-09-08T16:00:00+08:00
+E-020,W3-06-07-DR09,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-09-08T10:00:00+08:00,2026-09-08T12:00:00+08:00
+E-021,W1-06-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-09-09T16:00:00+08:00,2026-09-09T18:00:00+08:00
+E-022,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-09-09T12:00:00+08:00,2026-09-09T14:00:00+08:00
+E-023,E2-07-STUDY,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-09-10T17:00:00+08:00,2026-09-10T19:00:00+08:00
+E-024,W1-04-05-MR07,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-09-10T11:00:00+08:00,2026-09-10T13:00:00+08:00
+E-025,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-09-11T15:00:00+08:00,2026-09-11T17:00:00+08:00
+E-026,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-09-11T12:00:00+08:00,2026-09-11T13:00:00+08:00
+E-027,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-09-12T11:00:00+08:00,2026-09-12T15:00:00+08:00
+E-028,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-09-12T09:00:00+08:00,2026-09-12T14:00:00+08:00
+E-029,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-09-12T10:00:00+08:00,2026-09-12T16:00:00+08:00
+E-030,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-09-13T11:00:00+08:00,2026-09-13T16:00:00+08:00
+E-031,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-09-13T10:00:00+08:00,2026-09-13T17:00:00+08:00
+E-032,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-09-14T12:00:00+08:00,2026-09-14T13:00:00+08:00
+E-033,E6-04-05-DR303,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-09-14T15:00:00+08:00,2026-09-14T17:00:00+08:00
+E-034,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-09-15T14:00:00+08:00,2026-09-15T16:00:00+08:00
+E-035,W5-03-07-DR18,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-09-15T10:00:00+08:00,2026-09-15T12:00:00+08:00
+E-036,W1-09-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-09-16T16:00:00+08:00,2026-09-16T18:00:00+08:00
+E-037,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-09-16T12:00:00+08:00,2026-09-16T14:00:00+08:00
+E-038,E6-06-016,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-09-17T17:00:00+08:00,2026-09-17T19:00:00+08:00
+E-039,W1-04-10-MR15,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-09-17T11:00:00+08:00,2026-09-17T13:00:00+08:00
+E-040,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-09-18T15:00:00+08:00,2026-09-18T17:00:00+08:00
+E-041,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-09-18T12:00:00+08:00,2026-09-18T13:00:00+08:00
+E-042,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-09-19T11:00:00+08:00,2026-09-19T15:00:00+08:00
+E-043,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-09-19T09:00:00+08:00,2026-09-19T14:00:00+08:00
+E-044,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-09-19T10:00:00+08:00,2026-09-19T16:00:00+08:00
+E-045,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-09-20T11:00:00+08:00,2026-09-20T16:00:00+08:00
+E-046,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-09-20T10:00:00+08:00,2026-09-20T17:00:00+08:00
+E-047,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-09-21T12:00:00+08:00,2026-09-21T13:00:00+08:00
+E-048,E6-04-07-DR305,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-09-21T15:00:00+08:00,2026-09-21T17:00:00+08:00
+E-049,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-09-22T14:00:00+08:00,2026-09-22T16:00:00+08:00
+E-050,W5-07-12-DR23,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-09-22T10:00:00+08:00,2026-09-22T12:00:00+08:00
+E-051,W1-05-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-09-23T16:00:00+08:00,2026-09-23T18:00:00+08:00
+E-052,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-09-23T12:00:00+08:00,2026-09-23T14:00:00+08:00
+E-053,E6-08-016,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-09-24T17:00:00+08:00,2026-09-24T19:00:00+08:00
+E-054,W1-04-03-MR05,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-09-24T11:00:00+08:00,2026-09-24T13:00:00+08:00
+E-055,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-09-25T15:00:00+08:00,2026-09-25T17:00:00+08:00
+E-056,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-09-25T12:00:00+08:00,2026-09-25T13:00:00+08:00
+E-057,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-09-26T11:00:00+08:00,2026-09-26T15:00:00+08:00
+E-058,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-09-26T09:00:00+08:00,2026-09-26T14:00:00+08:00
+E-059,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-09-26T10:00:00+08:00,2026-09-26T16:00:00+08:00
+E-060,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-09-27T11:00:00+08:00,2026-09-27T16:00:00+08:00
+E-061,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-09-27T10:00:00+08:00,2026-09-27T17:00:00+08:00
+E-062,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-09-28T12:00:00+08:00,2026-09-28T13:00:00+08:00
+E-063,E2-03-07-DR209,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-09-28T15:00:00+08:00,2026-09-28T17:00:00+08:00
+E-064,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-09-29T14:00:00+08:00,2026-09-29T16:00:00+08:00
+E-065,W3-03-10-DR03,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-09-29T10:00:00+08:00,2026-09-29T12:00:00+08:00
+E-066,W1-06-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-09-30T16:00:00+08:00,2026-09-30T18:00:00+08:00
+E-067,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-09-30T12:00:00+08:00,2026-09-30T14:00:00+08:00
+E-068,E2-05-STUDY1,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-10-01T17:00:00+08:00,2026-10-01T19:00:00+08:00
+E-069,W1-04-05-MR07,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-10-01T11:00:00+08:00,2026-10-01T13:00:00+08:00
+E-070,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-10-02T15:00:00+08:00,2026-10-02T17:00:00+08:00
+E-071,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-10-02T12:00:00+08:00,2026-10-02T13:00:00+08:00
+E-072,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-10-03T11:00:00+08:00,2026-10-03T15:00:00+08:00
+E-073,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-10-03T09:00:00+08:00,2026-10-03T14:00:00+08:00
+E-074,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-10-03T10:00:00+08:00,2026-10-03T16:00:00+08:00
+E-075,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-10-04T11:00:00+08:00,2026-10-04T16:00:00+08:00
+E-076,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-10-04T10:00:00+08:00,2026-10-04T17:00:00+08:00
+E-077,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-10-05T12:00:00+08:00,2026-10-05T13:00:00+08:00
+E-078,E2-04-20-DR223,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-10-05T15:00:00+08:00,2026-10-05T17:00:00+08:00
+E-079,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-10-06T14:00:00+08:00,2026-10-06T16:00:00+08:00
+E-080,W3-06-07-DR09,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-10-06T10:00:00+08:00,2026-10-06T12:00:00+08:00
+E-081,W1-09-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-10-07T16:00:00+08:00,2026-10-07T18:00:00+08:00
+E-082,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-10-07T12:00:00+08:00,2026-10-07T14:00:00+08:00
+E-083,E2-07-STUDY,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-10-08T17:00:00+08:00,2026-10-08T19:00:00+08:00
+E-084,W1-04-10-MR15,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-10-08T11:00:00+08:00,2026-10-08T13:00:00+08:00
+E-085,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-10-09T15:00:00+08:00,2026-10-09T17:00:00+08:00
+E-086,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-10-09T12:00:00+08:00,2026-10-09T13:00:00+08:00
+E-087,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-10-10T11:00:00+08:00,2026-10-10T15:00:00+08:00
+E-088,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-10-10T09:00:00+08:00,2026-10-10T14:00:00+08:00
+E-089,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-10-10T10:00:00+08:00,2026-10-10T16:00:00+08:00
+E-090,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-10-11T11:00:00+08:00,2026-10-11T16:00:00+08:00
+E-091,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-10-11T10:00:00+08:00,2026-10-11T17:00:00+08:00
+E-092,W1-03-AMPHI,Wellness stretch session,Low-key mid-trimester reset in amphitheatre seating.,2026-10-12T10:00:00+08:00,2026-10-12T11:00:00+08:00
+E-093,E2-02M-STUDY,Catch-up project studio,East study space held for groups finishing lab reports.,2026-10-13T13:00:00+08:00,2026-10-13T17:00:00+08:00
+E-094,E2-02M-STUDY,Catch-up project studio,East study space held for groups finishing lab reports.,2026-10-15T13:00:00+08:00,2026-10-15T17:00:00+08:00
+E-095,E4-01-FOODGLE,Recess Saturday lunch,Foodgle weekend hours; campus is quieter than teaching weeks.,2026-10-17T11:00:00+08:00,2026-10-17T15:00:00+08:00
+E-096,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-10-19T12:00:00+08:00,2026-10-19T13:00:00+08:00
+E-097,E6-04-07-DR305,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-10-19T15:00:00+08:00,2026-10-19T17:00:00+08:00
+E-098,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-10-20T14:00:00+08:00,2026-10-20T16:00:00+08:00
+E-099,W5-07-12-DR23,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-10-20T10:00:00+08:00,2026-10-20T12:00:00+08:00
+E-100,W1-06-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-10-21T16:00:00+08:00,2026-10-21T18:00:00+08:00
+E-101,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-10-21T12:00:00+08:00,2026-10-21T14:00:00+08:00
+E-102,E6-08-016,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-10-22T17:00:00+08:00,2026-10-22T19:00:00+08:00
+E-103,W1-04-05-MR07,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-10-22T11:00:00+08:00,2026-10-22T13:00:00+08:00
+E-104,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-10-23T15:00:00+08:00,2026-10-23T17:00:00+08:00
+E-105,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-10-23T12:00:00+08:00,2026-10-23T13:00:00+08:00
+E-106,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-10-24T11:00:00+08:00,2026-10-24T15:00:00+08:00
+E-107,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-10-24T09:00:00+08:00,2026-10-24T14:00:00+08:00
+E-108,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-10-24T10:00:00+08:00,2026-10-24T16:00:00+08:00
+E-109,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-10-25T11:00:00+08:00,2026-10-25T16:00:00+08:00
+E-110,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-10-25T10:00:00+08:00,2026-10-25T17:00:00+08:00
+E-111,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-10-26T12:00:00+08:00,2026-10-26T13:00:00+08:00
+E-112,E2-03-07-DR209,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-10-26T15:00:00+08:00,2026-10-26T17:00:00+08:00
+E-113,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-10-27T14:00:00+08:00,2026-10-27T16:00:00+08:00
+E-114,W3-03-10-DR03,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-10-27T10:00:00+08:00,2026-10-27T12:00:00+08:00
+E-115,W1-09-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-10-28T16:00:00+08:00,2026-10-28T18:00:00+08:00
+E-116,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-10-28T12:00:00+08:00,2026-10-28T14:00:00+08:00
+E-117,E2-05-STUDY1,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-10-29T17:00:00+08:00,2026-10-29T19:00:00+08:00
+E-118,W1-04-10-MR15,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-10-29T11:00:00+08:00,2026-10-29T13:00:00+08:00
+E-119,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-10-30T15:00:00+08:00,2026-10-30T17:00:00+08:00
+E-120,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-10-30T12:00:00+08:00,2026-10-30T13:00:00+08:00
+E-121,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-10-31T11:00:00+08:00,2026-10-31T15:00:00+08:00
+E-122,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-10-31T09:00:00+08:00,2026-10-31T14:00:00+08:00
+E-123,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-10-31T10:00:00+08:00,2026-10-31T16:00:00+08:00
+E-124,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-11-01T11:00:00+08:00,2026-11-01T16:00:00+08:00
+E-125,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-11-01T10:00:00+08:00,2026-11-01T17:00:00+08:00
+E-126,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-11-02T12:00:00+08:00,2026-11-02T13:00:00+08:00
+E-127,E2-04-20-DR223,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-11-02T15:00:00+08:00,2026-11-02T17:00:00+08:00
+E-128,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-11-03T14:00:00+08:00,2026-11-03T16:00:00+08:00
+E-129,W3-06-07-DR09,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-11-03T10:00:00+08:00,2026-11-03T12:00:00+08:00
+E-130,W1-05-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-11-04T16:00:00+08:00,2026-11-04T18:00:00+08:00
+E-131,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-11-04T12:00:00+08:00,2026-11-04T14:00:00+08:00
+E-132,E2-07-STUDY,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-11-05T17:00:00+08:00,2026-11-05T19:00:00+08:00
+E-133,W1-04-03-MR05,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-11-05T11:00:00+08:00,2026-11-05T13:00:00+08:00
+E-134,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-11-06T15:00:00+08:00,2026-11-06T17:00:00+08:00
+E-135,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-11-06T12:00:00+08:00,2026-11-06T13:00:00+08:00
+E-136,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-11-07T11:00:00+08:00,2026-11-07T15:00:00+08:00
+E-137,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-11-07T09:00:00+08:00,2026-11-07T14:00:00+08:00
+E-138,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-11-07T10:00:00+08:00,2026-11-07T16:00:00+08:00
+E-139,E4-01-FOODGLE,Holiday campus lunch,Foodgle stays open on public holidays; quieter than a teaching weekday.,2026-11-08T11:00:00+08:00,2026-11-08T15:00:00+08:00
+E-140,E4-01-FOODGLE,Holiday campus lunch,Foodgle stays open on public holidays; quieter than a teaching weekday.,2026-11-09T11:00:00+08:00,2026-11-09T15:00:00+08:00
+E-141,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-11-10T14:00:00+08:00,2026-11-10T16:00:00+08:00
+E-142,W5-03-07-DR18,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-11-10T10:00:00+08:00,2026-11-10T12:00:00+08:00
+E-143,W1-06-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-11-11T16:00:00+08:00,2026-11-11T18:00:00+08:00
+E-144,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-11-11T12:00:00+08:00,2026-11-11T14:00:00+08:00
+E-145,E6-06-016,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-11-12T17:00:00+08:00,2026-11-12T19:00:00+08:00
+E-146,W1-04-05-MR07,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-11-12T11:00:00+08:00,2026-11-12T13:00:00+08:00
+E-147,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-11-13T15:00:00+08:00,2026-11-13T17:00:00+08:00
+E-148,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-11-13T12:00:00+08:00,2026-11-13T13:00:00+08:00
+E-149,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-11-14T11:00:00+08:00,2026-11-14T15:00:00+08:00
+E-150,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-11-14T09:00:00+08:00,2026-11-14T14:00:00+08:00
+E-151,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-11-14T10:00:00+08:00,2026-11-14T16:00:00+08:00
+E-152,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-11-15T11:00:00+08:00,2026-11-15T16:00:00+08:00
+E-153,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-11-15T10:00:00+08:00,2026-11-15T17:00:00+08:00
+E-154,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-11-16T12:00:00+08:00,2026-11-16T13:00:00+08:00
+E-155,E6-04-07-DR305,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-11-16T15:00:00+08:00,2026-11-16T17:00:00+08:00
+E-156,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-11-17T14:00:00+08:00,2026-11-17T16:00:00+08:00
+E-157,W5-07-12-DR23,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-11-17T10:00:00+08:00,2026-11-17T12:00:00+08:00
+E-158,W1-09-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-11-18T16:00:00+08:00,2026-11-18T18:00:00+08:00
+E-159,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-11-18T12:00:00+08:00,2026-11-18T14:00:00+08:00
+E-160,E6-08-016,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-11-19T17:00:00+08:00,2026-11-19T19:00:00+08:00
+E-161,W1-04-10-MR15,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-11-19T11:00:00+08:00,2026-11-19T13:00:00+08:00
+E-162,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-11-20T15:00:00+08:00,2026-11-20T17:00:00+08:00
+E-163,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-11-20T12:00:00+08:00,2026-11-20T13:00:00+08:00
+E-164,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-11-21T11:00:00+08:00,2026-11-21T15:00:00+08:00
+E-165,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-11-21T09:00:00+08:00,2026-11-21T14:00:00+08:00
+E-166,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-11-21T10:00:00+08:00,2026-11-21T16:00:00+08:00
+E-167,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-11-22T11:00:00+08:00,2026-11-22T16:00:00+08:00
+E-168,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-11-22T10:00:00+08:00,2026-11-22T17:00:00+08:00
+E-169,W1-03-AMPHI,Applied-learning briefing,Short cluster briefing in amphitheatre seating after morning classes.,2026-11-23T12:00:00+08:00,2026-11-23T13:00:00+08:00
+E-170,E2-03-07-DR209,ICT project huddle,Eight-person discussion room for a timed project check-in.,2026-11-23T15:00:00+08:00,2026-11-23T17:00:00+08:00
+E-171,W1-05-OPEN,Library skills clinic,"Info-search workshop in Learning Commons, walk-in seating.",2026-11-24T14:00:00+08:00,2026-11-24T16:00:00+08:00
+E-172,W3-03-10-DR03,West-block studio consult,Small-group consult in a W3/W5 discussion room.,2026-11-24T10:00:00+08:00,2026-11-24T12:00:00+08:00
+E-173,W1-05-HUB,Project Hub critique,"Peer critique in a Project Hub, not a lecture theatre.",2026-11-25T16:00:00+08:00,2026-11-25T18:00:00+08:00
+E-174,E4-01-FOODGLE,Industry lunch meetup,Informal partner chat over lunch while Foodgle is open.,2026-11-25T12:00:00+08:00,2026-11-25T14:00:00+08:00
+E-175,E2-05-STUDY1,Peer tutoring block,Open study space used for drop-in tutoring after labs.,2026-11-26T17:00:00+08:00,2026-11-26T19:00:00+08:00
+E-176,W1-04-03-MR05,Portfolio review,Small meeting room; occupancy stays a generated headcount.,2026-11-26T11:00:00+08:00,2026-11-26T13:00:00+08:00
+E-177,W1-09-02-MEDIA,Showreel hour,"Student media studio screening, limited seats.",2026-11-27T15:00:00+08:00,2026-11-27T17:00:00+08:00
+E-178,W3-02-WHOLESOME,Campus Heart lunch circle,Casual CCA lunch at Wholesome on a teaching Friday.,2026-11-27T12:00:00+08:00,2026-11-27T13:00:00+08:00
+E-179,E4-01-FOODGLE,Weekend campus lunch,"Foodgle Saturday hours 08:30–19:30; generated occupancy, not a booking.",2026-11-28T11:00:00+08:00,2026-11-28T15:00:00+08:00
+E-180,W3-02-WHOLESOME,Saturday study pit-stop,"Wholesome is open Saturday until 15:00; light seating, not a concert.",2026-11-28T09:00:00+08:00,2026-11-28T14:00:00+08:00
+E-181,W1-04-OPEN,Weekend makers table,Library L4 table for student makers while the Creative Trail is up.,2026-11-28T10:00:00+08:00,2026-11-28T16:00:00+08:00
+E-182,E4-01-FOODGLE,Sunday dining hours,Foodgle remains open Sundays; Wholesome is closed so this is the walk-in meal spot.,2026-11-29T11:00:00+08:00,2026-11-29T16:00:00+08:00
+E-183,W1-06-OPEN,Sunday quiet desks,L6 open study kept for students on campus; no performance booking.,2026-11-29T10:00:00+08:00,2026-11-29T17:00:00+08:00
+E-184,W1-05-OPEN,Assessment-week quiet hall,"Learning Commons booked for silent revision, not a social event.",2026-11-30T09:00:00+08:00,2026-11-30T18:00:00+08:00
+E-185,W1-06-OPEN,Last-paper consult drop-in,Short faculty drop-in on L6 open study before papers.,2026-12-01T14:00:00+08:00,2026-12-01T16:00:00+08:00
+E-186,W1-05-OPEN,Assessment-week quiet hall,"Learning Commons booked for silent revision, not a social event.",2026-12-02T09:00:00+08:00,2026-12-02T18:00:00+08:00
+E-187,W1-05-OPEN,Assessment-week quiet hall,"Learning Commons booked for silent revision, not a social event.",2026-12-04T09:00:00+08:00,2026-12-04T18:00:00+08:00
+E-188,W1-05-OPEN,Quiet-campus reading room,Learning Commons kept open for students still on campus over the break.,2026-12-08T10:00:00+08:00,2026-12-08T16:00:00+08:00
+E-189,E4-01-FOODGLE,Break-week brunch,Weekend dining while Foodgle is open; seating occupancy still generated.,2026-12-12T09:00:00+08:00,2026-12-12T14:00:00+08:00
+E-190,W1-05-OPEN,Quiet-campus reading room,Learning Commons kept open for students still on campus over the break.,2026-12-15T10:00:00+08:00,2026-12-15T16:00:00+08:00
+E-191,E4-01-FOODGLE,Break-week brunch,Weekend dining while Foodgle is open; seating occupancy still generated.,2026-12-19T09:00:00+08:00,2026-12-19T14:00:00+08:00
+E-192,W1-05-OPEN,Quiet-campus reading room,Learning Commons kept open for students still on campus over the break.,2026-12-22T10:00:00+08:00,2026-12-22T16:00:00+08:00
+E-193,E4-01-FOODGLE,Break-week brunch,Weekend dining while Foodgle is open; seating occupancy still generated.,2026-12-26T09:00:00+08:00,2026-12-26T14:00:00+08:00
+E-194,W1-03-AMPHI,Fresh-term cluster welcome,Week-one orientation-style briefing for students already on Punggol campus.,2026-08-31T09:00:00+08:00,2026-08-31T12:00:00+08:00
+E-195,E4-01-FOODGLE,CCA booth lunch,"Student clubs at Foodgle during weekday lunch, not a full campus fair.",2026-09-02T11:30:00+08:00,2026-09-02T14:00:00+08:00
+E-196,W1-09-02-MEDIA,Campus film night,Short student films in the media studio.,2026-09-11T18:00:00+08:00,2026-09-11T20:00:00+08:00
+E-197,W1-04-02-MR04,Printmaking workshop,"Eight-person workshop tied to the Creative Trail, library meeting room.",2026-09-16T14:00:00+08:00,2026-09-16T16:00:00+08:00
+E-198,W1-04-01-MR03,Voice and movement lab,"Tiny room (capacity 4) for a rehearsal, not a hall booking.",2026-09-23T16:00:00+08:00,2026-09-23T18:00:00+08:00
+E-199,W1-03-AMPHI,Creative Trail closing circle,Low-key sharing in amphitheatre seating at the end of the trail.,2026-10-16T16:00:00+08:00,2026-10-16T18:00:00+08:00
+E-200,E2-05-STUDY2,IWSP prep clinic,East study space clinic for students heading to work attachments later in the year.,2026-10-21T14:00:00+08:00,2026-10-21T17:00:00+08:00
+E-201,W5-03-08-DR19,Health-cluster case huddle,Discussion room case talk; eight seats.,2026-10-22T09:00:00+08:00,2026-10-22T11:00:00+08:00
+E-202,W1-05-HUB,Prototype night,Project Hub L5 evening build session.,2026-10-28T17:00:00+08:00,2026-10-28T20:00:00+08:00
+E-203,W1-04-OPEN,Deepavali sharing table,Cultural potluck-style display in L4 open study the day before the holiday.,2026-11-06T12:00:00+08:00,2026-11-06T16:00:00+08:00
+E-204,W3-04-05-DR06,Design critique,"W3 discussion room, two-hour slot.",2026-11-12T14:00:00+08:00,2026-11-12T16:00:00+08:00
+E-205,W1-03-AMPHI,Alumni industry chat,"Amphitheatre seating for a career conversation, not a graduation ceremony.",2026-11-18T16:00:00+08:00,2026-11-18T18:00:00+08:00
+E-206,E6-07-016,Code clinic,E6 study space drop-in before assessments.,2026-11-25T13:00:00+08:00,2026-11-25T16:00:00+08:00
+E-207,W1-05-OPEN,Year-end thank-you desk,Quiet commons gathering before campus thins out.,2026-12-04T12:00:00+08:00,2026-12-04T14:00:00+08:00

@@ -53,7 +53,7 @@ Sheet `5min`: 102,816 rows. These are floor totals, not rooms, and are not ROBOD
 
 **SIT type → ROBOD type** (`analytics/occupancy_model.py`): discussion_room → office; library → library; lecture_theatre → lecture; food_court → library; office → office.
 
-**Academic calendar overlay** (`data/sample/sit_calendar.json`): applied only when generating SIT rows. Teaching, recess (week 7), final assessment, and trimester break follow [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). Singapore **public holidays** follow the [MOM 2026 gazette](https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026). Generated occupancy covers **31 August–27 December 2026** (teaching, recess, Deepavali 8–9 November, Christmas 25 December in the break, IWSP mix). OIP 2026 dates are not published (window disabled). Sample ArtFest events in late September. Timestamps use ISO-8601 with `+08:00`.
+**Academic calendar overlay** (`data/sample/sit_calendar.json`): applied only when generating SIT rows. Teaching, recess (week 7), final assessment, and trimester break follow [SIT AY2026/27 Trimester 1](https://www.singaporetech.edu.sg/admissions/undergraduate/academic-calendar-sit-and-joint-programmes). Singapore **public holidays** follow the [MOM 2026 gazette](https://www.mom.gov.sg/newsroom/press-releases/2025/0616-public-holidays-for-2026). Generated occupancy covers **31 August–27 December 2026** (teaching, recess, weeks 12–13 swot, Deepavali 8–9 November, exam week, Christmas 25 December in the break, IWSP mix). OIP 2026 dates are not published (window disabled). Demo campus events apply mixed turnout (not a crowd bump) on overlapping location hours. Discussion rooms keep empty-available slots as well as bookings; study-space occupancy rises toward exams. Timestamps use ISO-8601 with `+08:00`.
 
 ## Application schema (`src/db/schema.sql`)
 
@@ -69,7 +69,7 @@ Campus is a field on `building` (`SIT Punggol`). Floor is an integer on `locatio
 
 **event** — `event_id` (PK), `location_id` (FK), `title`, `description`, `start_time`, `end_time` (`end_time > start_time`)
 
-**app_user** — `user_id` (PK), `email` (unique), `role` (`student` | `staff` | `admin`) — unused until authentication is added
+**app_user** — `user_id` (PK), `email` (unique), `role` (`student` | `staff` | `admin`). Demo student logins are seeded here.
 
 **v_occupancy_current** — latest reading, `occupancy_ratio`, `crowd_level` (quiet ≤ 0.30, moderate ≤ 0.70, otherwise crowded)
 
