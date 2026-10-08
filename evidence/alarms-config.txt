@@ -1,0 +1,38 @@
+# CloudWatch alarms for Occuscope, created 2026-10-08 (SGT) with src/infra/setup_alarms.sh
+# in AWS CloudShell, us-east-1. Owner: Kristen (with Ryan, monitoring).
+# All alarms notify the SNS topic crowdmap-alerts (email subscription; address not recorded here)
+# on ALARM and on return to OK. Period 5 minutes, 1 evaluation period, missing data = not breaching.
+# Dashboard: CloudWatch -> Dashboards -> crowdmap (requests, 4xx/5xx, latency p50/p95,
+# Lambda invocations/errors/throttles/concurrency, alarm status).
+
+$ bash setup_alarms.sh <email> <API_ID>
+SNS topic crowdmap-alerts created
+alarm crowdmap-api-errors
+alarm crowdmap-bookings-errors
+alarm crowdmap-web-errors
+alarm crowdmap-bookings-throttled
+alarm crowdmap-http-5xx
+alarm crowdmap-http-4xx
+alarm crowdmap-http-latency
+dashboard crowdmap created
+
+-------------------------------------------------------------------------
+|                            DescribeAlarms                             |
++------------------------------+------------+---------+-----------------+
+|  crowdmap-api-errors         |  Errors    |  1.0    |  INSUFFICIENT_DATA |
+|  crowdmap-bookings-errors    |  Errors    |  1.0    |  INSUFFICIENT_DATA |
+|  crowdmap-bookings-throttled |  Throttles |  1.0    |  INSUFFICIENT_DATA |
+|  crowdmap-http-4xx           |  4xx       |  50.0   |  INSUFFICIENT_DATA |
+|  crowdmap-http-5xx           |  5xx       |  5.0    |  INSUFFICIENT_DATA |
+|  crowdmap-http-latency       |  Latency   |  3000.0 |  INSUFFICIENT_DATA |
+|  crowdmap-web-errors         |  Errors    |  1.0    |  INSUFFICIENT_DATA |
++------------------------------+------------+---------+-----------------+
+
+# What each alarm means
+# crowdmap-*-errors          >= 1 unhandled Lambda error in 5 min (code fault, bad deploy, S3 access)
+# crowdmap-bookings-throttled >= 1 throttle on the single-writer Lambda (booking burst exceeds 1 instance)
+# crowdmap-http-5xx          >= 5 server errors in 5 min (users seeing failures)
+# crowdmap-http-4xx          >= 50 client errors in 5 min, mostly 429 from API Gateway throttling
+#                            (load spike or abuse; the throttle is protecting the backend)
+# crowdmap-http-latency      p95 latency >= 3000 ms (slow cold starts or overloaded backend)
+# INSUFFICIENT_DATA is the normal state right after creation; alarms move to OK once metrics arrive.

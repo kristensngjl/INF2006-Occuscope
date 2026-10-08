@@ -1,0 +1,36 @@
+{
+  "run_started": "2026-10-08 18:20 SGT",
+  "target": "<API_URL>",
+  "phases": [
+    {
+      "phase": "A steady load",
+      "workers": 10,
+      "duration_s": 61.4,
+      "requests": 364,
+      "req_per_s": 5.9,
+      "status_counts": {"200": 364},
+      "server_errors_5xx": 0,
+      "latency_ms_200": {"p50": 1582, "p95": 1700, "p99": 5799, "max": 6167, "mean": 1667}
+    },
+    {
+      "phase": "B spike above stage limit",
+      "workers": 60,
+      "duration_s": 15.2,
+      "requests": 4272,
+      "req_per_s": 281.5,
+      "status_counts": {"200": 1122, "429": 3150},
+      "server_errors_5xx": 0,
+      "latency_ms_200": {"p50": 158, "p95": 577, "p99": 3577, "max": 3871, "mean": 315}
+    },
+    {
+      "phase": "C auth throttle",
+      "requests": 30,
+      "status_counts": {"401": 14, "429": 9, "503": 7}
+    },
+    {
+      "phase": "D persistence across cold start",
+      "steps": ["login -> 429"],
+      "result": "FAIL (login)"
+    }
+  ]
+}

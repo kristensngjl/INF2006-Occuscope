@@ -1,0 +1,28 @@
+# Phase A re-run after raising crowdmap-api memory 128 MB -> 1024 MB (2026-10-08, CloudShell)
+# Command: python3 load_test.py https://<API_ID>.execute-api.us-east-1.amazonaws.com --only-steady --out steady-1024mb.txt
+# Run 1 (19:13 SGT): 2814 requests, 46.8 req/s, 200 x 2814, 0 5xx, p50/p95/p99/max = 206/220/229/2953 ms (max = first cold start after the change)
+# Run 2 (19:15 SGT), kept below:
+{
+  "run_started": "2026-10-08 19:15 SGT",
+  "target": "<API_URL>",
+  "phases": [
+    {
+      "phase": "A steady load",
+      "workers": 10,
+      "duration_s": 60.2,
+      "requests": 2931,
+      "req_per_s": 48.7,
+      "status_counts": {
+        "200": 2931
+      },
+      "server_errors_5xx": 0,
+      "latency_ms_200": {
+        "p50": 206,
+        "p95": 218,
+        "p99": 229,
+        "max": 492,
+        "mean": 205
+      }
+    }
+  ]
+}

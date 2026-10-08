@@ -1,0 +1,22 @@
+{
+  "run_started": "2026-10-08 19:04 SGT",
+  "target": "<API_URL>",
+  "phases": [
+    {
+      "phase": "D persistence across cold start",
+      "steps": [
+        "login attempt 1 -> 200",
+        "book E2-04-20-DR223 2026-10-11T19:30:00+08:00 attempt 1 -> 201",
+        "forced cold start of crowdmap-bookings",
+        "my bookings after restart attempt 1 -> 200",
+        "after restart: my bookings -> 200 in 3887 ms, booking present = True",
+        "cleanup: cancel attempt 1 -> 503",
+        "cleanup: cancel attempt 2 -> 200"
+      ],
+      "result": "PASS"
+    }
+  ]
+}
+
+Earlier run (2026-10-08 19:00 SGT, before retry logic): login 200, booking 503 {"message":"Service Unavailable"} -> FAIL.
+Command: python3 load_test.py https://<API_ID>.execute-api.us-east-1.amazonaws.com --only-persistence --out persistence-run.txt

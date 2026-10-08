@@ -1,0 +1,30 @@
+# CloudWatch alarm notifications received during the load test, 2026-10-08
+# Source: SNS topic crowdmap-alerts -> email (screenshots kept privately; account ID, API ID
+# and email address removed here). Times in UTC (SGT = UTC+8). Owner: Kristen.
+
+Alarm                        Metric (namespace)            Datapoint (5-min sum)   Threshold   State change   Time (UTC)
+crowdmap-http-5xx            5xx (AWS/ApiGateway)          7.0   @ 10:17           >= 5        OK -> ALARM    2026-10-08 10:22:26
+crowdmap-http-4xx            4xx (AWS/ApiGateway)          2962.0 @ 10:17          >= 50       OK -> ALARM    2026-10-08 10:22:30
+crowdmap-bookings-throttled  Throttles (AWS/Lambda,        7.0   @ 10:17           >= 1        OK -> ALARM    2026-10-08 10:22:44
+                             FunctionName=crowdmap-bookings)
+
+# Interpretation (to be confirmed against resilience-run.txt)
+# - 4xx: 2,962 client errors in the 10:17 window = API Gateway throttling returning HTTP 429 during
+#   the spike phase (60 parallel users above the 50 req/s stage limit). The throttle protected the
+#   Lambdas and S3 as designed, and the alarm detected the spike within ~5 minutes.
+# - bookings-throttled = 7 and 5xx = 7 in the same window: the single-writer Lambda
+#   (reserved concurrency 1) rejected 7 overlapping requests during the rapid auth burst, and
+#   API Gateway surfaced those Lambda throttles to the client as server errors. Equal counts
+#   (7 and 7) point to the same cause.
+# - Monitoring worked end to end: metric -> alarm -> SNS -> email in about 5 minutes.
+
+# Follow-up, about 10 minutes after the test (screenshots in evidence/screenshots/2026-10-08-*):
+# - crowdmap-http-4xx and crowdmap-http-5xx returned to OK automatically: the service recovered
+#   on its own once the spike ended (no manual action).
+# - crowdmap-bookings-throttled was still In alarm at the time of the screenshot (cleared later).
+# - Dashboard "Lambda errors, throttles, concurrency": crowdmap-api ConcurrentExecutions peaked at
+#   about 66, i.e. Lambda scaled out to ~66 parallel instances for the spike (horizontal scaling).
+# - Dashboard "API requests and errors": peak of about 4.35K requests per minute, most of the
+#   excess answered with 4xx (429 throttling) rather than reaching the Lambdas.
+# - Dashboard "API latency": p50 stayed low; p95 peaked at about 5.4 s at the start of the spike
+#   (cold starts while new instances were created), then settled below about 2.7 s.

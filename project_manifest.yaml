@@ -30,15 +30,23 @@ team:
 
 architecture:
   diagram: "evidence/architecture.png"
-  service_model: "IaaS (EC2) + managed database (RDS) — to be confirmed"
-  deployment_model: "Public cloud, load-balanced web app — to be confirmed"
+  service_model: "Serverless FaaS/PaaS on AWS: API Gateway HTTP API + AWS Lambda (Python 3.11) + Amazon S3. AWS manages servers, OS, patching and scaling; the team owns code, configuration, data and IAM use. Groq LLM API is an external SaaS for the chatbot."
+  deployment_model: "Public cloud, single region (us-east-1), AWS Academy Learner Lab account. No VMs, load balancer or managed database; see evidence/deploy-log.md for the alternatives considered."
   components:
-    - "frontend-map"
-    - "backend-api"
-    - "relational-db"
-    - "occupancy-model"
-    - "load-balancer"
-    - "cloudwatch"
+    - "crowdmap-http (API Gateway HTTP API, HTTPS, throttling)"
+    - "crowdmap-web (Lambda: serves src/frontend from the private web bucket)"
+    - "crowdmap-api (Lambda reader: map, forecasts, events, chat)"
+    - "crowdmap-bookings (Lambda single writer: login, bookings; reserved concurrency 1)"
+    - "crowdmap-web-<group> (S3, private: frontend files)"
+    - "crowdmap-lake-<group> (S3, private, versioned: db/occuscope.db SQLite)"
+    - "occupancy-model (hour x room-type mean, precomputed into the database)"
+    - "CloudWatch Logs, 7 alarms, dashboard crowdmap; SNS topic crowdmap-alerts"
+    - "AWS Budgets crowdmap-monthly"
+    - "Groq API (external SaaS, chatbot)"
+  deploy_log: "evidence/deploy-log.md"
+  deployment_check: "evidence/aws-deployment-check.txt"
+  build_command: "bash src/infra/build_lambda_package.sh"
+  verify_command: "bash src/infra/verify_deployment.sh <api-id>  # AWS CloudShell; output redacted"
 
 evidence:
   functional_test: "evidence/test-functional.md"

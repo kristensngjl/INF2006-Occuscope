@@ -94,7 +94,7 @@ Same Quiet/Moderate/Crowded cut-offs on NUS hold-out: 08:00 is almost all Quiet;
 ## Architecture
 
 1. **Offline analytics** — ROBOD / NUS Wi-Fi in `data/raw/` (gitignored). Never loaded into the app database.
-2. **Application database** — SIT buildings, 64 locations, generated occupancy, events (`data/occuscope.db` locally; RDS later). API reads SQLite; the browser reads the API only.
+2. **Application database** — SIT buildings, 64 locations, generated occupancy, events (`data/occuscope.db` locally; on AWS the same SQLite file is stored in a private S3 bucket and loaded by Lambda). API reads SQLite; the browser reads the API only.
 
 | Piece | Owner |
 |---|---|
@@ -107,7 +107,7 @@ Same Quiet/Moderate/Crowded cut-offs on NUS hold-out: 08:00 is almost all Quiet;
 ## Technology
 
 - App: HTML/CSS/JS frontend (`src/frontend/`), FastAPI (`src/backend/`), SQLite (`src/db/schema.sql`)
-- Cloud: AWS (topology with the cloud owner: S3 + API Gateway + Lambda, or EC2 + load balancer + RDS)
+- Cloud: AWS serverless, `us-east-1`: API Gateway HTTP API `crowdmap-http` → 3 Lambdas (`crowdmap-web`, `crowdmap-api`, `crowdmap-bookings`, Python 3.11) → private S3 (`crowdmap-web-<group>`, `crowdmap-lake-<group>`); CloudWatch alarms + SNS; AWS Budgets. Deployment record and redeploy steps: [`evidence/deploy-log.md`](evidence/deploy-log.md). Diagram: [`evidence/architecture.png`](evidence/architecture.png)
 - Training: Python 3.11.9, pandas / scikit-learn; [ROBOD](https://github.com/ideas-lab-nus/robod) (Tekler et al., *Building Simulation*, 2022); [NUS Wi-Fi floors](https://zenodo.org/records/17578240) CC BY 4.0 (ablation only; unused in v0)
 
 ## Repository layout
@@ -134,3 +134,5 @@ Same Quiet/Moderate/Crowded cut-offs on NUS hold-out: 08:00 is almost all Quiet;
 - Per-room mix and IWSP factors are not live RBS. Campus calendar pins are a demo overlay inspired by typical SIT student life, not copied official listings.
 - Study-space capacities are estimates. Catalogue: RBS discussion rooms (screenshots, not a scrape); E2/E6 Wayfinder study spaces; W1 from [LibHelp](https://libhelp.singaporetech.edu.sg/faq/277332) / [library facilities](https://libguides.singaporetech.edu.sg/library/facilities); Foodgle Hub and Wholesome hours from [SIT Punggol Campus](https://www.singaporetech.edu.sg/about/punggol-campus) (Foodgle open Sat/Sun/PH; Wholesome Saturday until 15:00, closed Sunday/PH). Occupancy is generated; seating is not booked in Occuscope. W5 has DR18–DR20 and DR23–DR26 (**not** DR21/DR22). ACE seminar rooms are not seeded as open study.
 - Wi-Fi device counts are not people (corr ≈ 0.69 with ROBOD occupants). Room Wi-Fi helps NUS MAE but is unused in v0 (SIT has no matching feed).
+- Cloud: bookings use a **single writer** (`crowdmap-bookings`, reserved concurrency 1) over a SQLite file in S3, so concurrent booking requests are rejected with 503 and must be retried; readers see new bookings up to about 60 s later. A shared database (RDS) is the production fix ([`evidence/test-resilience.md`](evidence/test-resilience.md)).
+- Cloud: AWS Academy Learner Lab blocks CloudFront and custom IAM roles, so there is no CDN/WAF and all Lambdas share `LabRole` (intended least-privilege policy in [`evidence/deploy-log.md`](evidence/deploy-log.md)). The live service stops when the lab session ends; evidence is captured as dated, redacted files.
