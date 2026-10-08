@@ -8,7 +8,7 @@ There is **no live Punggol sensor feed**. Occupancy on the map is **model-genera
 
 The visual layout follows SIT’s [Campus Wayfinder](https://www.singaporetech.edu.sg/campus-wayfinder) as a **map reference only** (not turn-by-turn routing). The frontend has two features: a **crowd heatmap** (colour from occupancy ratio) and a **wayfinder-style 3D campus view**.
 
-Architecture diagram: [`evidence/architecture.png`](evidence/architecture.png) (Kristen). Data/AI evidence: [`evidence/test-data-ai.md`](evidence/test-data-ai.md). Manifest: [`project_manifest.yaml`](project_manifest.yaml). Deadline: **Sunday 11 October 2026, 11:59 PM**. `group_id` in the manifest is still `Gxxx` until the group number is confirmed.
+Architecture diagram: [`evidence/architecture.png`](evidence/architecture.png) (Kristen). Data/AI evidence: [`evidence/test-data-ai.md`](evidence/test-data-ai.md). Manifest: [`project_manifest.yaml`](project_manifest.yaml). Deadline: **Sunday 11 October 2026, 11:59 PM**. Group: **G007**.
 
 ## Team
 

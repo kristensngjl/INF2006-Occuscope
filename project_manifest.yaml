@@ -1,6 +1,6 @@
 # Fill group_id and student_id before submission. Paths are relative to the ZIP root.
 project:
-  group_id: "Gxxx"
+  group_id: "G007"
   title: "Occuscope"
   problem_statement: >
     SIT students cannot tell whether campus spaces are quiet or crowded, whether
