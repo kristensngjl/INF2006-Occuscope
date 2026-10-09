@@ -7,7 +7,7 @@ const assets = new Set(['index.html','styles.css','app.js','data.js','model.js',
 const types = {'.html':'text/html','.css':'text/css','.js':'text/javascript'};
 http.createServer(async (req,res) => {
   const url = new URL(req.url,'http://localhost');
-  const writeRoute = /^\/api\/(chat|auth\/(login|logout)|bookings|bookings\/[a-f0-9]+\/cancel)$/.test(url.pathname);
+  const writeRoute = /^\/api\/(chat|auth\/(login|logout)|bookings|bookings\/cancel|bookings\/[a-f0-9]+\/cancel)$/.test(url.pathname);
   if(req.method !== 'GET' && !(req.method === 'POST' && writeRoute)) {res.writeHead(405); return res.end();}
   if(req.method === 'POST' && url.pathname !== '/api/chat') {
     const expectedOrigin = process.env.PUBLIC_ORIGIN || `http://${req.headers.host}`;

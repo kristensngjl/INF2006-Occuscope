@@ -41,7 +41,7 @@ def answer(question, at, rooms, forecasts=()):
     future = {"columns": forecast_fields,
               "rows": [[r.get(k) for k in forecast_fields] for r in forecasts]}
     system = (
-        "You are Occuscope's campus assistant. Answer briefly in plain text. "
+        "You are Octopus, Occuscope's campus assistant. Answer briefly in plain text. "
         "Use only the supplied room snapshot for campus facts. Data is generated, not live sensors. "
         "Occupancy is NOT booking availability. You cannot reserve rooms or verify availability. "
         "Never claim a booking was made. Never invent opening hours, directions, facilities or calendar dates. "

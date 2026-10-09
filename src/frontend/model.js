@@ -3,10 +3,10 @@
 const shapes={
  E2:{x:180,y:-125,w:190,d:66,wings:true},
  E4:{x:345,y:-20,w:48,d:76,wings:false},
- E6:{x:250,y:95,w:145,d:72,wings:true},
- W1:{x:-135,y:10,w:82,d:85,wings:false},
- W3:{x:-280,y:-100,w:115,d:65,wings:true},
- W5:{x:-280,y:100,w:115,d:65,wings:true}
+ E6:{x:250,y:95,w:145,d:72,wings:false,returnWing:true},
+ W1:{x:-135,y:10,w:82,d:85,wings:false,glass:true},
+ W3:{x:-280,y:-100,w:115,d:65,wings:false,glass:true},
+ W5:{x:-280,y:100,w:115,d:65,wings:false,glass:true}
 };
 const palette={quiet:'#4b956d',moderate:'#c69640',crowded:'#be685a',unknown:'#99a49d'};
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -50,7 +50,9 @@ export function bindModelGestures(host,redraw){
 }
 export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
  const host=document.getElementById('campus-model');
- const focus=shapes[state.building],scale=(focus?2.05:1)*zoom;
+ const focus=shapes[state.building];
+ const topFloor=Math.max(5,...state.locations.filter(r=>r.building_id===state.building).map(r=>Number(r.floor)||0));
+ const scale=(focus?Math.min(2.05,250/(topFloor*15+20)):1)*zoom;
  const project=(x,y,z=0)=>{x-=focus?.x||0;y-=focus?.y||0;const xx=x*Math.cos(angle)-y*Math.sin(angle),yy=x*Math.sin(angle)+y*Math.cos(angle);return [450+xx*scale,330+yy*tilt*scale-z*scale];};
  const point=p=>p.map(n=>n.toFixed(2)).join(',');
  const poly=(points,fill,stroke='#ffffff50')=>`<polygon points="${points.map(p=>point(project(...p))).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width=".7"/>`;
@@ -82,7 +84,14 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
    svg+=box(x-20,y+9,18,5,1,3,['#ad9471','#8d7659','#7b674e']);
  }
  for(let k=0;k<6;k++)svg+=strip(26+k*4,216,2,22,'#fffdf3',.2);
+ // Campus Court's planted heart: irregular clusters instead of only perimeter trees.
+ svg+=poly([[-330,-52,0],[-205,-58,0],[-190,55,0],[-325,62,0]],'#aec58e','none');
  const trees=[];
+ for(let i=0;i<42;i++){
+   const x=-320+((i*47)%115),y=-46+((i*31)%100);
+   trees.push([x,y]);
+ }
+
  for(let x=-350;x<=350;x+=28)trees.push([x,180],[x,-210]);
  for(let y=-170;y<=135;y+=28)trees.push([-355,y],[355,y]);
  trees.push([-90,-130],[-60,-150],[-25,-130],[70,90],[85,120],[-135,150],[105,-145]);
@@ -115,26 +124,51 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
    scene.push({depth:depth(tx,ty),markup:`<g aria-label="E1 University Tower reference model">${tower}</g>`});
    const towerLabel=project(tx,ty,th+20);
    contextLabels+=`<text x="${towerLabel[0]}" y="${towerLabel[1]}" text-anchor="middle" class="landmark-label">E1 · University Tower</text>`;
-   landmark(310,-118,45,66,37,'E3 · Ho Bee Auditorium',['#bca471','#99805c','#777066']);
+   // E3 is a building envelope, with auditorium massing rather than a plain landmark cube.
+   // Dimensions and facade divisions are illustrative, not bookable floor data.
+   const ex=310,ey=-118,ew=45,ed=66,eh=37;
+   let e3=box(ex,ey,ew+6,ed+6,0,3,['#dce4d0','#adbeaa','#91a794']);
+   e3+=box(ex,ey,ew,ed,3,eh-3,['#e5e9dc','#b3c4b3','#91a89d']);
+   const e3y=Math.cos(angle)>=0?1:-1,e3x=Math.sin(angle)>=0?1:-1;
+   for(let z=10;z<eh-3;z+=9){
+     e3+=poly([[ex-ew/2+3,ey+e3y*ed/2,z],[ex+ew/2-3,ey+e3y*ed/2,z],[ex+ew/2-3,ey+e3y*ed/2,z+4],[ex-ew/2+3,ey+e3y*ed/2,z+4]],'#73929a','none');
+     e3+=poly([[ex+e3x*ew/2,ey-ed/2+3,z],[ex+e3x*ew/2,ey+ed/2-3,z],[ex+e3x*ew/2,ey+ed/2-3,z+4],[ex+e3x*ew/2,ey-ed/2+3,z+4]],'#78959d','none');
+   }
+   for(let k=-ed/2+7;k<ed/2;k+=9)e3+=box(ex+e3x*(ew/2+1),ey+k,2,1.5,5,eh-6,['#f0f0e3','#d6dfcd','#a8bba9']);
+   e3+=box(ex,ey,ew+3,ed+3,eh,2,['#e7eadb','#bacbb8','#a0b59f']);
+   e3+=box(ex-4,ey-8,ew*.6,ed*.45,eh+2,3,['#b3c89a','#91ae7e','#7d9c70']);
+   e3+=box(ex,ey+ed/2+5,ew*.7,13,10,2,['#f1efdf','#ccdac5','#a6bba5']);
+   scene.push({depth:depth(ex,ey),markup:`<g aria-label="E3 building">${e3}</g>`});
+   const e3label=project(ex,ey,eh+17);
+   contextLabels+=`<text x="${e3label[0]}" y="${e3label[1]}" text-anchor="middle" class="landmark-label">E3</text>`;
    landmark(310,35,74,64,39,'E5 · Multi-Purpose Hall',['#e0e3e0','#becbc6','#a1b5b1']);
-   const road=project(12,120,1);
+   const court=project(-260,2,18);
+   contextLabels+=`<text x="${court[0]}" y="${court[1]}" text-anchor="middle" class="landmark-label">Campus Court</text>`;
+   const road=project(35,140,1);
    contextLabels+=`<text x="${road[0]}" y="${road[1]}" text-anchor="middle" class="landmark-label">Campus Boulevard</text>`;
    const coast=project(160,236,1);
    contextLabels+=`<text x="${coast[0]}" y="${coast[1]}" text-anchor="middle" class="landmark-label">Punggol Coast Road</text>`;
  }
  // Bridge endpoints are schematic, not a surveyed or routable floor plan.
- // E6–E1 is documented by SIT; western spans illustrate the Level 5 loop.
+ // Level 5 links, including the user-confirmed E2–W1 connection.
+ // Endpoints meet the authored building envelopes; intermediate routing is illustrative.
  const bridges=[
-   {from:'E6',to:'E1',points:[[178,95],[146,95],[134,78]],name:'L5 · E6–E1 link'},
-   {from:'W3',to:'W1',points:[[-223,-100],[-177,-100],[-177,-10]],name:'L5 · Collaboration Loop'},
-   {from:'W1',to:'W5',points:[[-176,35],[-177,100],[-223,100]],name:'L5 · Collaboration Loop'}
+   {from:'E2',to:'W1',points:[[85,-105],[55,-85],[-135,-85],[-135,-32.5]],labelPoint:[-25,-85],name:'L5 · E2–W1 link'},
+   {from:'E6',to:'E1',points:[[177.5,95],[148,95],[134,78]],name:'L5 · E6–E1 link'},
+   {from:'W3',to:'W1',points:[[-222.5,-100],[-181,-100],[-181,-10],[-176,-10]],name:'L5 · Collaboration Loop'},
+   {from:'W1',to:'W5',points:[[-176,35],[-181,35],[-181,100],[-222.5,100]],name:'L5 · Collaboration Loop'}
  ];
  const bridgeSegment=(a,b,z)=>{
-   const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy),nx=-dy/len*6,ny=dx/len*6;
+   const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy),nx=-dy/len*7,ny=dx/len*7;
    const corners=[[a[0]+nx,a[1]+ny],[b[0]+nx,b[1]+ny],[b[0]-nx,b[1]-ny],[a[0]-nx,a[1]-ny]];
-   let result=poly(corners.map(([x,y])=>[x,y,z]),'#c3a56d','#8d764e');
+   let result=poly(corners.map(([x,y])=>[x,y,z]),'#dce4d0','#829780');
+   for(let distance=5;distance<len;distance+=5){
+     const t=distance/len,x=a[0]+dx*t,y=a[1]+dy*t;
+     result+=`<polyline points="${point(project(x+nx,y+ny,z+.1))} ${point(project(x-nx,y-ny,z+.1))}" stroke="#f5f3e7" stroke-width=".55"/>`;
+   }
    for(const sign of [-1,1]){
-     result+=poly([[a[0]+nx*sign,a[1]+ny*sign,z-3],[b[0]+nx*sign,b[1]+ny*sign,z-3],[b[0]+nx*sign,b[1]+ny*sign,z],[a[0]+nx*sign,a[1]+ny*sign,z]],'#9b855d');
+     result+=poly([[a[0]+nx*sign,a[1]+ny*sign,z-3],[b[0]+nx*sign,b[1]+ny*sign,z-3],[b[0]+nx*sign,b[1]+ny*sign,z],[a[0]+nx*sign,a[1]+ny*sign,z]],'#9eaf97');
+     result+=poly([[a[0]+nx*sign,a[1]+ny*sign,z+1],[b[0]+nx*sign,b[1]+ny*sign,z+1],[b[0]+nx*sign,b[1]+ny*sign,z+6],[a[0]+nx*sign,a[1]+ny*sign,z+6]],'#b4ccc366','none');
      const line=(height)=>[project(a[0]+nx*sign,a[1]+ny*sign,z+height),project(b[0]+nx*sign,b[1]+ny*sign,z+height)].map(point).join(' ');
      result+=`<polyline points="${line(7)}" fill="none" stroke="#687b76" stroke-width="1.6"/>`;
      for(let t=0;t<=1;t+=.15){const x=a[0]+dx*t+nx*sign,y=a[1]+dy*t+ny*sign;result+=`<polyline points="${point(project(x,y,z))} ${point(project(x,y,z+7))}" stroke="#81958a" stroke-width="1"/>`;}
@@ -147,10 +181,14 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
      if(focus&&bridge.from!==state.building&&bridge.to!==state.building)continue;
      if(focus&&state.floor!=='all'&&String(state.floor)!=='5')continue;
      const z=focus?79:44;
-     result+=`<g class="campus-bridge"><title>${bridge.name} · schematic alignment</title>`;
-     for(let i=1;i<bridge.points.length;i++)result+=bridgeSegment(bridge.points[i-1],bridge.points[i],z);
-     const mid=bridge.points[1],label=project(mid[0],mid[1],z+15);
-     result+=`<text x="${label[0]}" y="${label[1]}" text-anchor="middle" class="bridge-label">${bridge.name}</text></g>`;
+     // Sort spans with the buildings rather than paint every bridge over every facade.
+     for(let i=1;i<bridge.points.length;i++){
+       const a=bridge.points[i-1],b=bridge.points[i];
+       scene.push({depth:depth((a[0]+b[0])/2,(a[1]+b[1])/2),markup:`<g class="campus-bridge"><title>${bridge.name}</title>${bridgeSegment(a,b,z)}</g>`});
+     }
+     for(const [x,y] of bridge.points.slice(1,-1))scene.push({depth:depth(x,y),markup:box(x,y,14,14,z-3,3,['#dce4d0','#9eaf97','#7d927e'])});
+     const mid=bridge.labelPoint||bridge.points[1],label=project(mid[0],mid[1],z+15);
+     result+=`<text x="${label[0]}" y="${label[1]}" text-anchor="middle" class="bridge-label">${bridge.name}</text>`;
    }
    return result;
  };
@@ -170,21 +208,37 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
      const opacity=expanded&&state.floor!=='all'&&!active?.22:1;
      svg+=`<g opacity="${opacity}" ${expanded&&mapped?`class="model-level" tabindex="0" role="button" aria-label="View Level ${f}" data-model-floor="${f}"`:''}>`;
      svg+=box(s.x,s.y,s.w,s.d,top,4,tones);
-     if(!expanded){
-       svg+=box(s.x,s.y,s.w-5,s.d-5,top+4,4,['#d7e1dd','#74929b','#536f7d']);
+     if(!expanded||state.floor==='all'){
+       const wallHeight=expanded?11:4;
+       const faceY=Math.cos(angle)>=0?1:-1,faceX=Math.sin(angle)>=0?1:-1;
+       svg+=box(s.x,s.y,s.w-5,s.d-5,top+4,wallHeight,['#d7e1dd',s.glass?'#8aa9b4':'#74929b',s.glass?'#648799':'#536f7d']);
        // Repeated facade fins, glazing and planted balcony strips.
-       for(let k=-s.w/2+8;k<s.w/2-3;k+=12)svg+=box(s.x+k,s.y+s.d/2-2,2,3,top+4,4,['#f6f5eb','#e9eadf','#b8c8c6']);
+       for(let k=-s.w/2+8;k<s.w/2-3;k+=12)svg+=box(s.x+k,s.y+faceY*(s.d/2-2),1.6,3,top+4,wallHeight,['#f6f5eb','#e9eadf','#b8c8c6']);
+       for(let k=-s.d/2+8;k<s.d/2-3;k+=11)svg+=box(s.x+faceX*(s.w/2-2),s.y+k,3,1.6,top+4,wallHeight,['#f6f5eb','#e9eadf','#b8c8c6']);
+       if(s.glass&&f%2===0)svg+=box(s.x,s.y,s.w+1,s.d+1,top+wallHeight+3,1,['#f1f3eb','#dce5df','#c3d3d2']);
        if(f%3===0)svg+=box(s.x+s.w*.12,s.y+s.d/2+1,s.w*.6,6,top+3,3,['#86ac68','#709654','#5c8348']);
+     }
+     // E6's return wing frames the east courtyard, matching the reference silhouette.
+     if(s.returnWing){
+       const wingHeight=expanded?15:8;
+       svg+=box(s.x+s.w*.32,s.y-s.d*.70,s.w*.36,s.d*.60,top,4,tones);
+       if(!expanded||state.floor==='all')svg+=box(s.x+s.w*.32,s.y-s.d*.70,s.w*.36-4,s.d*.60-4,top+4,wingHeight-4,['#dce6e2','#829faa','#62808c']);
      }
      if(s.wings && !expanded)svg+=box(s.x-s.w*.35,s.y+s.d*.38,s.w*.3,s.d*.48,top,7,tones);
      if(expanded&&mapped){const [lx,ly]=project(s.x-s.w/2-12,s.y+s.d/2,top+4);svg+=`<text x="${lx}" y="${ly}" class="floor-label">L${f}</text>`;}
      svg+='</g>';
    }
-   if(!expanded){
-     const roof=max*8+8;
+   if(!expanded||state.floor==='all'){
+     const roof=max*(expanded?15:8)+(expanded?15:8);
      svg+=box(s.x,s.y,s.w-4,s.d-4,roof,2,['#edf0e8','#cad5cd','#aebfbd']);
+     if(s.returnWing)svg+=box(s.x+s.w*.32,s.y-s.d*.70,s.w*.36,s.d*.60,roof,2,['#edf0e8','#cad5cd','#aebfbd']);
+     if(s.glass){
+       // Roof garden and lightwell distinguish the western blocks from the east labs.
+       svg+=box(s.x,s.y,s.w*.40,s.d*.34,roof+2,2,['#a7bd85','#859f70','#6e8c63']);
+       svg+=box(s.x-s.w*.12,s.y,s.w*.12,s.d*.22,roof+4,1,['#afc6ce','#88a7b2','#6f8d9b']);
+     }
      // Individually drawn rooftop solar modules, skylights and service core.
-     for(let row=0;row<3;row++)for(let col=0;col<7;col++){
+     for(let row=0;row<(s.glass?1:3);row++)for(let col=0;col<7;col++){
        svg+=box(s.x-s.w*.34+col*s.w*.085,s.y-s.d*.27+row*s.d*.17,s.w*.077,s.d*.14,roof+2,1,['#435c7d','#344b65','#293e56']);
      }
      svg+=box(s.x+s.w*.34,s.y-s.d*.14,s.w*.13,s.d*.36,roof+2,7,['#faf9f1','#d7dfd6','#becdc6']);
@@ -216,8 +270,9 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
      }
    }
  }
+ const bridgeLabels=drawBridges();
  svg+=scene.sort((a,b)=>a.depth-b.depth).map(item=>item.markup).join('');
- svg+=drawBridges()+contextLabels+markers+`<text x="24" y="539" class="model-footnote">${focus?'Select a floor or a crowd marker':'CAMPUS WEST + EAST · ILLUSTRATIVE LANDSCAPE'}</text></svg>`;
+ svg+=bridgeLabels+contextLabels+markers+`<text x="24" y="539" class="model-footnote">${focus?'Select a floor or a crowd marker':'SIT PUNGGOL · CAMPUS EAST + WEST'}</text></svg>`;
  host.innerHTML=svg;
  const bind=(selector,fn)=>host.querySelectorAll(selector).forEach(el=>{const activate=e=>{e.stopPropagation();fn(el);};el.onclick=activate;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(e);}};});
  bind('[data-model-building]',el=>{if(el.dataset.modelBuilding!==state.building)onBuilding(el.dataset.modelBuilding);});
@@ -225,5 +280,17 @@ export function renderModel(state,filtered,onBuilding,onFloor,onRoom){
  bind('[data-model-room]',el=>onRoom(el.dataset.modelRoom));
  const floors=focus?[...new Set([...(state.building==='E4'?[]:[5]),...state.locations.filter(l=>l.building_id===state.building).map(l=>Number(l.floor))])].sort((a,b)=>a-b):[];
  document.getElementById('model-floors').innerHTML=focus?['all',...floors].map(f=>`<button data-model-select-floor="${f}" class="${String(state.floor)===String(f)?'active':''}" aria-pressed="${String(state.floor)===String(f)}">${f==='all'?'All levels':'Level '+f}</button>`).join(''):'<span>Choose E2, E4, E6, W1, W3 or W5 to explore its floors.</span>';
+ const currentFloor=floors.indexOf(Number(state.floor));
+ if(focus&&state.floor!=='all'&&currentFloor>=0){
+   const controls=document.createElement('div');controls.className='floor-stepper';controls.setAttribute('role','group');controls.setAttribute('aria-label','Change floor');
+   controls.innerHTML=`<button type="button" data-floor-step="-1" aria-label="Go to lower floor" ${currentFloor===0?'disabled':''}>↓</button><span aria-live="polite">Level ${safe(state.floor)}</span><button type="button" data-floor-step="1" aria-label="Go to higher floor" ${currentFloor===floors.length-1?'disabled':''}>↑</button>`;
+   host.append(controls);
+   controls.addEventListener('pointerdown',e=>e.stopPropagation());
+   controls.addEventListener('click',e=>{
+     e.stopPropagation();const button=e.target.closest('[data-floor-step]');if(!button||button.disabled)return;
+     const step=Number(button.dataset.floorStep),next=floors[currentFloor+step];
+     if(next!==undefined){onFloor(String(next));const nextButton=host.querySelector(`[data-floor-step="${step}"]`);if(nextButton&&!nextButton.disabled)nextButton.focus();else host.querySelector('[data-floor-step]:not(:disabled)')?.focus();}
+   });
+ }
  document.querySelectorAll('[data-model-select-floor]').forEach(el=>el.onclick=()=>onFloor(el.dataset.modelSelectFloor));
 }

@@ -46,20 +46,11 @@ function bookPill(r){
   return Number(r.booked)?`<span class="book-pill is-booked">Booked</span>`:`<span class="book-pill is-free">Available</span>`;
 }
 function bookingNote(r){
-  if(r.type!=='discussion_room'){
-    if(r.type==='food_court')return 'Walk-in food court. Occupancy is generated; seating is not booked in Occuscope.';
-    if(r.type==='library')return 'Walk-in study space. Occupancy is generated; this space is not booked in Occuscope.';
-            return 'Walk-in space. Occupancy is generated.';
-  }
-  if(!bookingHoursOpen())return 'Discussion rooms can be booked 08:00–20:00 SGT. Occupancy below is still generated for this hour.';
-  const people=Number(r.occupancy_count||0);
-  if(Number(r.booked)){
-    if(people<=0)return 'Booked this hour, but generated occupancy is empty — students do reserve rooms and then not show up.';
-    if(people<=2)return 'Booked this hour. A small group may be inside, or the booking may be only partly used.';
-    return 'Booked this hour, and occupancy suggests people are using the room.';
-  }
-  if(people>0)return 'No Occuscope booking this hour. Occupancy can still be walk-in students using an unreserved room.';
-  return 'Available this hour. Generated occupancy is empty — this slot is free in the demo.';
+  if(r.type!=='discussion_room')return r.type==='food_court'?'Walk-in dining.': 'Walk-in space · no booking needed.';
+  if(!bookingHoursOpen())return 'Booking hours: 08:00–20:00 SGT.';
+  const booked=Number(r.booked)?'Booked this hour':'Available this hour';
+  if(r.occupancy_count==null)return booked+' · occupancy unavailable.';
+  return booked+(Number(r.occupancy_count)>0?' · currently occupied.':' · currently unoccupied.');
 }
 $('hour').innerHTML=Array.from({length:13},(_,i)=>{const h=String(i+8).padStart(2,'0');return `<option value="${h}">${h}:00</option>`;}).join('');
 function validate(){const d=$('date');if(!d.value||d.value<d.min||d.value>d.max){$('notice').textContent='Choose a date between 31 August and 27 December 2026, the available data period.';return false;}return true;}
@@ -84,7 +75,7 @@ function render(){
  const chosen=state.buildings.find(b=>b.building_id===state.building);
  $('map-title').textContent=chosen?`${chosen.name}${state.floor==='all'?'':' · Level '+state.floor}`:'Explore SIT Punggol';
  $('map-kicker').textContent='OCCUSCOPE CAMPUS MODEL';
- $('selected-time').textContent=`${$('live').checked?'Following clock · ':''}${$('date').value} · ${$('hour').value}:00 SGT · generated`;
+ $('selected-time').textContent=`${$('live').checked?'Following clock · ':''}${$('date').value} · ${$('hour').value}:00 SGT`;
  $('coordinate-title').textContent=`${chosen?chosen.name:'Campus'}${state.floor==='all'?'':' · Level '+state.floor}`;
  $('spaces-title').textContent=chosen?`${chosen.name} spaces`:'All campus spaces';
  const floors=[...new Set(state.locations.filter(l=>state.building==='all'||l.building_id===state.building).map(l=>Number(l.floor)))].sort((a,b)=>a-b);
@@ -94,14 +85,14 @@ function render(){
  const bookFilter=$('booked').value;
  const rooms=state.rows.filter(r=>(state.building==='all'||r.building_id===state.building)&&(state.floor==='all'||String(r.floor)===String(state.floor))&&($('crowd').value==='all'||r.crowd_level===$('crowd').value)&&($('type').value==='all'||r.type===$('type').value)&&(bookFilter==='all'||(r.type==='discussion_room'&&bookingHoursOpen()&&((bookFilter==='booked'&&Number(r.booked))||(bookFilter==='available'&&!Number(r.booked)))))&&`${r.name} ${r.location_id} ${r.building_id} ${r.building_name||''} ${r.building_id==='W1'?'library':''} ${r.type==='food_court'?'foodgle wholesome canteen':''}`.toLowerCase().includes(q));
  $('result-count').textContent=`${rooms.length} spaces`;
- $('map-count').textContent=`${state.rows.length} spaces · generated occupancy`;
+ $('map-count').textContent=`${state.rows.length} spaces`;
  renderCoordinates(rooms);
  renderModel(state,rooms,chooseBuilding,chooseFloor,selectRoom);
  $('rooms').innerHTML=rooms.length?rooms.map(r=>`<button class="room-card ${state.selected===r.location_id?'selected':''}" data-room="${esc(r.location_id)}" aria-pressed="${state.selected===r.location_id}"><div class="room-card-top"><span>${esc(r.building_id)} / LEVEL ${esc(r.floor)}</span>${badge(r)}</div><h3>${esc(r.name)}</h3><p>${[esc(r.type.replaceAll('_',' ')),bookPill(r)].filter(Boolean).join(' · ')}</p><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,Math.max(0,(r.occupancy_ratio||0)*100))}%"></span></div><div class="room-card-bottom"><span>${r.occupancy_count==null?'No reading':`${esc(r.occupancy_count)} / ${esc(r.capacity)} people`}</span><span>View space ↗</span></div></button>`).join(''):'<p class="no-results">No spaces match this view. Try another floor or clear your filters.</p>';
  document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>selectRoom(b.dataset.room));
  const eventDate=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Singapore',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const events=dayEvents(state.events,eventDate).filter(e=>state.building==='all'||state.locations.some(l=>l.location_id===e.location_id&&l.building_id===state.building));
- $('event-date').textContent=`${eventDate} · Today in Singapore (API)`;
+ $('event-date').textContent=`${eventDate} · Today in Singapore`;
  $('events').innerHTML=events.length?events.map(e=>`<article class="event"><h3>${esc(e.title)}</h3><p>${time(e.start_time)}–${time(e.end_time)} SGT</p><button data-event-room="${esc(e.location_id)}">${esc(e.location_id)} ↗</button></article>`).join(''):'<p class="event fine-print">No listed events for this view.</p>';
  document.querySelectorAll('[data-event-room]').forEach(b=>b.onclick=()=>{const r=state.rows.find(r=>r.location_id===b.dataset.eventRoom);if(r){state.building=r.building_id;state.floor=String(r.floor);selectRoom(r.location_id);}});
 }
@@ -111,7 +102,7 @@ async function renderDetail(){
  const version=++state.detailVersion;
  const r=state.rows.find(r=>r.location_id===state.selected);
  if(!r){$('detail').innerHTML='<div class="empty-detail"><span>⌖</span><h2>A spot with your name on it.</h2><p>Select a room below to explore its occupancy and daily rhythm.</p></div>';return;}
- $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div><div class="detail-pills">${badge(r)}${bookPill(r)}</div><h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% estimated occupancy · ${esc(r.source)}<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note">${esc(bookingNote(r))}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm <span class="detail-note">· generated</span></h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
+ $('detail').innerHTML=`<div class="detail-top"><p class="eyebrow">YOUR SELECTED SPACE</p><button id="close-detail" aria-label="Close location details">✕</button></div><div class="detail-pills">${badge(r)}${bookPill(r)}</div><h2>${esc(r.name)}</h2><p class="subtitle">${esc(r.building_id)} · Level ${esc(r.floor)} · ${esc(r.type.replaceAll('_',' '))}</p><div class="occupancy-number">${r.occupancy_count==null?'—':esc(r.occupancy_count)} <small>/ ${esc(r.capacity)} people</small></div><div class="meter ${esc(r.crowd_level)}"><span style="width:${Math.min(100,(r.occupancy_ratio||0)*100)}%"></span></div><p class="detail-note">${r.timestamp?`${Math.round(r.occupancy_ratio*100)}% occupancy<br>Reading: ${esc(r.timestamp.slice(0,10))}, ${time(r.timestamp)} SGT`:'No reading at this time.'}</p><p class="detail-note">${esc(bookingNote(r))}</p><p class="detail-note map-search-hint">Highlighted in our campus model: <strong>${esc(r.name)}</strong>, ${esc(r.building_id)}, Level ${esc(r.floor)}.</p><h3 class="chart-heading">The day's rhythm </h3><div id="history">Loading daily history…</div><div class="forecast" id="forecast">Loading forecast…</div>`;
  mountBookingAction(r);
  $('close-detail').onclick=()=>{state.selected=null;render();renderDetail();};
  try{
@@ -122,7 +113,7 @@ async function renderDetail(){
    if(version!==state.detailVersion)return;
    $('history').innerHTML=history.length?`<div class="chart" role="img" aria-label="Hourly estimated occupancy: ${esc(history.map(h=>`${time(h.timestamp)}: ${h.occupancy_count} people`).join('; '))}">${history.map(h=>`<span class="${h.timestamp.slice(11,13)===$('hour').value?'chosen':''}" style="height:${Math.max(3,Math.min(100,Number(h.occupancy_count)/Number(r.capacity)*100))}%" title="${time(h.timestamp)}: ${esc(h.occupancy_count)} people"></span>`).join('')}</div><div class="chart-labels"><span>${time(history[0].timestamp)}</span><span>Singapore time</span><span>${time(history.at(-1).timestamp)}</span></div>`:'<p class="detail-note">No history for this day.</p>';
    const future=predictions.filter(p=>Date.parse(p.predicted_for)>Date.parse(at())&&Date.parse(p.predicted_for)<=Date.parse(at())+7200000);
-   $('forecast').innerHTML='<strong>Next two hours</strong>'+(future.length?future.map(p=>`${time(p.predicted_for)} · ${esc(p.occupancy_count)} people <span class="detail-note">(${esc(p.model_version)})</span>`).join('<br>'):'<span class="detail-note">No saved forecast returned by the API for this time.</span>');
+   $('forecast').innerHTML='<strong>Next two hours</strong>'+(future.length?future.map(p=>`${time(p.predicted_for)} · ${esc(p.occupancy_count)} people`).join('<br>'):'<span class="detail-note">No forecast available for this time.</span>');
  }catch(e){if(version!==state.detailVersion)return;$('history').textContent=e.message;$('forecast').textContent='Forecast unavailable.';}
 }
 $('all').onclick=()=>chooseBuilding('all');
@@ -159,16 +150,34 @@ $('chat-toggle').onclick=()=>showChat(chatPanel.hidden);
 $('chat-close').onclick=()=>showChat(false);
 chatPanel.addEventListener('keydown',e=>{if(e.key==='Escape')showChat(false);});
 function chatLine(text,kind){const line=document.createElement('p');line.className='chat-line '+kind;line.textContent=text;$('chat-messages').append(line);line.scrollIntoView({block:'nearest'});return line;}
-chatLine('Hi! Ask me about crowd levels or rooms. Each question uses the date and time selected above.','assistant');
+chatLine('Hi, I’m Octopus! Ask me about crowd levels or rooms. Each question uses the date and time selected above.','assistant');
 $('chat-form').onsubmit=async e=>{
- e.preventDefault();const message=$('chat-input').value.trim();if(!message)return;
+ e.preventDefault();if($('chat-send').disabled)return;const message=$('chat-input').value.trim();if(!message)return;
  const instant=at();chatLine(message,'user');$('chat-input').value='';$('chat-send').disabled=true;
- const pending=chatLine('Checking campus data…','assistant');
+ const pending=chatLine('','assistant');
+ const typing=document.createElement('span');typing.className='octopus-typing';
+ const description=document.createElement('span');description.className='sr-only';description.textContent='Octopus is typing…';typing.append(description);
+ const mascot=$('chat-toggle').querySelector('svg').cloneNode(true);typing.append(mascot);
+ pending.append(typing);pending.scrollIntoView({block:'nearest'});
  try{
   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,at:instant}),signal:AbortSignal.timeout(30000)});
   const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Unable to answer this question.');
   pending.textContent=data.answer+'\nViewing: '+instant;
   for(const id of data.location_ids||[]){const room=state.rows.find(r=>r.location_id===id);if(!room)continue;const button=document.createElement('button');button.className='chat-room';button.textContent=room.name+' · '+room.building_id+' ↗';button.onclick=()=>{if(at()!==instant){chatLine('The selected time has changed. Ask again for updated suggestions.','assistant');return;}selectRoom(id);mapView(true);showChat(false);};pending.append(document.createElement('br'),button);}
- }catch(error){pending.textContent=error.name==='TimeoutError'?'The assistant took too long. Try again.':error.message;}
+ }catch(error){pending.textContent=error.name==='TimeoutError'?'Octopus took too long. Try again.':error.message;}
  finally{$('chat-send').disabled=false;}
 };
+
+// Step back from room/floor to building, then campus; drags suppress clicks.
+function stepBackMap(){
+ if(state.building==='all')return;
+ if(state.selected||state.floor!=='all'){adjustModel('reset');chooseFloor('all');}
+ else chooseBuilding('all');
+}
+for(const id of ['campus-model','crowd-plot']) $(id).addEventListener('click',event=>{
+ if(event.target.closest('button,a,[role="button"],[data-model-room],[data-model-building],[data-model-floor]'))return;
+ stepBackMap();
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!document.querySelector('dialog[open]')&&!event.target.closest('#campus-chat'))stepBackMap();
+});

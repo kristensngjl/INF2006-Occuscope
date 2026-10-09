@@ -1,8 +1,9 @@
+import {groupBookings} from './data.js';
 // Demo reservations use actual Singapore time, independently of the map clock.
 const $=id=>document.getElementById(id);
 let user=null, chosenRoom=null, slots=[], loadVersion=0, weekly=null, selected=new Set(), submitting=false;
 const format=t=>new Intl.DateTimeFormat('en-SG',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Singapore'}).format(new Date(t));
-const clock=t=>new Intl.DateTimeFormat('en-SG',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Singapore'}).format(new Date(t));
+const clock=t=>new Intl.DateTimeFormat('en-SG',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Singapore'}).format(new Date(t));
 const day=offset=>new Date(Date.now()+8*3600000+offset*86400000).toISOString().slice(0,10);
 async function request(path,body){
  const response=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',credentials:'same-origin',headers:body===undefined?{}:{'Content-Type':'application/json','X-Occuscope-Request':'1'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
@@ -20,15 +21,15 @@ document.body.insertAdjacentHTML('beforeend',`
   <div class="login-content"><button class="login-close" type="button" data-dismiss="account-dialog" aria-label="Close account">✕</button>
    <p class="eyebrow">WELCOME TO YOUR SPACE</p><h2 id="account-title">Welcome back.</h2><p id="login-subtitle" class="login-subtitle">Sign in with your student email to get started.</p>
    <form id="account-form"><label>Student email<input id="account-email" type="email" autocomplete="username" placeholder="2500001@sit.singaporetech.edu.sg" maxlength="254" required></label><label>Password<span class="password-field"><input id="account-password" type="password" autocomplete="current-password" minlength="10" maxlength="128" placeholder="Enter your password" required><button id="password-toggle" type="button" aria-label="Show password" aria-pressed="false">Show</button></span></label><button id="account-submit" class="booking-primary">Sign in <span aria-hidden="true">↗</span></button></form>
-   <div id="account-signed-in" hidden><div class="student-profile"><span id="student-avatar" aria-hidden="true"></span><div><strong id="student-name"></strong><p id="student-number"></p></div></div><p id="account-identity"></p><button id="account-logout" class="booking-secondary">Sign out</button><h3>My discussion-room bookings</h3><p class="booking-note">Reservations exist only in Occuscope. They do not reserve rooms in SIT’s official booking system.</p><div id="my-bookings"></div></div>
-   <p id="account-status" role="status" aria-live="polite"></p><p class="login-footnote">Fictional accounts for this project. Not connected to SIT sign-in.</p>
+   <div id="account-signed-in" hidden><div class="student-profile"><span id="student-avatar" aria-hidden="true"></span><div><strong id="student-name"></strong><p id="student-number"></p></div></div><p id="account-identity"></p><button id="account-logout" class="booking-secondary">Sign out</button><h3>My discussion-room bookings</h3><div id="my-bookings"></div></div>
+   <p id="account-status" role="status" aria-live="polite"></p>
   </div>
  </div>
 </dialog>
 <dialog id="booking-dialog" class="booking-dialog" aria-labelledby="booking-title">
  <div class="booking-heading"><div><p class="eyebrow">DISCUSSION ROOMS ONLY</p><h2 id="booking-title">Book a room</h2></div><button type="button" data-dismiss="booking-dialog" aria-label="Close booking">✕</button></div>
- <p class="booking-note">Demo rules: 08:00–20:00 SGT · 30-minute slots · 240 minutes per student per week (Monday–Sunday SGT) · next 14 days. Booking uses actual Singapore time, independently of the map’s viewing date. Occupancy colours do not indicate booking availability.</p>
- <form id="booking-form"><label>Booking date · SGT<input id="booking-date" type="date" required></label><div id="booking-allowance" class="booking-allowance" aria-live="polite"></div><fieldset class="slot-fieldset"><legend>Select 30-minute blocks · SGT</legend><p class="booking-note">Choose one or more blocks. They do not have to be consecutive.</p><div id="booking-slots" class="booking-slots"></div></fieldset><p id="booking-selection" aria-live="polite"></p><p class="booking-note">This reserves a room in the Occuscope demo only.</p><button id="booking-submit" class="booking-primary">Confirm demo booking</button></form>
+ 
+ <form id="booking-form"><label>Booking date · SGT<input id="booking-date" type="date" required></label><div id="booking-allowance" class="booking-allowance" aria-live="polite"></div><fieldset class="slot-fieldset"><legend>Select 30-minute blocks · SGT</legend><p class="booking-note">Choose the times that work for you.</p><div id="booking-slots" class="booking-slots"></div></fieldset><p id="booking-selection" aria-live="polite"></p><button id="booking-submit" class="booking-primary">Confirm booking</button></form>
  <p id="booking-status" role="status" aria-live="polite"></p><button id="booking-view-mine" class="booking-secondary" hidden>View my bookings</button>
 </dialog>`);
 for(const button of document.querySelectorAll('[data-dismiss]'))button.onclick=()=>$(button.dataset.dismiss).close();
@@ -60,15 +61,15 @@ async function myBookings(){
  $('my-bookings').textContent='Loading your bookings…';
  try{const bookings=await request('bookings/mine');$('my-bookings').replaceChildren();
  if(!bookings.length)$('my-bookings').textContent='No bookings yet. Select a discussion room on the map to get started.';
- for(const booking of bookings){
+ for(const booking of groupBookings(bookings)){
  const card=document.createElement('article');card.className='booking-card';
  const title=document.createElement('strong');title.textContent=booking.name+' · '+booking.building_id;
  const detail=document.createElement('p');detail.textContent=format(booking.start_time)+' – '+clock(booking.end_time)+' SGT';
- const status=document.createElement('p');status.textContent=booking.status;
+ const status=document.createElement('p');status.textContent=(booking.status==='confirmed'?'Confirmed':'Cancelled')+' · '+Math.round((Date.parse(booking.end_time)-Date.parse(booking.start_time))/60000)+' min';
  card.append(title,detail,status);
  if(booking.status==='confirmed'&&Date.parse(booking.start_time)>Date.now()){
  const cancel=document.createElement('button');cancel.className='booking-secondary';cancel.textContent='Cancel booking';
- cancel.onclick=async()=>{if(!confirm('Cancel this discussion-room booking?'))return;cancel.disabled=true;try{await request('bookings/'+encodeURIComponent(booking.booking_id)+'/cancel',{});await myBookings();}catch(error){$('account-status').textContent=error.message;cancel.disabled=false;}};
+ cancel.onclick=async()=>{if(!confirm('Cancel '+format(booking.start_time)+' – '+clock(booking.end_time)+'?'))return;cancel.disabled=true;try{await request('bookings/cancel',{booking_ids:booking.booking_ids});await myBookings();}catch(error){$('account-status').textContent=error.message;cancel.disabled=false;}};
  card.append(cancel);
  }$('my-bookings').append(card);
  }
@@ -112,7 +113,7 @@ $('booking-date').onchange=loadSlots;
 $('booking-form').onsubmit=async event=>{
  event.preventDefault();if(submitting||!selected.size)return;
  submitting=true;$('booking-date').disabled=true;renderSlots();
- try{const result=await request('bookings',{location_id:chosenRoom.location_id,slots:[...selected].sort()});$('booking-form').hidden=true;$('booking-status').textContent=`${result.bookings.length} blocks confirmed · ${result.booked_minutes} minutes.\n`+result.bookings.map(b=>format(b.start_time)+' – '+clock(b.end_time)+' SGT').join('\n');$('booking-view-mine').hidden=false;}
+ try{const result=await request('bookings',{location_id:chosenRoom.location_id,slots:[...selected].sort()});$('booking-form').hidden=true;$('booking-status').textContent=`${result.bookings.length} blocks confirmed · ${result.booked_minutes} minutes.\n`+groupBookings(result.bookings).map(b=>format(b.start_time)+' – '+clock(b.end_time)+' SGT').join('\n');$('booking-view-mine').hidden=false;}
  catch(error){if(error.status===401){user=null;accountState();showAccount();$('account-status').textContent='Your session expired. Sign in and choose your blocks again.';}else{await loadSlots();$('booking-status').textContent=error.message;}}
  finally{submitting=false;$('booking-date').disabled=false;if(!$('booking-form').hidden)renderSlots();}
 };

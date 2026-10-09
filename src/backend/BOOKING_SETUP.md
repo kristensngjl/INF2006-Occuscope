@@ -18,6 +18,8 @@ Run offline tests (temporary databases; no real accounts or paid APIs):
 python -m unittest src.backend.test_bookings src.backend.test_chat
 ```
 
-Routes: POST `/auth/login`, `/auth/logout`; GET `/auth/me`, `/bookings/mine`, `/bookings/availability?location_id=...&date=YYYY-MM-DD`; POST `/bookings`, `/bookings/{booking_id}/cancel`. Frontend routes add the `/api` prefix. Availability returns anonymous half-hour slots, never other students' details.
+Routes: POST `/auth/login`, `/auth/logout`; GET `/auth/me`, `/bookings/mine`, `/bookings/availability?location_id=...&date=YYYY-MM-DD`; POST `/bookings`, `/bookings/cancel`, `/bookings/{booking_id}/cancel`. Frontend routes add the `/api` prefix. Availability returns anonymous half-hour slots, never other students' details.
 
 Booking requests use `{ "location_id": "...", "slots": ["2026-10-03T09:00:00+08:00"] }` (one to eight half-hour start times). The response contains `bookings` and `booked_minutes`. The old start/end request format and registration endpoint have been removed.
+
+Consecutive slots for the same room, Singapore date and status display as one range (including existing bookings). Gaps remain separate. Group cancellation sends `POST /bookings/cancel` with `{ "booking_ids": ["..."] }`; all IDs must belong to the signed-in student and all active slots must be in the future. Validation and cancellation happen in one transaction, so a rejected slot cannot cause partial cancellation. Keep this route on the AWS booking writer with the other booking POST routes. No schema change or database rebuild is needed. Restart the API and frontend proxy together.

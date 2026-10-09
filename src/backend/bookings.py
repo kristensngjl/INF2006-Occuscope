@@ -43,6 +43,10 @@ class Credentials(BaseModel):
     password: str = Field(min_length=10, max_length=128)
 
 
+class CancelBookingsInput(BaseModel):
+    booking_ids: list[str] = Field(min_length=1, max_length=48)
+
+
 class SlotBookingInput(BaseModel):
     location_id: str = Field(min_length=1, max_length=100)
     slots: list[str] = Field(min_length=1, max_length=8)
@@ -245,6 +249,23 @@ def create_router(path, parse_time):
             return [dict(r) for r in conn.execute("""SELECT r.booking_id,r.location_id,l.name,l.building_id,
                 r.start_time,r.end_time,r.status FROM room_booking r JOIN location l ON l.location_id=r.location_id
                 WHERE r.user_id=? ORDER BY r.start_time DESC""", (user["user_id"],))]
+
+    @router.post("/bookings/cancel")
+    def cancel_group(body: CancelBookingsInput, request: Request):
+        write_guard(request)
+        with database() as conn, conn:
+            conn.execute("BEGIN IMMEDIATE")
+            user = student(conn, request)
+            now = now_sgt()
+            ids = list(dict.fromkeys(body.booking_ids))
+            for booking_id in ids:
+                row = conn.execute("SELECT * FROM room_booking WHERE booking_id=? AND user_id=?", (booking_id, user["user_id"])).fetchone()
+                if row is None:
+                    raise HTTPException(404, "Booking not found.")
+                if row["status"] != "cancelled" and datetime.fromisoformat(row["start_time"]) <= now:
+                    raise HTTPException(409, "Only upcoming bookings can be cancelled.")
+            conn.executemany("UPDATE room_booking SET status='cancelled' WHERE booking_id=? AND user_id=?", [(bid, user["user_id"]) for bid in ids])
+        return {"ok": True}
 
     @router.post("/bookings/{booking_id}/cancel")
     def cancel(booking_id: str, request: Request):
