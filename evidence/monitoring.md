@@ -1,56 +1,27 @@
 # Monitoring evidence
 
-Ryan: CloudWatch dashboard / log query goes here after Kristen deploys. Redact account IDs, IPs, and secrets before paste.
+Owner: Ryan (Security / Monitoring / Testing). Source of metrics: Kristen’s CloudWatch / SNS artefacts from the 8 October 2026 load test. Account IDs, API IDs, hostnames and emails are not copied here.
 
-# Wishlist (implement on AWS; not running today)
+Pointer (do not re-export unless the lab is re-run): `evidence/alarms-config.txt`, `evidence/alarm-notifications.txt`, `evidence/screenshots/2026-10-08-cloudwatch-dashboard-load-test.png`, `evidence/screenshots/2026-10-08-cloudwatch-alarms-after-load-test.png`, `evidence/test-resilience.md`.
 
-Kristen should expose at least:
+# What is instrumented
 
-- API 4xx and 5xx counts (by route if possible)
-- API latency (p50 / p99)
-- RDS connection count / failed connections
-- Failed auth count (only if mutating routes exist; skip if API is public read-only)
-- Deploy / instance health (ALB target or Lambda errors)
+Seven CloudWatch alarms on SNS topic `crowdmap-alerts` (email on ALARM and OK), period 5 minutes, created with `src/infra/setup_alarms.sh`:
 
-Logs should not contain `.env` values, access keys, or full connection strings.
+- Lambda `Errors` ≥ 1 on `crowdmap-api`, `crowdmap-bookings`, `crowdmap-web`
+- `crowdmap-bookings` `Throttles` ≥ 1 (single-writer saturation)
+- API Gateway 5xx ≥ 5, 4xx ≥ 50, p95 latency ≥ 3 s
+
+Dashboard `crowdmap`: requests, 4xx/5xx, latency p50/p95, Lambda invocations/errors/throttles/concurrency, alarm state.
 
 # Date
 
-TODO (blocked on deploy)
+8 October 2026 (load test window ~10:17–10:22 UTC / 18:17–18:22 SGT). Interpretation written 10 October 2026 from those redacted files (lab was not re-queried).
 
 # Interpretation
 
-TODO after the first redacted export: whether error rate and latency are acceptable for the demo, and what we would page on.
+During the spike, `crowdmap-http-4xx` saw **2,962** 4xx in five minutes (mostly HTTP 429 from the 50 req/s stage throttle) and entered ALARM; that is the gateway doing its job, not a map outage. `crowdmap-http-5xx` (**7**) and `crowdmap-bookings-throttled` (**7**) fired together: overlapping auth/booking calls hit reserved concurrency 1 and API Gateway surfaced Lambda throttles as 503. Emails arrived within about five minutes; 4xx and 5xx returned to **OK** without manual action once load stopped. We would page on 5xx and booking throttles, and treat a 4xx alarm as “throttle absorbed a spike” unless 5xx rises with it.
 
-# Export commands for Kristen (redact before committing)
+# Limitations
 
-Run in AWS CloudShell or a configured CLI. Save each output as a .txt file under evidence/ and remove the account ID (12 digits), role ARNs' account part, API ID and hostname before committing. Replace with <ACCOUNT>, <API_ID>, <REGION>.
-
-1. Lambda runtime and limits:
-   aws lambda get-function-configuration --function-name crowdmap-api --query "{Runtime:Runtime,MemorySize:MemorySize,Timeout:Timeout,Handler:Handler,Role:Role,Env:Environment.Variables}"
-   (redact Role account ID and env values)
-
-2. IAM role policies (least privilege):
-   aws iam list-attached-role-policies --role-name <LAMBDA_ROLE_NAME>
-   aws iam list-role-policies --role-name <LAMBDA_ROLE_NAME>
-   aws iam get-role-policy --role-name <LAMBDA_ROLE_NAME> --policy-name <INLINE_POLICY_NAME>
-   Expect: S3 read on the one DB object, CloudWatch Logs write, nothing else.
-
-3. S3 bucket is private:
-   aws s3api get-public-access-block --bucket <DATA_BUCKET>
-   Expect all four block settings true.
-
-4. Lambda errors and duration (last 24h):
-   aws cloudwatch get-metric-statistics --namespace AWS/Lambda --metric-name Errors --dimensions Name=FunctionName,Value=crowdmap-api --start-time <ISO> --end-time <ISO> --period 3600 --statistics Sum
-   (repeat with --metric-name Duration --statistics Average Maximum)
-
-5. API Gateway 4xx/5xx (HTTP API):
-   aws cloudwatch get-metric-statistics --namespace AWS/ApiGateway --metric-name 4xx --dimensions Name=ApiId,Value=<API_ID> --start-time <ISO> --end-time <ISO> --period 3600 --statistics Sum
-   (repeat with --metric-name 5xx and Count)
-   If the API uses a stage with detailed metrics disabled, note that instead of guessing.
-
-6. Liveness check:
-   curl -s https://<API_HOST>/api/health
-   Save only the JSON body ({"status":"ok",...}); never the hostname.
-
-Also needed: evidence/architecture.png (labels match: frontend-map, backend-api, relational-db/S3 database file, occupancy-model, cloudwatch), and the Python runtime shown in step 1.
+RDS / ALB metrics from the old wishlist do not apply (serverless; SQLite on S3). Live CloudWatch was not re-exported on 10 October. Confirm Groq key rotation and `crowdmap-bookings` memory after the lab is back (Kristen freeze TODOs); those are operations follow-ups, not substitutes for the 8 October alarm evidence.

@@ -21,7 +21,7 @@ Full command output: `evidence/functional-run-local.txt`.
 # Expected result
 
 - Buildings include E2, E6, W1, W3, W5; E2 floor 4 lists DR223 and DR224 (`location_id` `E2-04-20-DR223`, `E2-04-21-DR224`).
-- `/api/occupancy/current` without `at` returns **422**; with demo `at` returns a **47-row** JSON array.
+- `/api/occupancy/current` without `at` returns **422**; with demo `at` returns one row per seeded location (**64** in the current catalogue: E2, E4 Foodgle, E6, W1, W3, W5). The 30 September run below recorded **47** rows on that day’s seed.
 - DR223 at `2026-09-30T15:00:00+08:00`: `occupancy_count` 3, `capacity` 8, `crowd_level` `moderate`, `source` `generated`, matching timestamp.
 - W3 floors 3, 4, 6, 7, 8; W5 floors 3, 5, 7, 8.
 - Timeline for DR223 on 30 Sep: non-empty hourly list, every `source` is `generated`; prediction is a list (may be older than 30 Sep).
@@ -36,7 +36,7 @@ Full command output: `evidence/functional-run-local.txt`.
 | Sub-check | Result |
 |---|---|
 | 2a proxy API | **Pass** — five buildings; E2 L4 has DR223/DR224; no-`at` **422**; `cur.json` saved |
-| 2b DR223 + floors | **Pass** — 47 rows; DR223 3/8 moderate generated at demo time; W3 `[3,4,6,7,8]`, W5 `[3,5,7,8]` |
+| 2b DR223 + floors | **Pass (30 Sep seed)** — **47** rows that day; DR223 3/8 moderate generated at demo time; W3 `[3,4,6,7,8]`, W5 `[3,5,7,8]`. **Current seed (10 Oct rebuild): 64 locations.** A new proxy run has not replaced this table. |
 | 2c timeline / prediction | **Pass** (retry) — first timeline curl failed (PowerShell stripped query params → 422); retried with quoted URL: **13** hourly rows, all `source` `generated`; prediction **2** rows (29 Sep v0) |
 | 2d events | **Pass** — HTTP **200**, **3** events returned for "today" |
 | 2e `node --test` | **Pass** — **4** tests, **4** passed, **0** failed |
@@ -47,7 +47,8 @@ No teammate bug filed: timeline failure was operator/shell quoting, not API beha
 
 # Date
 
-30 September 2026, run by Ryan.
+- Workflow run: 30 September 2026, Ryan (47-location seed).
+- Catalogue note: 10 October 2026, Ryan — `data/sample/locations.csv` and rebuilt `data/occuscope.db` have **64** locations. Login button label is **Login** (`d67cb1c`). Sign-off lines below still wait on Zi Qian and Zul.
 
 # Artefact path
 
