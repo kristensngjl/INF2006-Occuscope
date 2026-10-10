@@ -16,6 +16,11 @@ data/raw/*
 *.db
 *.db-journal
 
+# Lambda package (built on the laptop, uploaded in the console; never commit)
+build/
+deploy/
+*.zip
+
 # Private local files — never commit or push
 report_draft/
 CLOUDPROJ.md
