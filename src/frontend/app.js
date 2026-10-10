@@ -117,7 +117,45 @@ async function renderDetail(){
  }catch(e){if(version!==state.detailVersion)return;$('history').textContent=e.message;$('forecast').textContent='Forecast unavailable.';}
 }
 $('all').onclick=()=>chooseBuilding('all');
-['search','crowd','type','booked'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+['crowd','type','booked'].forEach(id=>$(id).addEventListener('change',render));
+const searchResults=document.createElement('div');searchResults.id='search-results';searchResults.className='search-results';searchResults.hidden=true;searchResults.setAttribute('aria-label','Search results');
+$('search').closest('.search').insertAdjacentElement('afterend',searchResults);
+$('search').setAttribute('aria-controls','search-results');
+let searchMatches=[];
+const normalizeSearch=value=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+function showSearchResults(){
+ const query=normalizeSearch($('search').value);
+ searchMatches=[];
+ if(query){
+  for(const b of state.buildings){if(normalizeSearch(b.building_id+' '+b.name+(b.building_id==='W1'?' library':'')).includes(query))searchMatches.push({building:b});}
+  const rooms=state.rows.filter(r=>normalizeSearch(r.name+' '+r.location_id+' '+r.building_id).includes(query));
+  rooms.sort((a,b)=>Number(normalizeSearch(b.name)===query)-Number(normalizeSearch(a.name)===query));
+  searchMatches.push(...rooms.map(room=>({room})));
+ }
+ searchResults.hidden=!query;$('search').setAttribute('aria-expanded',String(!!query));
+ searchResults.innerHTML=searchMatches.length?searchMatches.map((match,i)=>`<button type="button" data-search-result="${i}"><strong>${esc(match.room?.name||match.building.name)}</strong><span>${match.room?esc(match.room.building_id)+' · Level '+esc(match.room.floor):esc(match.building.building_id)+' · All floors'} ↗</span></button>`).join(''):'<p>No matching rooms or buildings.</p>';
+ searchResults.querySelectorAll('[data-search-result]').forEach(button=>button.onclick=()=>openSearchMatch(searchMatches[Number(button.dataset.searchResult)]));
+}
+function openSearchMatch(match){
+ if(!match)return;
+ $('search').value='';searchResults.hidden=true;$('search').setAttribute('aria-expanded','false');
+ for(const id of ['crowd','type','booked'])$(id).value='all';
+ mapView(true);
+ if(match.room)selectRoom(match.room.location_id);else chooseBuilding(match.building.building_id);
+ $('campus-model').scrollIntoView({behavior:'smooth',block:'center'});
+}
+$('search').addEventListener('input',()=>{
+ state.building='all';state.floor='all';state.selected=null;
+ render();renderDetail();showSearchResults();
+});
+$('search').addEventListener('focus',showSearchResults);
+$('search').addEventListener('keydown',event=>{
+ if(event.key==='Enter'){event.preventDefault();openSearchMatch(searchMatches[0]);}
+ if(event.key==='ArrowDown'&&!searchResults.hidden){event.preventDefault();searchResults.querySelector('button')?.focus();}
+ if(event.key==='Escape'){searchResults.hidden=true;$('search').setAttribute('aria-expanded','false');}
+});
+document.addEventListener('click',event=>{if(!searchResults.contains(event.target)&&event.target!==$('search')){searchResults.hidden=true;$('search').setAttribute('aria-expanded','false');}});
+
 ['date','hour'].forEach(id=>$(id).addEventListener('change',()=>{setLive(false);refresh();}));
 $('live').onchange=()=>{if($('live').checked){setLive(true);refresh();}else setLive(false);};
 $('reset').onclick=()=>{adjustModel('reset');state.building='all';state.floor='all';state.selected=null;$('search').value='';$('crowd').value='all';$('type').value='all';$('booked').value='all';setLive(true);refresh();};
@@ -162,7 +200,7 @@ $('chat-form').onsubmit=async e=>{
  try{
   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,at:instant}),signal:AbortSignal.timeout(30000)});
   const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Unable to answer this question.');
-  pending.textContent=data.answer+'\nViewing: '+instant;
+  pending.textContent=data.answer;
   for(const id of data.location_ids||[]){const room=state.rows.find(r=>r.location_id===id);if(!room)continue;const button=document.createElement('button');button.className='chat-room';button.textContent=room.name+' · '+room.building_id+' ↗';button.onclick=()=>{if(at()!==instant){chatLine('The selected time has changed. Ask again for updated suggestions.','assistant');return;}selectRoom(id);mapView(true);showChat(false);};pending.append(document.createElement('br'),button);}
  }catch(error){pending.textContent=error.name==='TimeoutError'?'Octopus took too long. Try again.':error.message;}
  finally{$('chat-send').disabled=false;}

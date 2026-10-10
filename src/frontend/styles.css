@@ -44,3 +44,10 @@
 .floor-stepper button:hover:not(:disabled){background:#dce8d3}
 .floor-stepper button:disabled{opacity:.38;cursor:default}
 .floor-stepper span{font-size:12px;font-weight:600;color:#203e37}
+
+.toolbar{position:relative}
+.search-results{position:absolute;left:12px;top:calc(100% - 5px);width:min(430px,calc(100% - 24px));max-height:320px;overflow:auto;z-index:90;border:1px solid #cdd9c7;border-radius:12px;background:#fffef8;box-shadow:0 10px 28px #203e3726;padding:6px}
+.search-results button{display:flex;justify-content:space-between;align-items:center;gap:14px;width:100%;padding:12px;text-align:left;background:transparent;border:0;border-radius:7px;color:#203e37}
+.search-results button:hover,.search-results button:focus-visible{background:#eaf0e1}
+.search-results button span{font-size:11px;color:#617969;white-space:nowrap}
+.search-results p{padding:8px 12px;color:#617969}
