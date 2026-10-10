@@ -46,14 +46,18 @@ For cloud deployment, serve the frontend assets through the team's chosen hostin
 
 ## Manual functional check
 
-1. Start the API and frontend, then open the default API view: 64 spaces at the selected Singapore time (Follow Singapore time, or a demo date/hour).
-2. Select E2, then Level 4: DR223 and DR224 appear.
-3. Choose Crowd positions, select DR223, and verify 3/8 people, 38% displayed, moderate, generated, and the 30 September 15:00 timestamp.
-4. The daily chart is populated. The forecast states that no saved forecast exists for this time; September 29 forecasts are not relabelled.
-5. Choose 3D campus, select W3 and Level 8: DR15, DR16 and DR17 appear. W5 Level 8 contains DR25 and DR26. Test model rotation, zoom and room selection.
-6. Filter Food courts: Foodgle Hub (E4 L1) and Wholesome (W3 L2) show occupancy only. Discussion rooms show Booked or Available plus occupancy; booked rooms usually have people, with some empty bookings and some walk-ins.
-7. Verify there is no source selector; /sample/locations.csv returns 404.
-8. Stop the API and refresh: an error and retry action appear, with no stale occupancy cards.
+Ryan’s dated copy is in [`evidence/test-functional.md`](../../evidence/test-functional.md). Demo login: `2500001@sit.singaporetech.edu.sg` / `OccuscopeDemo26!`. Site: http://127.0.0.1:5173 (API must be on port 8000).
+
+1. Open the site. Top-right should say **Login**. Somewhere on the page it should say occupancy is **model-generated** / **not live sensors**.
+2. Find **Follow Singapore time** and turn it **off**. Set the date to **30 Sep 2026** and the hour to **15:00**. Wait until the room list fills (about 64 rooms).
+3. In the building list click **E2**. Click floor **Level 4**. Click room **DR223**. On the detail panel write: how many people / capacity (e.g. 4/8), Quiet/Moderate/Crowded, the word generated, and Booked or Available.
+4. Still on DR223, look at the **daily history** chart (bars). **Next two hours** can be empty — that is fine.
+5. Switch the view to **Crowd positions** (the 2D dots, not the 3D model). Find the DR223 dot. It should look Quiet/Moderate/Crowded the same as the detail panel. There is no box to type a colour or crowd band.
+6. Switch to **3D campus**. Click building **W3**, then **Level 8**. You should see **DR15, DR16, DR17**. Drag to rotate the model a little. Optionally click W5 Level 8 and look for DR25 and DR26.
+7. Find the type/filter control and choose **food courts** (or similar). You should see **Foodgle** (E4) and **Wholesome** (W3). Those cards should **not** have a Book button. A discussion room (if you clear the filter) should show Booked or Available.
+8. Click **Login**. Student email: the full demo address above (the grey text is only a hint). Password: `OccuscopeDemo26!`. After sign-in you should see a name/email, not the password sitting on the page.
+9. Open any **discussion room** (e.g. DR223). Click **Book**. Pick **tomorrow’s date** and one free 30-minute block. Confirm. Open **My account** (top-right) and check the booking is listed. Click **Cancel booking**.
+10. In the API terminal press Ctrl+C. Refresh the browser. You should see an error and **Try again**, not yesterday’s room numbers still looking live. Optional: skip chat if it says it is not configured.
 
 ## Integration test
 

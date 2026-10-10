@@ -1,4 +1,4 @@
-"""Named threat: client cannot forge crowd_level; API is read-only and fails closed (offline, local SQLite)."""
+"""Named threat: client cannot forge crowd_level; occupancy GET fails closed; writes need a session (offline, local SQLite)."""
 
 from __future__ import annotations
 
@@ -17,6 +17,10 @@ DB_PATH = ROOT / "data" / "occuscope.db"
 LOCATIONS_CSV = ROOT / "data" / "sample" / "locations.csv"
 DEMO_AT = "2026-09-30T15:00:00+08:00"
 KNOWN_ID = "E2-03-07-DR209"
+DEMO_EMAIL = "2500001@sit.singaporetech.edu.sg"
+DEMO_PASSWORD = "OccuscopeDemo26!"
+GUARD = {"X-Occuscope-Request": "1"}
+ALLOWED_POST_PREFIXES = ("/auth/login", "/auth/logout", "/chat", "/bookings")
 
 QUIET_MAX = 0.30
 MODERATE_MAX = 0.70
@@ -191,18 +195,69 @@ class ApiSecurityTest(unittest.TestCase):
         missing = self.client.get(f"/occupancy/{KNOWN_ID}/prediction")
         self.assertEqual(missing.status_code, 422)
 
-    def test_no_write_routes(self) -> None:
+    def test_occupancy_has_no_write_verbs(self) -> None:
         paths = self.client.app.openapi()["paths"]
         for path, ops in paths.items():
             for method in ops:
                 if method == "parameters":
                     continue
-                self.assertEqual(method.lower(), "get", msg=f"{method.upper()} {path}")
+                method = method.lower()
+                if method == "get":
+                    continue
+                allowed_post = method == "post" and path.startswith(ALLOWED_POST_PREFIXES)
+                self.assertTrue(
+                    allowed_post,
+                    msg=f"unexpected {method.upper()} {path}",
+                )
         for method in ("post", "put", "patch", "delete"):
             for path in ("/occupancy/current", "/locations"):
                 r = getattr(self.client, method)(path)
                 self.assertIn(r.status_code, (404, 405), msg=f"{method} {path}")
                 self.assertFalse(200 <= r.status_code < 300)
+
+    def test_booking_without_session_is_denied(self) -> None:
+        body = {
+            "location_id": "E2-04-20-DR223",
+            "slots": ["2026-10-12T10:00:00+08:00"],
+        }
+        bare = self.client.post("/bookings", json=body)
+        self.assertIn(bare.status_code, (401, 403))
+        guarded = self.client.post("/bookings", json=body, headers=GUARD)
+        self.assertEqual(guarded.status_code, 401)
+
+    def test_login_without_request_header_is_403(self) -> None:
+        r = self.client.post(
+            "/auth/login",
+            json={"email": DEMO_EMAIL, "password": DEMO_PASSWORD},
+        )
+        self.assertEqual(r.status_code, 403)
+
+    def test_login_cookie_flags_and_bad_password(self) -> None:
+        bad = self.client.post(
+            "/auth/login",
+            json={"email": DEMO_EMAIL, "password": "wrong-password-xx"},
+            headers=GUARD,
+        )
+        self.assertEqual(bad.status_code, 401)
+        ok = self.client.post(
+            "/auth/login",
+            json={"email": DEMO_EMAIL, "password": DEMO_PASSWORD},
+            headers=GUARD,
+        )
+        self.assertEqual(ok.status_code, 200)
+        header = ok.headers.get("set-cookie") or ""
+        self.assertIn("httponly", header.lower())
+        self.assertIn("samesite=strict", header.lower())
+
+    def test_login_throttle_after_ten_attempts(self) -> None:
+        isolated = _make_client()
+        payload = {"email": DEMO_EMAIL, "password": "wrong-password-xx"}
+        codes = [
+            isolated.post("/auth/login", json=payload, headers=GUARD).status_code
+            for _ in range(11)
+        ]
+        self.assertTrue(all(c in (401, 429) for c in codes[:10]), codes[:10])
+        self.assertEqual(codes[10], 429, codes)
 
     def test_db_is_read_only(self) -> None:
         uri = DB_PATH.resolve().as_uri() + "?mode=ro"

@@ -23,7 +23,7 @@ MANIFEST_KEYS = (
     "contributions",
 )
 
-EXPECTED_MISSING = {"evidence/architecture.png"}
+EXPECTED_MISSING: set[str] = set()
 
 HEADING_CHECKS = (
     "objective",
