@@ -107,7 +107,7 @@ Same Quiet/Moderate/Crowded cut-offs on NUS hold-out: 08:00 is almost all Quiet;
 ## Technology
 
 - App: HTML/CSS/JS frontend (`src/frontend/`), FastAPI (`src/backend/`), SQLite (`src/db/schema.sql`)
-- Cloud: AWS serverless, `us-east-1`: API Gateway HTTP API `crowdmap-http` → 3 Lambdas (`crowdmap-web`, `crowdmap-api`, `crowdmap-bookings`, Python 3.11) → private S3 (`crowdmap-web-<group>`, `crowdmap-lake-<group>`); CloudWatch alarms + SNS; AWS Budgets. Deployment record and redeploy steps: [`evidence/deploy-log.md`](evidence/deploy-log.md). Diagram: [`evidence/architecture.png`](evidence/architecture.png)
+- Cloud: AWS serverless, `us-east-1`: API Gateway HTTP API `crowdmap-http` → 3 Lambdas (`crowdmap-web`, `crowdmap-api`, `crowdmap-bookings`, Python 3.11) → private S3 (`crowdmap-web-g07`, `crowdmap-lake-g07`); CloudWatch alarms + SNS; AWS Budgets. Deployment record and redeploy steps: [`evidence/deploy-log.md`](evidence/deploy-log.md). Diagram: [`evidence/architecture.png`](evidence/architecture.png)
 - Training: Python 3.11.9, pandas / scikit-learn; [ROBOD](https://github.com/ideas-lab-nus/robod) (Tekler et al., *Building Simulation*, 2022); [NUS Wi-Fi floors](https://zenodo.org/records/17578240) CC BY 4.0 (ablation only; unused in v0)
 
 ## Repository layout

@@ -94,12 +94,12 @@ Chat is optional (503 if no Groq key).
 # Sign-off (owners)
 
 
-| Owner            | Confirmation                      |
-| ---------------- | --------------------------------- |
-| Zi Qian (map UI) | TODO: one dated confirmation line |
-| Zul (API)        | TODO: one dated confirmation line |
+| Owner            | Confirmation |
+| ---------------- | ------------ |
+| Zi Qian (map UI) | 10 Oct 2026, team chat: Crowd positions + 3D checked; DR223 band matches the panel; 64 locations; generated copy visible. |
+| Zul (API)        | 10 Oct 2026, team chat: occupancy `?at=` + DR223 4/8 moderate generated; login and book/cancel OK locally; `crowd_level` not client-set. |
 
 
 # Limitations
 
-Local stack only; occupancy is **generated**, not live SIT sensors. 30 Sep automated proxy steps remain in the table above. 10 Oct browser checklist completed by Ryan. Deployed API Gateway / Lambda not tested in this file. Zi Qian and Zul dated sign-off lines still open.
+Local stack only; occupancy is **generated**, not live SIT sensors. 30 Sep automated proxy steps remain in the table above. 10 Oct browser checklist completed by Ryan. Deployed API Gateway / Lambda not tested in this file. Zi Qian and Zul confirmed in team chat (10 Oct 2026); lines above.
