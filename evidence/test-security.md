@@ -60,7 +60,9 @@ Supporting:
 - Frontend dev server checks: `python tests/test_frontend_server_security.py` — **6 tests run, 6 passed**, 10 October 2026. Static review: **8** open findings (**7** Low, **1** Medium); SR-6 closed (placeholder `<data-bucket>`).
 - Booking/chat unit tests (Zul): `python -m unittest src.backend.test_bookings src.backend.test_chat` — **24 passed**, 10 October 2026.
 
-**Not yet covered:** deployed API Gateway smoke (422/401/403/headers), IAM export, Groq key rotation.
+- Deployed API Gateway smokes, 10 October 2026, Ryan (Learner Lab session; **no URL, account ID or API ID recorded**): `GET /api/health` → `{"status":"ok","database":true,"role":"reader"}`; `GET /` → **200**; `POST /api/auth/login` and `POST /api/bookings` with a valid JSON body and **no** `X-Occuscope-Request` header → **403** (`Reload this page before trying again.`). Empty `{}` bodies return **422** (schema) before the header guard — that is FastAPI order, not a miss. Browser: login, book, cancel (after uploading current `crowdmap-api.zip` so `POST /api/bookings/cancel` exists). Load test and `verify_deployment.sh` were **not** re-run.
+
+**Not covered:** IAM policy JSON (LabRole cannot be custom); Groq key rotation (key present as an env **name** on `crowdmap-api`; value not logged).
 
 # Artefact path
 

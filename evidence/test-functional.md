@@ -102,4 +102,4 @@ Chat is optional (503 if no Groq key).
 
 # Limitations
 
-Local stack only; occupancy is **generated**, not live SIT sensors. 30 Sep automated proxy steps remain in the table above. 10 Oct browser checklist completed by Ryan. Deployed API Gateway / Lambda not tested in this file. Zi Qian and Zul confirmed in team chat (10 Oct 2026); lines above.
+Occupancy is **generated**, not live SIT sensors. 30 Sep automated proxy steps remain in the table above. 10 Oct local browser checklist completed by Ryan. Deployed stack (same evening, Ryan): map, login, book and cancel worked on API Gateway after the Lambda zip upload; live URL not recorded. Zi Qian and Zul confirmed in team chat (10 Oct 2026); lines above.

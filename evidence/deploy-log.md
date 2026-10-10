@@ -17,7 +17,7 @@ Rebuild scripts: [`../src/infra/build_lambda_package.sh`](../src/infra/build_lam
 | Route `ANY /api/auth/{proxy+}`, `ANY /api/bookings`, `ANY /api/bookings/{proxy+}` | → `crowdmap-bookings` | Login and room booking |
 | Lambda | `crowdmap-web` | Python 3.11. Reads the 7 frontend files from the private web bucket. Adds security headers and a 5-minute browser cache. |
 | Lambda | `crowdmap-api` (reader) | Python 3.11, 1024 MB (was 128 MB until 8 Oct, see timeline), 29 s. FastAPI + Mangum (`src/backend/lambda_handler.py`). Copies the DB from S3 to `/tmp` and re-checks the S3 ETag at most every 60 s. Env keys: `DB_BUCKET`, `DB_KEY`, `COOKIE_SECURE`, `GROQ_API_KEY`. |
-| Lambda | `crowdmap-bookings` (writer) | Python 3.11, 128 MB → 1024 MB (pending, 8 Oct), 15 s. Same code package as `crowdmap-api`. Env keys: `DB_BUCKET`, `DB_KEY`, `DB_WRITER=1`, `COOKIE_SECURE`. Uploads the DB back to S3 after every successful write. Reserved concurrency 1 (single writer); confirm in `aws-deployment-check.txt`. |
+| Lambda | `crowdmap-bookings` (writer) | Python 3.11, **1024 MB · 15 s** (confirmed in console 10 Oct 2026, Ryan). Same code package as `crowdmap-api`. Env keys: `DB_BUCKET`, `DB_KEY`, `DB_WRITER=1`, `COOKIE_SECURE`. Uploads the DB back to S3 after every successful write. Reserved concurrency 1 (single writer). |
 | IAM | `LabRole` | Execution role for all 3 Lambdas. Learner Lab does not allow custom roles. |
 | S3 | `crowdmap-web-g07` | Block Public Access ON, SSE-S3. Holds `index.html`, `styles.css`, `login.css`, `app.js`, `data.js`, `model.js`, `bookings.js`. |
 | S3 | `crowdmap-lake-g07` | Block Public Access ON, SSE-S3, versioning ON. Holds `db/occuscope.db` (SQLite, about 24 MB), plus `raw/` and `models/` (reserved). |
@@ -51,6 +51,7 @@ Rebuild scripts: [`../src/infra/build_lambda_package.sh`](../src/infra/build_lam
 | 8 Oct 18:20–19:04 SGT | Load / resilience test from CloudShell: steady load, spike above the throttle, auth throttle, booking survives a forced cold start. 7 CloudWatch alarms + SNS email set up first. | A–C: 0 errors on map routes, 74% of spike shed as 429, alarms emailed and returned to OK. D: PASS after adding retry on 503 (single writer). `test-resilience.md`, `resilience-run.txt`, `persistence-run.txt` |
 | 8 Oct 19:09 SGT | Deployment check in an active session. Found: all 3 Lambdas at the 128 MB default (memory settings lost on re-upload); 3 unused API Gateway integrations from early testing; old `g017` buckets still present. Everything else matched the diagram. | `aws-deployment-check.txt` |
 | 8 Oct 19:12–19:17 SGT | Raised `crowdmap-api` to 1024 MB and re-ran phase A: p50 1,582 → 206 ms, 5.9 → 48.7 req/s, 0 errors. Deleted the 3 unused integrations. Re-ran the check. | `steady-1024mb.txt`, `test-resilience.md`, `aws-deployment-check.txt` |
+| 10 Oct evening SGT | Ryan lab session (Kristen overseas). Console: `crowdmap-api` 1024 MB / 29 s; `crowdmap-bookings` **1024 MB / 15 s**; `crowdmap-web` 128 MB / 10 s. Account had **8** Lambda functions (3 Occuscope + 5 Academy leftovers); no new functions created. Uploaded 7 frontend files to `crowdmap-web-g07` and a rebuilt `crowdmap-api.zip` to **both** api and bookings (Git Bash has no `zip`; package finished with `shutil.make_archive`). Group cancel `POST /api/bookings/cancel` was 404 until that zip; then login / book / cancel worked in the browser. Curl smokes (no live URL recorded): `GET /api/health` → `role=reader`; `GET /` → 200; `POST /api/auth/login` and `POST /api/bookings` without `X-Occuscope-Request` → **403**. Load test and `verify_deployment.sh` **not** re-run (8 Oct CLI export stands). | Console (redact ARNs); `evidence/test-security.md` 10 Oct actual |
 
 ## 3. Learner Lab constraints met (and how they were handled)
 
@@ -72,7 +73,7 @@ Rebuild scripts: [`../src/infra/build_lambda_package.sh`](../src/infra/build_lam
 
 ## 5. How to redeploy
 
-1. `bash src/infra/build_lambda_package.sh` (Python 3.11, with fastapi installed). This produces `deploy/crowdmap-api.zip` and `deploy/occuscope.db` (gitignored).
+1. `bash src/infra/build_lambda_package.sh` (Python 3.11 wheels for Lambda; local seed may use 3.12). This produces `deploy/crowdmap-api.zip` and `deploy/occuscope.db` (gitignored). On Windows Git Bash, if the script dies at `zip: command not found`, the `build/lambda` folder is already filled — finish with `python -c "import shutil; shutil.make_archive('deploy/crowdmap-api', 'zip', 'build/lambda')"` from the repo root. Do not create a new Lambda function; upload the zip onto the existing `crowdmap-api` and `crowdmap-bookings` only. Re-check memory (1024 MB) and env keys after upload.
 2. Upload `deploy/occuscope.db` to `s3://crowdmap-lake-g07/db/occuscope.db`.
 3. Upload `deploy/crowdmap-api.zip` to **both** `crowdmap-api` and `crowdmap-bookings`. Handler: `lambda_handler.handler`.
 4. Upload the 7 files in `src/frontend/` (not `server.mjs` or the tests) to `crowdmap-web-g07`.

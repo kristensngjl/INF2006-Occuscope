@@ -24,4 +24,4 @@ During the spike, `crowdmap-http-4xx` saw **2,962** 4xx in five minutes (mostly 
 
 # Limitations
 
-RDS / ALB metrics from the old wishlist do not apply (serverless; SQLite on S3). Live CloudWatch was not re-exported on 10 October. Confirm Groq key rotation and `crowdmap-bookings` memory after the lab is back (Kristen freeze items); those are operations follow-ups, not substitutes for the 8 October alarm evidence.
+RDS / ALB metrics from the old wishlist do not apply (serverless; SQLite on S3). Live CloudWatch was not re-exported on 10 October; the 8 October alarm files remain the monitoring evidence. Ryan’s 10 October lab session confirmed `crowdmap-bookings` at **1024 MB** in the console (same as `crowdmap-api`). Groq stays a Lambda env var on `crowdmap-api` (value never recorded). IAM JSON was not exported (Learner Lab `LabRole` only).

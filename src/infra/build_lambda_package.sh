@@ -14,5 +14,9 @@ cp src/backend/lambda_handler.py build/lambda/lambda_handler.py
 # Linux (x86_64, CPython 3.11) wheels so compiled parts like pydantic-core work on Lambda.
 python -m pip install --target build/lambda --platform manylinux2014_x86_64 \
   --implementation cp --python-version 3.11 --only-binary=:all: "fastapi>=0.115,<1" "mangum>=0.19,<1"
-(cd build/lambda && zip -qr9 ../../deploy/crowdmap-api.zip .)
+if command -v zip >/dev/null 2>&1; then
+  (cd build/lambda && zip -qr9 ../../deploy/crowdmap-api.zip .)
+else
+  python -c "import shutil; shutil.make_archive('deploy/crowdmap-api', 'zip', 'build/lambda')"
+fi
 echo "Built deploy/crowdmap-api.zip and deploy/occuscope.db"

@@ -14,7 +14,7 @@
   <rect width="1280" height="920" fill="#fff"/>
 
   <text x="32" y="31" font-size="19.5" font-weight="700" fill="#111827">Occuscope: deployed architecture</text>
-  <text x="32" y="50" font-size="11.2" fill="#4b5563">AWS Academy Learner Lab · us-east-1 · serverless (API Gateway + 3 Lambdas + S3) · as of 8 Oct 2026 after load-test memory change</text>
+  <text x="32" y="50" font-size="11.2" fill="#4b5563">AWS Academy Learner Lab · us-east-1 · serverless (API Gateway + 3 Lambdas + S3) · as of 10 Oct 2026 (api + bookings 1024 MB in console)</text>
 
   <!-- Groq (above AWS; captions stay outside the AWS border) -->
   <rect x="552" y="56" width="232" height="54" rx="4" fill="#fdf0ec" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="6 3"/>
@@ -83,7 +83,7 @@
 
   <!-- Lambda bookings -->
   <rect x="552" y="328" width="232" height="150" rx="4" fill="#fdf1e0" stroke="#d97706" stroke-width="2"/>
-  <text x="668" y="348" class="h" fill="#b45309" font-size="9">AWS Lambda · Python 3.11 · 128 MB · 15 s</text>
+  <text x="668" y="348" class="h" fill="#b45309" font-size="9">AWS Lambda · Python 3.11 · 1024 MB · 15 s</text>
   <text x="668" y="367" class="hb">crowdmap-bookings (writer)</text>
   <text x="668" y="386" class="t">login · availability · book · cancel</text>
   <text x="668" y="401" class="t">reserved concurrency = 1 (single writer)</text>
@@ -91,7 +91,7 @@
   <text x="668" y="431" class="t">HttpOnly · Secure · SameSite=Strict</text>
   <text x="668" y="446" class="t">saves DB back to S3 after each write</text>
   <text x="668" y="456" class="t">same code package as crowdmap-api</text>
-  <text x="668" y="470" class="t" font-size="8.5">1024 MB intended (not confirmed after re-upload)</text>
+  <text x="668" y="470" class="t" font-size="8.5">1024 MB confirmed in console 10 Oct 2026</text>
 
   <!-- Lambda web -->
   <rect x="552" y="488" width="232" height="64" rx="4" fill="#fdf1e0" stroke="#d97706" stroke-width="2"/>
