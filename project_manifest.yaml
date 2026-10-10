@@ -57,7 +57,7 @@ evidence:
 
 data_ai:
   dataset: "data/README.md"
-  method: "Hour×room-type mean on ROBOD (14-day date hold-out). SIT occupancy = (prediction/type p95)×capacity × AY2026/27 Tri 1 calendar, MOM 2026 holidays, E=IT IWSP mix, W3/W5=other courses, W1 library shared, sample event bump. OIP disabled."
+  method: "Hour×room-type mean on ROBOD (14-day date hold-out). SIT occupancy = (prediction/type p95)×capacity × AY2026/27 Tri 1 calendar, MOM 2026 holidays, E=IT IWSP mix, W3/W5=other courses, W1 library shared, mixed event turnout. OIP disabled."
   evaluation: "Held-out NUS dates MAE/RMSE/R² (mean MAE 1.74); MAE by type/hour; 7 vs 14-day window; persist vs v0 on 1–2h; NUS crowd-band shares at 08:00 vs 15:00. SIT values generated, not labelled"
   reproducible_command: "python analytics/02_clean_robod.py && python analytics/04_train.py && python analytics/06_holdout_diagnostics.py && python analytics/05_generate_sit.py && python src/db/init_app_db.py"
 

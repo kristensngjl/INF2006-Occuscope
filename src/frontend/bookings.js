@@ -12,7 +12,7 @@ async function request(path,body){
  return data;
 }
 const accountButton=document.createElement('button');
-accountButton.id='student-account';accountButton.className='account-button';accountButton.textContent='Student login';
+accountButton.id='student-account';accountButton.className='account-button';accountButton.textContent='Login';
 document.querySelector('.topbar').append(accountButton);
 document.body.insertAdjacentHTML('beforeend',`
 <dialog id="account-dialog" class="booking-dialog student-login" aria-labelledby="account-title">
@@ -39,7 +39,7 @@ function accountState(){
  $('account-title').textContent=user?'Your campus account.':'Welcome back.';
  $('login-subtitle').textContent=user?'A little more room to make the most of campus.':'Sign in with your student email to get started.';
  $('account-dialog').classList.toggle('is-signed-in',!!user);
- accountButton.textContent=user?'My account':'Student login';
+ accountButton.textContent=user?'My account':'Login';
  if(user){$('account-identity').textContent=user.email;$('student-name').textContent=user.display_name||'Student';$('student-number').textContent='Student ID · '+user.student_id;$('student-avatar').textContent=(user.display_name||'S').split(' ').map(n=>n[0]).slice(0,2).join('');}
 }
 async function showAccount(){

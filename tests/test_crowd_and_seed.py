@@ -5,14 +5,14 @@ from __future__ import annotations
 import csv
 import sys
 import unittest
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "analytics"))
 from occupancy_model import demo_slot_booked, event_turnout  # noqa: E402
-
-ROOT = Path(__file__).resolve().parents[1]
+from src.db.demo_bookings import WEEK_LIMIT_MINUTES, iter_demo_bookings  # noqa: E402
 SCHEMA = (ROOT / "src" / "db" / "schema.sql").read_text(encoding="utf-8")
 CONTRACT = (ROOT / "src" / "api-contract.md").read_text(encoding="utf-8")
 GENERATED = ROOT / "data" / "sample" / "occupancy_generated.csv"
@@ -299,6 +299,23 @@ class GeneratedSeedTest(unittest.TestCase):
                     exam_lib += int(row["occupancy_count"])
         self.assertGreater(n_lib, 5)
         self.assertGreater(exam_lib, teach_lib)
+
+    def test_demo_bookings_respect_weekly_limit_and_no_overlap(self) -> None:
+        """Seeded DRs (including W1 library meeting rooms) share the 240 min/week cap."""
+        rows = list(iter_demo_bookings(date(2026, 8, 31), date(2026, 12, 27)))
+        self.assertGreater(len(rows), 100)
+        weekly: dict[tuple[str, str], int] = {}
+        busy: dict[str, set[str]] = {}
+        for row in rows:
+            start = datetime.fromisoformat(row["start_time"])
+            monday = (start.date() - timedelta(days=start.weekday())).isoformat()
+            key = (row["user_id"], monday)
+            weekly[key] = weekly.get(key, 0) + 60
+            stamp = row["start_time"]
+            seen = busy.setdefault(row["user_id"], set())
+            self.assertNotIn(stamp, seen, row)
+            seen.add(stamp)
+        self.assertTrue(all(n <= WEEK_LIMIT_MINUTES for n in weekly.values()))
 
 
 if __name__ == "__main__":

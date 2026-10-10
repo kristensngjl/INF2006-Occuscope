@@ -1,6 +1,8 @@
 """Seed hour-aligned discussion-room bookings that match occupancy generate.
 
 Run after student accounts exist. Demo login 2500001 is left with a free weekly quota.
+Each student is capped at 240 minutes per Monday–Sunday week across all discussion
+rooms (including W1 library meeting rooms), with no overlapping hours.
 """
 from __future__ import annotations
 
@@ -18,6 +20,8 @@ from occupancy_model import demo_slot_booked  # noqa: E402
 
 SAMPLE = ROOT / "data" / "sample"
 SGT = "+08:00"
+WEEK_LIMIT_MINUTES = 240
+SLOT_MINUTES = 60
 # Keep 2500001–2500199 free so the usual demo login can still book.
 BOOKING_USERS = [f"trial-2600{n:03d}" for n in range(1, 1000)] + [
     f"trial-2500{n:03d}" for n in range(200, 1000)
@@ -57,10 +61,34 @@ def discussion_rooms() -> list[str]:
         return [row["location_id"] for row in csv.DictReader(f) if row["type"] == "discussion_room"]
 
 
+def week_monday(day: date) -> date:
+    return day - timedelta(days=day.weekday())
+
+
+def pick_student(location_id: str, ts: datetime, used: dict, busy: dict) -> str | None:
+    """Same 240 min/week and no-overlap rules as the booking API (all discussion rooms share one quota)."""
+    monday = week_monday(ts.date())
+    stamp = (ts.date(), ts.hour)
+    start = int(
+        hashlib.sha256(f"who|{location_id}|{ts.date().isoformat()}|{ts.hour}".encode()).hexdigest()[:8],
+        16,
+    ) % len(BOOKING_USERS)
+    for step in range(len(BOOKING_USERS)):
+        user_id = BOOKING_USERS[(start + step) % len(BOOKING_USERS)]
+        if stamp in busy.get(user_id, ()):
+            continue
+        if used.get((user_id, monday), 0) + SLOT_MINUTES > WEEK_LIMIT_MINUTES:
+            continue
+        return user_id
+    return None
+
+
 def iter_demo_bookings(start: date, end: date):
     events = event_index()
     rooms = discussion_rooms()
     created = iso_sgt(datetime(2026, 8, 20, 9, 0, 0))
+    used: dict[tuple[str, date], int] = {}
+    busy: dict[str, set[tuple[date, int]]] = {}
     day = start
     while day <= end:
         for location_id in rooms:
@@ -71,11 +99,12 @@ def iter_demo_bookings(start: date, end: date):
                     continue
                 if not demo_slot_booked(location_id, ts):
                     continue
-                who = int(
-                    hashlib.sha256(f"who|{location_id}|{day.isoformat()}|{hour}".encode()).hexdigest()[:8],
-                    16,
-                ) % len(BOOKING_USERS)
-                user_id = BOOKING_USERS[who]
+                user_id = pick_student(location_id, ts, used, busy)
+                if user_id is None:
+                    continue
+                monday = week_monday(day)
+                used[(user_id, monday)] = used.get((user_id, monday), 0) + SLOT_MINUTES
+                busy.setdefault(user_id, set()).add((day, hour))
                 key = f"demo|{location_id}|{iso_sgt(ts)}"
                 booking_id = hashlib.sha256(key.encode()).hexdigest()[:32]
                 yield {
