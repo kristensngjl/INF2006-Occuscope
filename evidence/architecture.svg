@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 920" width="1280" height="920" preserveAspectRatio="xMidYMid meet" style="max-width:100%;height:auto;display:block" font-family="Helvetica, Arial, 'Liberation Sans', sans-serif"><defs>
+    <marker id="dark" viewBox="0 0 10 9" refX="10" refY="4.5" markerWidth="11" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4.5 L0,9 z" fill="#1f2937"/></marker>
+    <marker id="mag" viewBox="0 0 10 9" refX="10" refY="4.5" markerWidth="9" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4.5 L0,9 z" fill="#b5177a"/></marker>
+    <marker id="ext" viewBox="0 0 10 9" refX="10" refY="4.5" markerWidth="12" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4.5 L0,9 z" fill="#c2410c"/></marker>
+  </defs>
+  <style>
+    .t{fill:#374151;font-size:9.5px;text-anchor:middle}
+    .h{font-weight:700;font-size:10.5px;text-anchor:middle}
+    .hb{font-weight:700;font-size:12.7px;text-anchor:middle;fill:#111827}
+    .l{fill:#111827;font-size:10.5px}
+    .lb{fill:#111827;font-size:9.8px;font-weight:700}
+    .sm{fill:#374151;font-size:9px}
+  </style>
+  <rect width="1280" height="920" fill="#fff"/>
+
+  <text x="32" y="31" font-size="19.5" font-weight="700" fill="#111827">Occuscope: deployed architecture</text>
+  <text x="32" y="50" font-size="11.2" fill="#4b5563">AWS Academy Learner Lab · us-east-1 · serverless (API Gateway + 3 Lambdas + S3) · as of 8 Oct 2026 after load-test memory change</text>
+
+  <!-- Groq (above AWS; captions stay outside the AWS border) -->
+  <rect x="552" y="56" width="232" height="54" rx="4" fill="#fdf0ec" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="6 3"/>
+  <text x="668" y="76" class="h" fill="#111827" font-size="12">Groq API (external, outside AWS)</text>
+  <text x="668" y="91" class="t">hosted LLM · free tier · chatbot only</text>
+  <text x="668" y="103" class="t">no accounts or bookings sent</text>
+  <text x="800" y="76" font-size="10.5" font-weight="700" fill="#c2410c">THIRD PARTY (untrusted)</text>
+  <text x="800" y="92" class="sm" fill="#c2410c" font-size="9.5">key in Lambda env var (never in Git)</text>
+
+  <!-- AWS boundary -->
+  <rect x="224" y="136" width="1024" height="583" rx="10" fill="none" stroke="#1f2937" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="238" y="155" font-size="11.2" font-weight="700" fill="#374151">AWS Cloud · us-east-1 (Learner Lab account) · trust boundary: IAM-controlled</text>
+
+  <!-- Private data zone -->
+  <rect x="864" y="170" width="360" height="405" rx="6" fill="#eef6e9" stroke="#3d8b37" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="877" y="186" font-size="10.7" font-weight="700" fill="#2f6b2a">Private data · S3 Block Public Access ON</text>
+
+  <!-- S3 lake -->
+  <rect x="880" y="196" width="320" height="252" rx="4" fill="#f4faf0" stroke="#2f7d32" stroke-width="2"/>
+  <text x="1040" y="216" class="h" fill="#2f6b2a" font-size="10.4">Amazon S3 bucket · versioning on</text>
+  <text x="1040" y="236" class="hb" fill="#111827">crowdmap-lake-g07</text>
+  <text x="1040" y="256" class="h" fill="#111827" font-size="11.5">db/occuscope.db (SQLite)</text>
+  <text x="1040" y="276" class="t">64 locations · 99,008 hourly readings</text>
+  <text x="1040" y="291" class="t">207 events · next-2-hour forecasts</text>
+  <text x="1040" y="306" class="t">1,998 fictional demo accounts</text>
+  <text x="1040" y="321" class="t">room bookings · hashed sessions</text>
+  <text x="1040" y="345" class="t">single source of truth: readers copy it,</text>
+  <text x="1040" y="360" class="t">the one writer publishes changes</text>
+  <text x="1040" y="385" class="t">raw/ · models/ (reserved)</text>
+
+  <!-- S3 web -->
+  <rect x="880" y="480" width="320" height="80" rx="4" fill="#fff" stroke="#2f7d32" stroke-width="2"/>
+  <text x="1040" y="500" class="h" fill="#2f6b2a" font-size="10.4">Amazon S3 bucket</text>
+  <text x="1040" y="518" class="hb" fill="#111827">crowdmap-web-g07</text>
+  <text x="1040" y="536" class="t">index.html · styles.css · login.css</text>
+  <text x="1040" y="551" class="t">app.js · data.js · model.js · bookings.js</text>
+
+  <!-- API Gateway -->
+  <rect x="256" y="208" width="200" height="240" rx="4" fill="#f3ecfb" stroke="#7c3aed" stroke-width="2"/>
+  <text x="356" y="229" class="h" fill="#5b21b6" font-size="11">Amazon API Gateway</text>
+  <text x="356" y="247" class="hb">crowdmap-http</text>
+  <text x="356" y="264" class="t">HTTP API · HTTPS only</text>
+  <text x="356" y="278" class="t">$default stage · auto-deploy</text>
+  <line x1="272" y1="289" x2="440" y2="289" stroke="#9ca3af"/>
+  <text x="356" y="305" class="h" fill="#5b21b6" font-size="10.5">Throttling (excess → HTTP 429)</text>
+  <text x="356" y="320" class="t">all routes: 50 req/s, burst 100</text>
+  <text x="356" y="334" class="t">POST /api/chat: 1 req/s, burst 5</text>
+  <text x="356" y="348" class="t">/api/auth/*: 2 req/s, burst 5</text>
+  <line x1="272" y1="358" x2="440" y2="358" stroke="#9ca3af"/>
+  <text x="356" y="373" class="h" fill="#5b21b6" font-size="10.5">Routes</text>
+  <text x="356" y="388" class="t" font-size="9">GET / · GET /{proxy+}</text>
+  <text x="356" y="401" class="t" font-size="9">GET /api/{proxy+} · POST /api/chat</text>
+  <text x="356" y="414" class="t" font-size="8.8">ANY /api/auth/{proxy+}</text>
+  <text x="356" y="427" class="t" font-size="8.8">ANY /api/bookings, /api/bookings/{proxy+}</text>
+
+  <!-- Lambda api -->
+  <rect x="552" y="168" width="232" height="136" rx="4" fill="#fdf1e0" stroke="#d97706" stroke-width="2"/>
+  <text x="668" y="188" class="h" fill="#b45309" font-size="9">AWS Lambda · Python 3.11 · 1024 MB · 29 s</text>
+  <text x="668" y="207" class="hb">crowdmap-api (reader)</text>
+  <text x="668" y="226" class="t">map · forecasts · events · chatbot</text>
+  <text x="668" y="241" class="t">FastAPI + Mangum (lambda_handler.py)</text>
+  <text x="668" y="256" class="t">SQLite opened read-only from /tmp</text>
+  <text x="668" y="271" class="t">re-checks S3 ETag at most every 60 s</text>
+  <text x="668" y="286" class="t">scales out automatically</text>
+  <text x="668" y="299" class="t">crowd_level derived server-side</text>
+
+  <!-- Lambda bookings -->
+  <rect x="552" y="328" width="232" height="150" rx="4" fill="#fdf1e0" stroke="#d97706" stroke-width="2"/>
+  <text x="668" y="348" class="h" fill="#b45309" font-size="9">AWS Lambda · Python 3.11 · 128 MB · 15 s</text>
+  <text x="668" y="367" class="hb">crowdmap-bookings (writer)</text>
+  <text x="668" y="386" class="t">login · availability · book · cancel</text>
+  <text x="668" y="401" class="t">reserved concurrency = 1 (single writer)</text>
+  <text x="668" y="416" class="t">PBKDF2 passwords · hashed sessions</text>
+  <text x="668" y="431" class="t">HttpOnly · Secure · SameSite=Strict</text>
+  <text x="668" y="446" class="t">saves DB back to S3 after each write</text>
+  <text x="668" y="456" class="t">same code package as crowdmap-api</text>
+  <text x="668" y="470" class="t" font-size="8.5">1024 MB intended (not confirmed after re-upload)</text>
+
+  <!-- Lambda web -->
+  <rect x="552" y="488" width="232" height="64" rx="4" fill="#fdf1e0" stroke="#d97706" stroke-width="2"/>
+  <text x="668" y="506" class="h" fill="#b45309" font-size="9">AWS Lambda · Python 3.11</text>
+  <text x="668" y="523" class="hb" font-size="12.7">crowdmap-web</text>
+  <text x="668" y="538" class="t">serves frontend files</text>
+  <text x="668" y="549" class="t" font-size="9.5">security headers · 5-min browser cache</text>
+
+  <!-- IAM -->
+  <rect x="552" y="576" width="232" height="38" rx="4" fill="#fdecec" stroke="#be123c" stroke-width="1.6"/>
+  <text x="668" y="592" class="h" fill="#be123c" font-size="10.4">IAM execution role: LabRole</text>
+  <text x="668" y="606" class="t" font-size="9.5">used by all 3 Lambdas (Learner Lab fixed role)</text>
+
+  <!-- CloudWatch / Budgets -->
+  <rect x="256" y="480" width="200" height="78" rx="4" fill="#fde8f1" stroke="#b5177a" stroke-width="2"/>
+  <text x="356" y="500" class="h" fill="#a3156f" font-size="11.5">Amazon CloudWatch</text>
+  <text x="356" y="517" class="t">Logs: all 3 Lambdas</text>
+  <text x="356" y="531" class="t">Metrics: errors, duration, throttles,</text>
+  <text x="356" y="544" class="t">API 4xx / 5xx, latency, 7 alarms + SNS</text>
+  <rect x="256" y="584" width="200" height="46" rx="4" fill="#fde8f1" stroke="#b5177a" stroke-width="2"/>
+  <text x="356" y="603" class="h" fill="#a3156f" font-size="11.5">AWS Budgets</text>
+  <text x="356" y="618" class="t">monthly cost alert (lab credit $50)</text>
+
+  <!-- Designed not deployed (width matches Lambda column so the zip gutter stays clear) -->
+  <rect x="552" y="626" width="232" height="88" rx="6" fill="#fff" stroke="#9ca3af" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <text x="564" y="642" font-size="10" font-weight="700" fill="#4b5563">Designed, not in the request path</text>
+  <text x="564" y="658" class="sm">• VPC crowdmap (2 AZs, S3 endpoint):</text>
+  <text x="574" y="670" class="sm">reserved for RDS</text>
+  <text x="564" y="684" class="sm">• RDS PostgreSQL: scale bookings writes</text>
+  <text x="564" y="698" class="sm">• CloudFront + OAC + WAF: blocked</text>
+  <text x="574" y="710" font-size="8.5" fill="#4b5563">(cloudfront:CreateDistribution denied)</text>
+
+  <!-- Student browser -->
+  <text x="32" y="276" font-size="10.5" font-weight="700" fill="#374151">INTERNET (untrusted)</text>
+  <rect x="32" y="288" width="152" height="72" rx="36" fill="#fff" stroke="#1f2937" stroke-width="2"/>
+  <text x="108" y="316" class="hb">Student browser</text>
+  <text x="108" y="334" class="t" font-size="9.5">map: public, read-only</text>
+  <text x="108" y="347" class="t" font-size="9.5">booking: demo login</text>
+  <text x="190" y="317" font-size="10.5" font-weight="700" fill="#111827">HTTPS</text>
+
+  <!-- Legend -->
+  <text x="32" y="392" font-size="11" font-weight="700" fill="#111827">Legend</text>
+  <line x1="32" y1="407" x2="64" y2="407" stroke="#1f2937" stroke-width="2" marker-end="url(#dark)"/><text x="72" y="411" class="l">request / data flow</text>
+  <line x1="32" y1="426" x2="64" y2="426" stroke="#b5177a" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#mag)"/><text x="72" y="430" class="l">logs / metrics</text>
+  <line x1="32" y1="445" x2="64" y2="445" stroke="#c2410c" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#ext)"/><text x="72" y="449" class="l">call to external service</text>
+  <line x1="32" y1="464" x2="64" y2="464" stroke="#1f2937" stroke-width="1.6" stroke-dasharray="2 3" marker-end="url(#dark)"/><text x="72" y="468" class="l">upload from repo (console)</text>
+  <rect x="32" y="478" width="32" height="14" fill="none" stroke="#1f2937" stroke-width="1.4" stroke-dasharray="6 4"/><text x="72" y="489" class="l">trust boundary</text>
+  <rect x="32" y="500" width="32" height="14" fill="#fff" stroke="#9ca3af" stroke-width="1.4" stroke-dasharray="5 3"/><text x="72" y="511" class="l">designed, not deployed</text>
+
+  <!-- Arrows: main flow -->
+  <g fill="none" stroke="#1f2937" stroke-width="2">
+    <line x1="184" y1="324" x2="255" y2="324" marker-end="url(#dark)"/>
+    <line x1="457" y1="234" x2="551" y2="234" marker-end="url(#dark)"/>
+    <line x1="457" y1="406" x2="551" y2="406" marker-end="url(#dark)"/>
+    <polyline points="457,436 540,436 540,524 551,524" marker-end="url(#dark)"/>
+    <line x1="784" y1="240" x2="879" y2="240" marker-end="url(#dark)"/>
+    <line x1="879" y1="358" x2="786" y2="358" marker-end="url(#dark)"/>
+    <line x1="786" y1="428" x2="879" y2="428" marker-end="url(#dark)"/>
+    <line x1="784" y1="524" x2="879" y2="524" marker-end="url(#dark)"/>
+  </g>
+  <text x="462" y="216" class="lb" font-size="9">GET /api/{proxy+}</text>
+  <text x="462" y="227" class="lb" font-size="9">POST /api/chat</text>
+  <text x="462" y="387" class="lb">/api/auth/*</text>
+  <text x="462" y="397" class="lb">/api/bookings*</text>
+  <text x="462" y="458" class="lb">GET /, /{proxy+}</text>
+  <text x="790" y="221" class="l" font-size="8.4">GetObject</text>
+  <text x="790" y="232" class="l" font-size="8.4">(cold start)</text>
+  <text x="790" y="254" class="l" font-size="8.4">HeadObject</text>
+  <text x="790" y="265" class="l" font-size="8.4">every 60 s</text>
+  <text x="790" y="351" class="l" font-size="8.4">GetObject</text>
+  <text x="790" y="420" class="l" font-size="8.4">PutObject</text>
+  <text x="790" y="441" class="l" font-size="8.4">after each write</text>
+  <text x="790" y="517" class="l" font-size="8.4">GetObject</text>
+
+  <!-- Groq arrow -->
+  <line x1="668" y1="168" x2="668" y2="110" stroke="#c2410c" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#ext)"/>
+  <text x="676" y="128" class="l" font-size="9.2">HTTPS · question + room snapshot</text>
+
+  <!-- CloudWatch: API Gateway metrics + logs from all 3 Lambdas -->
+  <line x1="356" y1="448" x2="356" y2="479" stroke="#b5177a" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#mag)"/>
+  <g fill="none" stroke="#b5177a" stroke-width="1.6" stroke-dasharray="5 3">
+    <line x1="552" y1="292" x2="508" y2="292"/>
+    <line x1="552" y1="455" x2="508" y2="455"/>
+    <line x1="552" y1="540" x2="508" y2="540"/>
+    <polyline points="508,292 508,518 457,518" marker-end="url(#mag)"/>
+  </g>
+  <text x="468" y="568" class="sm" fill="#b5177a">logs from all 3 Lambdas</text>
+
+  <!-- Offline build -->
+  <rect x="224" y="744" width="1024" height="164" rx="6" fill="#fff" stroke="#6b7280" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="238" y="765" font-size="11.2" font-weight="700" fill="#374151">Team laptops + GitHub repo (offline build, outside AWS)</text>
+  <g fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4">
+    <rect x="240" y="792" width="144" height="56" rx="4"/>
+    <rect x="408" y="792" width="168" height="56" rx="4"/>
+    <rect x="600" y="792" width="188" height="56" rx="4"/>
+    <rect x="832" y="792" width="168" height="56" rx="4"/>
+    <rect x="1056" y="792" width="160" height="56" rx="4"/>
+  </g>
+  <text x="312" y="814" class="hb" font-size="11">NUS ROBOD</text><text x="312" y="832" class="t" font-size="9.5">data/raw/ · gitignored</text>
+  <text x="492" y="814" class="hb" font-size="11">analytics/02–06</text><text x="492" y="832" class="t" font-size="9.5">clean · train v0 · generate SIT</text>
+  <text x="694" y="814" class="hb" font-size="11">data/sample/*.csv</text><text x="694" y="832" class="t" font-size="9.5">init_app_db.py + demo accounts</text>
+  <text x="916" y="814" class="hb" font-size="11">src/frontend/</text><text x="916" y="832" class="t" font-size="9.5">7 static files</text>
+  <text x="1136" y="814" class="hb" font-size="11">deploy/</text><text x="1136" y="832" class="t" font-size="9.5">occuscope.db · Lambda zip</text>
+  <g stroke="#1f2937" stroke-width="2" fill="none">
+    <line x1="384" y1="820" x2="407" y2="820" marker-end="url(#dark)"/>
+    <line x1="576" y1="820" x2="599" y2="820" marker-end="url(#dark)"/>
+    <polyline points="688,848 688,872 1144,872 1144,849" marker-end="url(#dark)"/>
+  </g>
+  <text x="866" y="867" class="sm">build_lambda_package.sh</text>
+  <text x="240" y="896" class="sm" font-size="9.2">NUS training data never enters the app DB · SIT occupancy is generated, not live sensors · demo accounts are fictional</text>
+
+  <!-- Upload arrows (dotted): frontend → web bucket; db → lake; zip → api + bookings -->
+  <g fill="none" stroke="#1f2937" stroke-width="1.6" stroke-dasharray="2 3">
+    <line x1="919" y1="792" x2="919" y2="562" marker-end="url(#dark)"/>
+    <polyline points="1212,792 1212,322 1201,322" marker-end="url(#dark)"/>
+    <polyline points="1136,792 1136,728 868,728 868,200 786,200" marker-end="url(#dark)"/>
+    <line x1="868" y1="390" x2="786" y2="390" marker-end="url(#dark)"/>
+  </g>
+  <text x="926" y="738" class="sm">upload frontend (console)</text>
+  <text x="1108" y="738" class="sm">upload db</text>
+  <text x="790" y="194" class="sm">upload zip</text>
+  <text x="790" y="384" class="sm">upload zip</text>
+</svg>
