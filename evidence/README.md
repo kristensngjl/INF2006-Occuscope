@@ -1,6 +1,6 @@
 # Evidence
 
-Named artefacts cited by `project_manifest.yaml`. Fill these before submission; keep account IDs, IPs, and secrets redacted.
+Named artefacts cited by `project_manifest.yaml`. Account IDs, IPs, and secrets are redacted.
 
 | File | Test / artefact | Owner |
 |---|---|---|

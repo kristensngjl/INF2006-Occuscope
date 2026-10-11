@@ -36,4 +36,4 @@ See `api-contract.md`. The backend implements:
 - `GET /occupancy/current?at=` → latest reading at or before the selected time per room
 - `GET /floors/{building_id}/{floor}/summary` → `v_floor_type_summary`
 
-Server entrypoint: `python -m uvicorn src.backend.api:app --reload`. Frontend: to be added by Zi Qian.
+Server entrypoint: `python -m uvicorn src.backend.api:app --reload`. Frontend: `src/frontend/` (Zi Qian).
