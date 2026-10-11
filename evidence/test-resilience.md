@@ -13,7 +13,7 @@ Show that the deployed service (API Gateway `crowdmap-http` → Lambda → S3) h
 
 ## Setup
 
-- Deployed stack as in `evidence/architecture.png` and `evidence/deploy-log.md`. Versions confirmed identical to the repo just before the test (`evidence/version-check.txt`, 14/14 MATCH).
+- Deployed stack as in `evidence/architecture.png` and `evidence/deploy-log.md`. On 8 October 2026, `src/infra/check_versions.sh` reported **14/14 MATCH** against the repo (script in the ZIP; console output was not saved as a separate file).
 - Throttling: `evidence/throttling-config.txt`. Alarms and dashboard: `src/infra/setup_alarms.sh` → `evidence/alarms-config.txt`.
 - Load generator: `tests/load_test.py` (Python standard library only), run from AWS CloudShell in the same region. The chatbot route is deliberately excluded to protect the Groq free-tier quota.
 
@@ -91,7 +91,7 @@ Raw output: `evidence/resilience-run.txt` (A–C) and `evidence/persistence-run.
 
 ## Improvement verified: Lambda memory 128 MB → 1024 MB (8 Oct, 19:13–19:15 SGT)
 
-The deployment check (`aws-deployment-check.txt`) showed that all three Lambdas were running at the 128 MB default; the intended memory settings had been lost when the code was re-uploaded. Phases A–D above were therefore measured at 128 MB. `crowdmap-api` was raised to 1024 MB (`aws lambda update-function-configuration --memory-size 1024`) and phase A was re-run with the same command (`--only-steady`), the same endpoint and the same 10 clients.
+A console check on 8 October 2026 showed that all three Lambdas were running at the 128 MB default; the intended memory settings had been lost when the code was re-uploaded. Phases A–D above were therefore measured at 128 MB. `crowdmap-api` was raised to 1024 MB (`aws lambda update-function-configuration --memory-size 1024`) and phase A was re-run with the same command (`--only-steady`), the same endpoint and the same 10 clients.
 
 | Phase A, 10 clients, 60 s | Requests | Throughput | 5xx | p50 | p95 | p99 | max |
 |---|---|---|---|---|---|---|---|
@@ -103,11 +103,12 @@ The deployment check (`aws-deployment-check.txt`) showed that all three Lambdas 
 - Tail latency became flat (p99 229 ms vs 5.8 s).
 - Throughput is now just below the 50 req/s stage throttle, so the gateway limit, not the backend, is the next ceiling.
 - Cost: Lambda bills GB-seconds. Each request now uses about 8× the memory for about 1/8 of the time, so the cost per request is roughly the same, and still well inside the free allowance.
-- Raw output: `evidence/steady-1024mb.txt`. Configuration after the change: `evidence/aws-deployment-check.txt`.
+- Raw output: `evidence/steady-1024mb.txt`.
 
 ## Artefact path
 
 - `evidence/resilience-run.txt` (phases A–C), `evidence/persistence-run.txt` (phase D, run 3), `tests/load_test.py` (test code)
 - `evidence/alarm-notifications.txt`, `evidence/alarms-config.txt`, `evidence/screenshots/2026-10-08-cloudwatch-alarms-after-load-test.png`, `evidence/screenshots/2026-10-08-cloudwatch-dashboard-load-test.png`
-- `evidence/steady-1024mb.txt` (before/after memory change), `evidence/aws-deployment-check.txt`
-- `evidence/throttling-config.txt`, `evidence/version-check.txt`
+- `evidence/steady-1024mb.txt` (before/after memory change)
+- `evidence/throttling-config.txt`
+- Version script: `src/infra/check_versions.sh` (8 Oct result: 14/14 MATCH, recorded in this file)
