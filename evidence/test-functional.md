@@ -50,7 +50,7 @@ No teammate bug filed: timeline failure was operator/shell quoting, not API beha
 # Date
 
 - Workflow run: 30 September 2026, Ryan (47-location seed).
-- Catalogue note: 10 October 2026, Ryan — `data/sample/locations.csv` and rebuilt `data/occuscope.db` have **64** locations. Login button label is **Login** (`d67cb1c`). Sign-off lines below still wait on Zi Qian and Zul.
+- Catalogue note: 10 October 2026, Ryan — `data/sample/locations.csv` and rebuilt `data/occuscope.db` have **64** locations. Login button label is **Login** (`d67cb1c`). Zi Qian and Zul signed off the same day (table below).
 - Browser click-through: 10 October 2026, Ryan (local http://127.0.0.1:5173).
 
 # Artefact path

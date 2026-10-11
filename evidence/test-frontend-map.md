@@ -1,6 +1,6 @@
 # Frontend model and occupancy integration
 
-Date: 30 September 2026. Agent-run checks; human team review pending.
+Date: 30 September 2026 (agent-run checks). Human browser sign-off: 10 October 2026 in `evidence/test-functional.md`.
 
 ## Implementation
 
